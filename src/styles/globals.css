@@ -20,34 +20,9 @@
     @apply bg-primary;
     border-radius: 0.5rem;
   }
-  @font-face {
-    font-display: block;
-    font-family: 'Nagoda';
-    font-style: normal;
-    src: local('Nagoda'), url('/fonts/Nagoda.ttf');
-  }
 }
 
 @layer components {
-  .font-nagoda {
-    font-family: 'Nagoda';
-  }
-
-  .project-logo {
-    @apply relative h-[2.25rem] w-[6rem] text-3xl text-transparent;
-  }
-  .project-logo::before {
-    @apply font-nagoda absolute inset-0 text-clip bg-gradient-pink;
-    content: 'Logo';
-    background-clip: text;
-    z-index: 1;
-  }
-  .project-logo::after {
-    @apply font-nagoda absolute inset-0 text-transparent;
-    content: 'Logo';
-    text-shadow: 0.1875rem 0.1875rem 0 rgba(249, 99, 117, 0.6);
-    z-index: 0;
-  }
 }
 
 @layer utilities {

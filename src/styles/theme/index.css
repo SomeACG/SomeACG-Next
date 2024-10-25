@@ -1,6 +1,6 @@
 :root {
-  --primary: #e91e63;
-  --accent-100: #ff4081;
+  --primary: #0051a6;
+  --accent-100: #409eff;
   --accent-200: #ffe1eb;
   --danger: #dc2626;
   --text-100: #333333;
@@ -11,11 +11,10 @@
   --bg-300: #cccccc;
   --bg-900: #000;
   --gradient-bg: linear-gradient(135deg, #fdfbfb 10%, #ebedee 100%);
-  --gradient-pink: linear-gradient(279deg, rgba(249, 102, 118, 1) 0%, rgba(233, 30, 99, 1) 100%);
 }
 html.dark {
-  --primary: #e91e63;
-  --accent-100: #ff4081;
+  --primary: #60a9f7;
+  --accent-100: #1b79d7;
   --accent-200: #ffe1eb;
   --danger: #dc2626;
   --text-100: #ffffff;
@@ -26,5 +25,4 @@ html.dark {
   --bg-300: #434343;
   --bg-900: #fff;
   --gradient-bg: linear-gradient(160deg, rgba(28, 28, 28, 1) 0%, rgba(55, 60, 56, 1) 100%);
-  --gradient-pink: linear-gradient(279deg, #ff4081 0%, #e91e63 100%);
 }

@@ -1,9 +1,9 @@
 'use client';
 
 import { useIsMounted } from '@/hooks/useIsMounted';
-import NavItem, { NavItemProps } from '../navigator/NavItem';
+import NavItem, { NavItemProps } from '../ui/navigator/NavItem';
 import { useNavItems } from '@/hooks/app';
-import Drawer from '../drawer';
+import Drawer from '../ui/drawer';
 import { useAtom } from 'jotai';
 import { oneLevelMenuExpandAtom, oneLevelTabSelectIdxAtom } from '@/store/app';
 import { useRouter } from 'next/navigation';

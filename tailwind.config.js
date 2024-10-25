@@ -34,10 +34,10 @@ module.exports = {
       },
       backgroundImage: {
         gradient: 'var(--gradient-bg)',
-        'gradient-pink': 'var(--gradient-pink)',
       },
       fontFamily: {
         poppins: 'var(--font-poppins)',
+        averia: 'var(--font-averia)',
       },
     },
   },

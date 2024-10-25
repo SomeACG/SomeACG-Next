@@ -2,7 +2,6 @@ import Root from '@/components/layout/root';
 import { fontVariants } from '@/constants/font';
 import clsx from 'clsx';
 import '../styles/globals.css';
-import { ThemeProvider } from 'next-themes';
 
 type Props = {
   children: React.ReactNode;
