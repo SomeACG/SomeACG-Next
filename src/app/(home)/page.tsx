@@ -1,12 +1,6 @@
 'use client';
-import Card from '@/components/ui/card';
+import ImageList from './components/ImageList';
 
 export default function Home() {
-  return (
-    <>
-      <Card clickable className="p-20 text-xl">
-        Hello
-      </Card>
-    </>
-  );
+  return <ImageList />;
 }

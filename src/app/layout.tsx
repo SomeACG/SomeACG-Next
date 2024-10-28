@@ -1,7 +1,10 @@
 import Root from '@/components/layout/root';
 import { fontVariants } from '@/constants/font';
-import clsx from 'clsx';
+import { cn } from '@/lib/utils';
+import Providers from './providers';
+
 import '../styles/globals.css';
+import 'react-photo-view/dist/react-photo-view.css';
 
 type Props = {
   children: React.ReactNode;
@@ -17,8 +20,10 @@ export default async function RootLayout(props: Props) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className={clsx(` m-0 h-full p-0 font-sans`, ...fontVariants)}>
-        <Root>{children}</Root>
+      <body className={cn(`m-0 h-full p-0 font-sans`, ...fontVariants)}>
+        <Providers>
+          <Root>{children}</Root>
+        </Providers>
       </body>
     </html>
   );
