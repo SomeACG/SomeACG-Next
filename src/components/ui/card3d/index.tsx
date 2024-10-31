@@ -104,7 +104,7 @@ const Card3d = ({ children, showMask = true, className, maskClass, scaleNum = 1.
         scale: scaleValue,
         ...style,
       }}
-      className={cn('relative w-fit transition duration-75', className)}
+      className={cn('relative w-fit transition duration-75 hover:z-10', className)}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       onMouseMove={rotateToMouse}

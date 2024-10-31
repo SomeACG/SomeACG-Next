@@ -16,7 +16,7 @@ module.exports = {
       colors: {
         primary: 'var(--primary)',
         accent: {
-          default: 'var(--accent-100)',
+          DEFAULT: 'var(--accent-100)',
           200: 'var(--accent-200)',
         },
         danger: 'var(--danger)',
@@ -31,6 +31,18 @@ module.exports = {
           300: 'var(--bg-300)',
           900: 'var(--bg-900)',
         },
+        blue: {
+          DEFAULT: '#49a1f5',
+        },
+        yellow: {
+          DEFAULT: '#fec61d',
+        },
+        red: {
+          DEFAULT: '#ec4f41',
+        }
+      },
+      spacing: {
+        21: '5.25rem',
       },
       backgroundImage: {
         gradient: 'var(--gradient-bg)',
