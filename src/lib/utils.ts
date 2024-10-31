@@ -19,7 +19,7 @@ export const genArtistUrl = (platform: string | null, artist: { uid?: string; us
     case Platform.Pixiv:
       return 'https://www.pixiv.net/users/' + artist.uid;
     case Platform.Twitter:
-      return 'https://twitter.com/user/' + artist.username;
+      return 'https://twitter.com/' + artist.username;
   }
 }
 

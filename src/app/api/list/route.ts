@@ -6,7 +6,7 @@ export async function GET(request: Request) {
   const page = parseInt(searchParams.get('page') || '1', 10);
   const pageSize = parseInt(searchParams.get('pageSize') || '10', 10);
 
-  const items = await getPaginatedImages(page, pageSize);
+  const result = await getPaginatedImages(page, pageSize);
 
-  return NextResponse.json(items);
+  return NextResponse.json(result);
 }

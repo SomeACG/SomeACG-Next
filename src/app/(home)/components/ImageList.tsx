@@ -7,10 +7,19 @@ import { images } from '@prisma/client';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Masonry } from 'masonic';
 import { useEffect, useMemo, useState } from 'react';
-import { FaArrowRotateRight, FaCircleMinus, FaCirclePlus, FaSquareXTwitter } from 'react-icons/fa6';
+import {
+  FaArrowRotateRight,
+  FaCircleMinus,
+  FaCirclePlus,
+  FaSquareXTwitter,
+  FaAnglesRight,
+  FaAnglesLeft,
+} from 'react-icons/fa6';
 import { SiPixiv } from 'react-icons/si';
 import { PhotoProvider, PhotoView } from 'react-photo-view';
 import { FaExternalLinkAlt } from 'react-icons/fa';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { pageAtom, totalPageAtom } from '@/store/app';
 
 const ImageItem = ({ data }: { data: images }) => {
   const { id, title, author, thumburl, rawurl, platform, authorid, pid } = data ?? {};
@@ -31,11 +40,11 @@ const ImageItem = ({ data }: { data: images }) => {
       layout
       onHoverStart={() => setIsHover(true)}
       onHoverEnd={() => setIsHover(false)}
-      whileHover={{ scale: 1.1 }}
+      // whileHover={{ scale: 1.1 }}
       className="group relative overflow-hidden rounded-lg hover:z-10"
     >
       <PhotoView src={originShowUrl}>
-        <Card3d className="relative" scaleNum={1.05}>
+        <Card3d className="relative" scaleNum={1.2}>
           <img src={thumbShowUrl} alt={title ?? ''} className="h-auto w-full cursor-pointer rounded-lg shadow-md" />
         </Card3d>
       </PhotoView>
@@ -73,18 +82,18 @@ const ImageItem = ({ data }: { data: images }) => {
 };
 
 const ImageList = () => {
-  const [page, setPage] = useState(1);
+  const page = useAtomValue(pageAtom);
   const pageSize = 20;
-
   const [images, setImages] = useState<images[]>([]);
-
-  console.log({ images });
+  const setTotalPage = useSetAtom(totalPageAtom);
+  // const totalPages = Math.floor(total / pageSize);
 
   useEffect(() => {
     const fetchImages = async () => {
       const response = await fetch(`/api/list?page=${page}&pageSize=${pageSize}`);
       const data = await response.json();
-      setImages(data);
+      setImages(data.images);
+      setTotalPage(Math.floor((data?.total ?? 0) / pageSize));
     };
 
     fetchImages();
@@ -92,15 +101,6 @@ const ImageList = () => {
 
   return (
     <div className="flex flex-col gap-4 px-3">
-      <div className="flex items-center justify-between">
-        <Button className="px-4 py-2" onClick={() => setPage((prev) => Math.max(prev - 1, 1))}>
-          上一页
-        </Button>
-        <span className="text-lg">第 {page} 页</span>
-        <Button className="px-4 py-2" onClick={() => setPage((prev) => prev + 1)}>
-          下一页
-        </Button>
-      </div>
       <AnimatePresence mode="wait">
         <PhotoProvider
           toolbarRender={({ onRotate, onScale, rotate, scale, index, images }) => {

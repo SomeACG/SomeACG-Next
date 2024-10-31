@@ -14,7 +14,10 @@ module.exports = {
         '2xl': '1366px',
       },
       colors: {
-        primary: 'var(--primary)',
+        primary: {
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))',
+        },
         accent: {
           DEFAULT: 'var(--accent-100)',
           200: 'var(--accent-200)',

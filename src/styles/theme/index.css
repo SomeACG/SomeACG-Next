@@ -1,5 +1,6 @@
 :root {
-  --primary: #0051a6;
+  --primary: 340 82% 52%;
+  --primary-foreground: 355.7 100% 97.3%;
   --accent-100: #409eff;
   --accent-200: #ffe1eb;
   --danger: #dc2626;
@@ -13,7 +14,8 @@
   --gradient-bg: linear-gradient(135deg, #fdfbfb 10%, #ebedee 100%);
 }
 html.dark {
-  --primary: #0051a6;
+  --primary: 340 82% 52%;
+  --primary-foreground: 355.7 100% 97.3%;
   --accent-100: #1b79d7;
   --accent-200: #ffe1eb;
   --danger: #dc2626;
