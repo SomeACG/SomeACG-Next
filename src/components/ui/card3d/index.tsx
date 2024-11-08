@@ -122,4 +122,6 @@ const Card3d = forwardRef<HTMLDivElement, Card3dProps>(
   },
 );
 
+Card3d.displayName = 'Card3d';
+
 export default Card3d;

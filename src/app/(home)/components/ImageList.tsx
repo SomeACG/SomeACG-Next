@@ -1,6 +1,8 @@
+'use client';
+import { ClientOnly } from '@/components/common/ClientOnly';
+import { Button } from '@/components/ui/button';
 import Card3d from '@/components/ui/card3d';
 import { microReboundPreset } from '@/constants/anim/spring';
-import { useIsMounted } from '@/hooks/useIsMounted';
 import { Platform } from '@/lib/type';
 import { genArtistUrl, genArtworkUrl, transformPixivUrl } from '@/lib/utils';
 import { pageAtom, totalPageAtom } from '@/store/app';
@@ -8,13 +10,13 @@ import { images } from '@prisma/client';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { Masonry } from 'masonic';
+import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { FaExternalLinkAlt } from 'react-icons/fa';
 import { FaArrowRotateRight, FaCircleMinus, FaCirclePlus, FaSquareXTwitter } from 'react-icons/fa6';
 import { SiPixiv } from 'react-icons/si';
 import { PhotoProvider, PhotoView } from 'react-photo-view';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
+import superjson from 'superjson';
 
 const ImageItem = ({ data }: { data: images }) => {
   const { id, title, author, thumburl, rawurl, platform, authorid, pid } = data ?? {};
@@ -29,7 +31,7 @@ const ImageItem = ({ data }: { data: images }) => {
   );
   const artworkUrl = useMemo(
     () => genArtworkUrl({ platform: platform ?? '', pid: pid ?? '', username: author ?? '' }),
-    [platform, authorid, author],
+    [platform, author, pid],
   );
 
   return (
@@ -82,20 +84,31 @@ const ImageItem = ({ data }: { data: images }) => {
   );
 };
 
-const ImageList = () => {
+type ImageListProps = {
+  initialData: {
+    images: images[];
+    total: number;
+  };
+};
+
+const ImageList = ({ initialData }: ImageListProps) => {
   const page = useAtomValue(pageAtom);
   const pageSize = 20;
-  const [images, setImages] = useState<images[]>([]);
+  const [images, setImages] = useState<images[]>(initialData.images);
   const setTotalPage = useSetAtom(totalPageAtom);
-  // const totalPages = Math.floor(total / pageSize);
-  const isMounted = useIsMounted();
 
   useEffect(() => {
+    setTotalPage(Math.floor(initialData.total / pageSize));
+  }, [initialData.total, setTotalPage]);
+
+  useEffect(() => {
+    if (page === 1) return;
+
     const fetchImages = async () => {
       const response = await fetch(`/api/list?page=${page}&pageSize=${pageSize}`);
-      const data = await response.json();
+      const serializedData = await response.json();
+      const data = superjson.deserialize(serializedData) as { images: images[]; total: number };
       setImages(data.images);
-      setTotalPage(Math.floor((data?.total ?? 0) / pageSize));
     };
 
     fetchImages();
@@ -115,14 +128,14 @@ const ImageList = () => {
             );
           }}
         >
-          {isMounted && (
+          <ClientOnly>
             <Masonry
               items={images}
               columnGutter={26} // 列间距
               columnWidth={250} // 列宽
               render={ImageItem}
             />
-          )}
+          </ClientOnly>
         </PhotoProvider>
       </AnimatePresence>
     </div>

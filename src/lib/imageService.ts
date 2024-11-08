@@ -1,4 +1,5 @@
 import prisma from './db';
+import superjson from 'superjson';
 
 export async function getPaginatedImages(page: number, pageSize: number) {
   const skip = (page - 1) * pageSize;
@@ -15,12 +16,10 @@ export async function getPaginatedImages(page: number, pageSize: number) {
     prisma.images.count(),
   ]);
 
-  return {
-    images: images.map(image => ({
-      ...image,
-      userid: image.userid ? image.userid.toString() : null,
-      authorid: image.authorid ? image.authorid.toString() : null,
-    })),
+  const serializedData = superjson.serialize({
+    images,
     total
-  };
+  });
+
+  return serializedData.json;
 }
