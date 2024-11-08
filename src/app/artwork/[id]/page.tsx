@@ -15,9 +15,6 @@ export async function generateStaticParams() {
   }));
 }
 
-// 设置页面重新生成的时间间隔
-export const revalidate = 3600; // 1小时重新生成一次
-
 async function getArtwork(id: string) {
   const artwork = await prisma.images.findFirst({
     where: {
