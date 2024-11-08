@@ -15,7 +15,7 @@ export default function Root({ children }: React.PropsWithChildren<{}>) {
       )}
     >
       <Header />
-      <main className="relative flex-grow overflow-hidden">{children}</main>
+      <main className="relative flex-grow overflow-auto">{children}</main>
       <Footer />
     </div>
   );

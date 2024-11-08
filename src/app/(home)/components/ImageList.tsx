@@ -1,29 +1,26 @@
-import { Button } from '@/components/ui/button';
 import Card3d from '@/components/ui/card3d';
-import { microDampingPreset, microReboundPreset } from '@/constants/anim/spring';
+import { microReboundPreset } from '@/constants/anim/spring';
+import { useIsMounted } from '@/hooks/useIsMounted';
 import { Platform } from '@/lib/type';
 import { genArtistUrl, genArtworkUrl, transformPixivUrl } from '@/lib/utils';
+import { pageAtom, totalPageAtom } from '@/store/app';
 import { images } from '@prisma/client';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { Masonry } from 'masonic';
 import { useEffect, useMemo, useState } from 'react';
-import {
-  FaArrowRotateRight,
-  FaCircleMinus,
-  FaCirclePlus,
-  FaSquareXTwitter,
-  FaAnglesRight,
-  FaAnglesLeft,
-} from 'react-icons/fa6';
+import { FaExternalLinkAlt } from 'react-icons/fa';
+import { FaArrowRotateRight, FaCircleMinus, FaCirclePlus, FaSquareXTwitter } from 'react-icons/fa6';
 import { SiPixiv } from 'react-icons/si';
 import { PhotoProvider, PhotoView } from 'react-photo-view';
-import { FaExternalLinkAlt } from 'react-icons/fa';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { pageAtom, totalPageAtom } from '@/store/app';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 
 const ImageItem = ({ data }: { data: images }) => {
   const { id, title, author, thumburl, rawurl, platform, authorid, pid } = data ?? {};
   const [isHover, setIsHover] = useState(false);
+  const router = useRouter();
+
   const thumbShowUrl = useMemo(() => transformPixivUrl(thumburl ?? ''), [thumburl]);
   const originShowUrl = useMemo(() => transformPixivUrl(rawurl ?? ''), [rawurl]);
   const authorUrl = useMemo(
@@ -34,6 +31,7 @@ const ImageItem = ({ data }: { data: images }) => {
     () => genArtworkUrl({ platform: platform ?? '', pid: pid ?? '', username: author ?? '' }),
     [platform, authorid, author],
   );
+
   return (
     <motion.div
       key={id}
@@ -75,6 +73,9 @@ const ImageItem = ({ data }: { data: images }) => {
             )}
             <span className="truncate text-xs">{author}</span>
           </a>
+          <Button variant="link" onClick={() => router.push(`/artwork/${id}`)}>
+            <FaExternalLinkAlt /> 详细信息
+          </Button>
         </motion.div>
       )}
     </motion.div>
@@ -87,6 +88,7 @@ const ImageList = () => {
   const [images, setImages] = useState<images[]>([]);
   const setTotalPage = useSetAtom(totalPageAtom);
   // const totalPages = Math.floor(total / pageSize);
+  const isMounted = useIsMounted();
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -103,7 +105,7 @@ const ImageList = () => {
     <div className="flex flex-col gap-4 px-3">
       <AnimatePresence mode="wait">
         <PhotoProvider
-          toolbarRender={({ onRotate, onScale, rotate, scale, index, images }) => {
+          toolbarRender={({ onRotate, onScale, rotate, scale }) => {
             return (
               <>
                 <FaArrowRotateRight className="mr-2 h-5 w-5 cursor-pointer" onClick={() => onRotate(rotate + 90)} />
@@ -113,12 +115,14 @@ const ImageList = () => {
             );
           }}
         >
-          <Masonry
-            items={images}
-            columnGutter={26} // 列间距
-            columnWidth={250} // 列宽
-            render={ImageItem}
-          />
+          {isMounted && (
+            <Masonry
+              items={images}
+              columnGutter={26} // 列间距
+              columnWidth={250} // 列宽
+              render={ImageItem}
+            />
+          )}
         </PhotoProvider>
       </AnimatePresence>
     </div>
