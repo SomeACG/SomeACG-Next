@@ -5,28 +5,38 @@ import ArtworkClient from './_components/ArtworkClient';
 
 // 生成静态页面参数
 export async function generateStaticParams() {
-  const artworks = await prisma.images.findMany({
-    select: { id: true },
-    take: 100, // 可以根据需求调整预渲染的数量
-  });
+  try {
+    const artworks = await prisma.images.findMany({
+      select: { id: true },
+      take: 100,
+    });
 
-  return artworks.map((artwork) => ({
-    id: artwork.id.toString(),
-  }));
+    return artworks.map((artwork) => ({
+      id: artwork.id.toString(),
+    }));
+  } catch (error) {
+    console.error('生成静态参数时出错:', error);
+    return []; // 返回空数组作为fallback
+  }
 }
 
 async function getArtwork(id: string) {
-  const artwork = await prisma.images.findFirst({
-    where: {
-      id: parseInt(id),
-    },
-  });
+  try {
+    const artwork = await prisma.images.findFirst({
+      where: {
+        id: parseInt(id),
+      },
+    });
 
-  if (!artwork) {
-    notFound();
+    if (!artwork) {
+      notFound();
+    }
+
+    return artwork;
+  } catch (error) {
+    console.error('获取作品数据时出错:', error);
+    throw error; // 或者根据需求处理错误
   }
-
-  return artwork;
 }
 
 export default async function ArtworkPage({ params }: { params: { id: string } }) {
