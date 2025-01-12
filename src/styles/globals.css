@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 @import './theme/index.css';
+@import './components/loading.css';
 
 @layer base {
   *::-webkit-scrollbar {

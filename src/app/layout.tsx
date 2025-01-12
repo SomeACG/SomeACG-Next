@@ -13,14 +13,14 @@ type Props = {
 export default async function RootLayout(props: Props) {
   const { children } = props;
   return (
-    <html lang="zh-CN">
+    <html lang="zh-CN" suppressHydrationWarning>
       <head>
         <title>Cosine 🎨 Gallery | 精选 ACG 好图壁纸集</title>
         <meta name="description" content="质量超高的 ACG 图片列表，包好看的！" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className={cn(`m-0 h-full p-0 font-sans`, ...fontVariants)}>
+      <body className={cn(`m-0 h-full p-0 font-sans`, ...fontVariants)} suppressHydrationWarning>
         <Providers>
           <Root>{children}</Root>
         </Providers>

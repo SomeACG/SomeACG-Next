@@ -38,7 +38,7 @@ export function Header() {
           damping: 20,
         }}
         whileHover={{ scale: 1.1, rotate: 2 }}
-        className="flex h-20 w-36 cursor-pointer items-center justify-center gap-2 whitespace-nowrap text-2xl font-bold"
+        className="flex h-16 w-36 cursor-pointer items-center justify-center gap-2 whitespace-nowrap text-2xl font-bold"
         onClick={() => router.push('/')}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
