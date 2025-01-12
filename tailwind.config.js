@@ -42,10 +42,12 @@ module.exports = {
         },
         red: {
           DEFAULT: '#ec4f41',
-        }
+        },
       },
       spacing: {
+        16.5: '4.125rem',
         21: '5.25rem',
+        25: '6.25rem',
       },
       backgroundImage: {
         gradient: 'var(--gradient-bg)',

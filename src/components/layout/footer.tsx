@@ -10,12 +10,12 @@ export function Footer() {
   return (
     <footer className="flex-center-y items-stretch">
       {isMounted && pathname === '/' && <ImagePagination />}
-      <div className="flex items-center justify-center gap-1 py-2 text-sm">
-        壁纸不够看？订阅
-        <a className="text-blue-400" href="https://t.me/SomeACG">
-          SomeACG
+      <div className="flex items-center justify-center gap-1 py-3 text-xs">
+        关注余弦谢谢喵，关注
+        <a className="text-blue-400" href="https://t.me/CosineGallery">
+          Cosine 🎨 Gallery
         </a>
-        壁纸频道 每天获取高质量壁纸！
+        每天看甜妹！
       </div>
     </footer>
   );

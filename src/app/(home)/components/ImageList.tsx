@@ -40,13 +40,10 @@ const ImageItem = ({ data }: { data: images }) => {
       layout
       onHoverStart={() => setIsHover(true)}
       onHoverEnd={() => setIsHover(false)}
-      // whileHover={{ scale: 1.1 }}
       className="group relative overflow-hidden rounded-lg hover:z-10"
     >
       <PhotoView src={originShowUrl}>
-        <Card3d className="relative" scaleNum={1.2}>
-          <img src={thumbShowUrl} alt={title ?? ''} className="h-auto w-full cursor-pointer rounded-lg shadow-md" />
-        </Card3d>
+        <img src={thumbShowUrl} alt={title ?? ''} className="h-auto w-full cursor-pointer rounded-lg shadow-md" />
       </PhotoView>
       {isHover && (
         <motion.div
@@ -108,6 +105,10 @@ const ImageList = ({ initialData }: ImageListProps) => {
       const response = await fetch(`/api/list?page=${page}&pageSize=${pageSize}`);
       const serializedData = await response.json();
       const data = superjson.deserialize(serializedData) as { images: images[]; total: number };
+      if (!data?.images?.length) {
+        console.error('no images');
+        return;
+      }
       setImages(data.images);
     };
 
