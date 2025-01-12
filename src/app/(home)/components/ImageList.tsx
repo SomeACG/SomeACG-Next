@@ -157,28 +157,15 @@ const ImageList = ({ initialData }: ImageListProps) => {
     const fetchImages = async () => {
       try {
         const response = await fetch(`/api/list?page=${page}&pageSize=${pageSize}`);
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const text = await response.text(); // 先获取原始响应文本
-        let serializedData;
-
-        try {
-          serializedData = JSON.parse(text); // 尝试解析 JSON
-        } catch (parseError) {
-          console.error('JSON 解析错误:', parseError);
-          console.error('收到的响应内容:', text);
-          throw new Error('服务器返回了无效的 JSON 数据');
-        }
-
+        const serializedData = await response.json();
+        console.log('serializedData type:', typeof serializedData);
+        console.log('serializedData:', serializedData);
         if (mounted) {
+          // 直接设置新数据，不再使用 setTimeout
           setImages(serializedData.images || []);
         }
       } catch (error) {
         console.error('获取图片失败:', error);
-        setImages([]); // 发生错误时清空图片列表
       } finally {
         if (mounted) {
           setIsLoading(false);
