@@ -1,12 +1,36 @@
-import { motion } from 'framer-motion';
+import { motion, useMotionValueEvent, useScroll } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Navigator } from '../ui/navigator';
 import Lottie, { ILottie } from '@lottielab/lottie-player/react';
-import { useRef, useEffect, Suspense } from 'react';
+import { useRef, useEffect, Suspense, useState } from 'react';
+import { cn } from '@/lib/utils';
 
 export function Header() {
   const router = useRouter();
   const lottieRef = useRef<ILottie>(null);
+
+  const { scrollYProgress } = useScroll();
+
+  const [visible, setVisible] = useState(true);
+
+  useMotionValueEvent(scrollYProgress, 'change', (current) => {
+    // Check if current is not undefined and is a number
+    if (typeof current === 'number') {
+      let direction = current! - scrollYProgress.getPrevious()!;
+
+      if (scrollYProgress.get() < 0.05) {
+        setVisible(true);
+      } else {
+        if (direction < 0) {
+          // 往上滚
+          setVisible(true);
+        } else {
+          // 往下滚
+          setVisible(false);
+        }
+      }
+    }
+  });
 
   useEffect(() => {
     // 初始时暂停动画
@@ -28,7 +52,14 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex select-none items-center justify-between gap-4 border-b border-gray-300 bg-background px-4 dark:border-gray-500">
+    <motion.header
+      className={cn(
+        'sticky top-0 z-30 flex select-none items-center justify-between gap-4 border-b border-gray-300 bg-background px-4 dark:border-gray-500',
+      )}
+      initial={{ y: 0 }}
+      animate={{ y: visible ? 0 : -100 }}
+      transition={{ duration: 0.3 }}
+    >
       <motion.div
         initial={{ rotate: -180, scale: 0 }}
         animate={{ scale: 1, rotate: 0 }}
@@ -49,6 +80,6 @@ export function Header() {
         </div>
       </motion.div>
       <Navigator className="flex-grow" />
-    </header>
+    </motion.header>
   );
 }
