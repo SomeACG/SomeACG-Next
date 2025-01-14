@@ -8,14 +8,9 @@ import { ThemeProvider } from 'next-themes';
 
 export default function Root({ children }: React.PropsWithChildren<{}>) {
   return (
-    <div
-      className={clsx(
-        'dark:bg-gradient-dark flex min-h-screen flex-col bg-gradient text-black dark:text-white',
-        ...fontVariants,
-      )}
-    >
+    <div className={clsx('dark:bg-gradient-dark flex flex-col bg-gradient text-black dark:text-white', ...fontVariants)}>
       <Header />
-      <main className="relative">{children}</main>
+      <main className="relative min-h-screen">{children}</main>
       <Footer />
     </div>
   );
