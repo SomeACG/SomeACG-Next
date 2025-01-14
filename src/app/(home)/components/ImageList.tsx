@@ -17,6 +17,7 @@ import { FaExternalLinkAlt } from 'react-icons/fa';
 import { FaArrowRotateRight, FaCircleMinus, FaCirclePlus, FaSquareXTwitter } from 'react-icons/fa6';
 import { SiPixiv } from 'react-icons/si';
 import { PhotoProvider, PhotoView } from 'react-photo-view';
+import { useImages } from '@/lib/hooks/useImages';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -127,19 +128,19 @@ const ImageItem = ({ data }: { data: images }) => {
   );
 };
 
-type ImageListProps = {
+interface ImageListProps {
   initialData: {
     images: images[];
     total: number;
   };
-};
+}
 
-const ImageList = ({ initialData }: ImageListProps) => {
+export function ImageList({ initialData }: ImageListProps) {
   const page = useAtomValue(pageAtom);
   const pageSize = 20;
-  const [images, setImages] = useState<images[]>(initialData.images);
-  const [isLoading, setIsLoading] = useState(false);
   const setTotalPage = useSetAtom(totalPageAtom);
+
+  const { images, total, isLoading, isError } = useImages(page, pageSize);
 
   // 使用 useCallback 缓存 render 函数
   const renderItem = useCallback((props: { data: images; index: number }) => {
@@ -147,38 +148,10 @@ const ImageList = ({ initialData }: ImageListProps) => {
   }, []);
 
   useEffect(() => {
-    setTotalPage(Math.round(initialData.total / pageSize));
-  }, [initialData.total, setTotalPage]);
-
-  useEffect(() => {
-    let mounted = true;
-    setIsLoading(true);
-
-    const fetchImages = async () => {
-      try {
-        const response = await fetch(`/api/list?page=${page}&pageSize=${pageSize}`);
-        const serializedData = await response.json();
-        console.log('serializedData type:', typeof serializedData);
-        console.log('serializedData:', serializedData);
-        if (mounted) {
-          // 直接设置新数据，不再使用 setTimeout
-          setImages(serializedData.images || []);
-        }
-      } catch (error) {
-        console.error('获取图片失败:', error);
-      } finally {
-        if (mounted) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    fetchImages();
-
-    return () => {
-      mounted = false;
-    };
-  }, [page, pageSize]);
+    if (total) {
+      setTotalPage(Math.ceil(total / pageSize));
+    }
+  }, [total, pageSize, setTotalPage]);
 
   return (
     <div className="flex flex-col gap-4 px-3">
@@ -199,7 +172,7 @@ const ImageList = ({ initialData }: ImageListProps) => {
               <div className="flex-center min-h-[200px]">
                 <div className="text-lg">加载中...</div>
               </div>
-            ) : images.length > 0 ? (
+            ) : images && images.length > 0 ? (
               <Masonry items={images} columnGutter={26} columnWidth={250} render={renderItem} key={`masonry-${page}`} />
             ) : (
               <div className="flex-center min-h-[200px]">
@@ -211,6 +184,6 @@ const ImageList = ({ initialData }: ImageListProps) => {
       </AnimatePresence>
     </div>
   );
-};
+}
 
 export default ImageList;

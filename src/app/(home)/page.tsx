@@ -1,5 +1,5 @@
 import { getPaginatedImages } from '@/lib/imageService';
-import ImageList from './components/ImageList';
+import { ImageList } from './components/ImageList';
 import superjson from 'superjson';
 
 export default async function Home() {

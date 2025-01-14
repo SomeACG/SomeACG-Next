@@ -6,12 +6,7 @@ import Providers from './providers';
 import '../styles/globals.css';
 import 'react-photo-view/dist/react-photo-view.css';
 
-type Props = {
-  children: React.ReactNode;
-};
-
-export default async function RootLayout(props: Props) {
-  const { children } = props;
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <head>
