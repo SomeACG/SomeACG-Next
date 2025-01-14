@@ -22,7 +22,11 @@ export function InfiniteImageList({ initialData }: InfiniteImageListProps) {
   const pageSize = 20;
   const { allImages, isLoading, hasNextPage, fetchNextPage, error, size } = useInfiniteImages(pageSize, initialData);
 
-  console.log('InfiniteImageList', { allImages, isLoading, hasNextPage, error });
+  // 使用 useCallback 缓存 render 函数
+  const renderItem = useCallback((props: { data: images; index: number }) => {
+    return <ImageItem data={props.data} />;
+  }, []);
+
   if (error) {
     return (
       <div className="flex-center min-h-[200px]">
@@ -30,11 +34,6 @@ export function InfiniteImageList({ initialData }: InfiniteImageListProps) {
       </div>
     );
   }
-
-  // 使用 useCallback 缓存 render 函数
-  const renderItem = useCallback((props: { data: images; index: number }) => {
-    return <ImageItem data={props.data} />;
-  }, []);
 
   return (
     <div className="flex w-full flex-col gap-4 px-3">
