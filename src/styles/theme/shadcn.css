@@ -1,3 +1,6 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 :root {
   --primary: 243 18% 39%;
   --primary-foreground: 355.7 100% 97.3%;
@@ -12,6 +15,9 @@
   --bg-300: #cccccc;
   --bg-900: #000;
   --gradient-bg: linear-gradient(135deg, #fdfbfb 10%, #ebedee 100%);
+
+  --background: 0 0% 100%;
+  --foreground: 0 0% 20%;
 }
 html.dark {
   --primary: 250 12% 48%;
@@ -27,4 +33,7 @@ html.dark {
   --bg-300: #434343;
   --bg-900: #fff;
   --gradient-bg: linear-gradient(160deg, rgba(28, 28, 28, 1) 0%, rgba(55, 60, 56, 1) 100%);
+
+  --background: 0 0% 11%;
+  --foreground: 0 0% 95%;
 }

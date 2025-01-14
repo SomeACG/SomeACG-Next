@@ -2,7 +2,8 @@
 import { ClientOnly } from '@/components/common/ClientOnly';
 import { Button } from '@/components/ui/button';
 import Loader from '@/components/ui/loading/Loader';
-import { microReboundPreset } from '@/constants/anim/spring';
+import { microDampingPreset } from '@/constants/anim/spring';
+import { useImages } from '@/lib/hooks/useImages';
 import { Platform } from '@/lib/type';
 import { genArtistUrl, genArtworkUrl, transformPixivUrl } from '@/lib/utils';
 import { pageAtom, totalPageAtom } from '@/store/app';
@@ -17,7 +18,6 @@ import { FaExternalLinkAlt } from 'react-icons/fa';
 import { FaArrowRotateRight, FaCircleMinus, FaCirclePlus, FaSquareXTwitter } from 'react-icons/fa6';
 import { SiPixiv } from 'react-icons/si';
 import { PhotoProvider, PhotoView } from 'react-photo-view';
-import { useImages } from '@/lib/hooks/useImages';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -68,7 +68,7 @@ const ImageItem = ({ data }: { data: images }) => {
         layout
         onHoverStart={() => setIsHover(true)}
         onHoverEnd={() => setIsHover(false)}
-        className="group relative overflow-hidden rounded-lg hover:z-10"
+        className="group relative overflow-hidden rounded-lg hover:z-10 hover:ring-2 hover:ring-primary/50"
       >
         <PhotoView src={originShowUrl}>
           <div className="relative bg-primary/20" style={{ width: '100%', paddingBottom }}>
@@ -79,9 +79,9 @@ const ImageItem = ({ data }: { data: images }) => {
                 alt={title ?? ''}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className={`cursor-pointer rounded-lg object-cover shadow-md transition-opacity duration-300 ${
+                className={`cursor-pointer rounded-lg object-cover shadow-md transition-all duration-300 ${
                   isLoading ? 'opacity-0' : 'opacity-100'
-                }`}
+                } group-hover:scale-105`}
                 placeholder="blur"
                 blurDataURL={`data:image/svg+xml;base64,${toBase64(shimmer(700, 475))}`}
                 onLoad={() => setIsLoading(false)}
@@ -94,33 +94,45 @@ const ImageItem = ({ data }: { data: images }) => {
         {isHover && (
           <motion.div
             key={'item-desc-' + id}
-            initial={{ y: 50 }}
-            animate={{ y: 0 }}
-            exit={{ y: 50 }}
-            transition={{ ...microReboundPreset, duration: 0.3 }}
-            className="flex-center-y absolute inset-x-0 -bottom-1 z-10 bg-black/70 bg-opacity-40 p-2 pb-3 text-white"
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 50, opacity: 0 }}
+            transition={{ ...microDampingPreset, duration: 0.2 }}
+            className="absolute inset-x-0 bottom-0 z-10 flex flex-col gap-2 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-3 pb-4 text-white backdrop-blur-sm"
           >
-            <motion.a
-              target="_blank"
-              className="absolute -bottom-10 -right-10 h-20 w-20 rounded-full bg-primary p-1 pl-4 pt-3 text-white"
-              href={artworkUrl}
-              whileHover={{ scale: 1.1 }}
-            >
-              <FaExternalLinkAlt />
-            </motion.a>
-            <h2 className="mt-auto line-clamp-2 text-sm/5 font-semibold">{title}</h2>
-            <a target="_blank" className="flex-center w-full cursor-pointer gap-2" href={authorUrl}>
-              {platform === Platform.Pixiv && (
-                <SiPixiv className="cursor-pointer" href={genArtistUrl(platform, { uid: authorid?.toString() ?? '' })} />
-              )}
-              {platform === Platform.Twitter && (
-                <FaSquareXTwitter className="cursor-pointer" href={genArtistUrl(platform, { username: author ?? '' })} />
-              )}
-              <span className="truncate text-xs">{author}</span>
-            </a>
-            <Button variant="link" onClick={() => router.push(`/artwork/${id}`)}>
-              <FaExternalLinkAlt /> 详细信息
-            </Button>
+            <div className="flex items-start justify-between gap-2">
+              <h2 className="line-clamp-2 flex-1 text-sm/5 font-semibold">{title}</h2>
+              <motion.a
+                target="_blank"
+                className="flex-center h-8 w-8 rounded-full bg-primary/90 p-2 text-white hover:bg-primary"
+                href={artworkUrl}
+                whileHover={{ scale: 1.1 }}
+              >
+                <FaExternalLinkAlt className="h-3 w-3" />
+              </motion.a>
+            </div>
+
+            <div className="flex items-center justify-between gap-2">
+              <a
+                target="_blank"
+                className="flex-center group flex-1 cursor-pointer gap-2 rounded-full bg-black/30 px-3 py-1.5 hover:bg-black/50"
+                href={authorUrl}
+              >
+                {platform === Platform.Pixiv && <SiPixiv className="h-3.5 w-3.5 opacity-70 group-hover/author:opacity-100" />}
+                {platform === Platform.Twitter && (
+                  <FaSquareXTwitter className="h-3.5 w-3.5 opacity-70 group-hover/author:opacity-100" />
+                )}
+                <span className="truncate text-xs text-white/90 group-hover/author:text-white">{author}</span>
+              </a>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 rounded-full bg-black/30 px-3 text-xs text-white/90 hover:bg-black/50 hover:text-white"
+                onClick={() => router.push(`/artwork/${id}`)}
+              >
+                <FaExternalLinkAlt className="mr-1.5 h-3 w-3" /> 详细信息
+              </Button>
+            </div>
           </motion.div>
         )}
       </motion.div>

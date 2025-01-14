@@ -1,10 +1,10 @@
-import { PIXIV_PROXY_URL } from "@/constants";
-import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
-import { Artist, Platform } from "./type";
- 
+import { PIXIV_PROXY_URL } from '@/constants';
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+import { Platform } from './type';
+
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 export const transformPixivUrl = (url: string) => {
@@ -21,9 +21,9 @@ export const genArtistUrl = (platform: string | null, artist: { uid?: string; us
     case Platform.Twitter:
       return 'https://twitter.com/' + artist.username;
   }
-}
+};
 
-export const genArtworkUrl = (opts?: { platform: string | null; pid: string; username?: string; }) => {
+export const genArtworkUrl = (opts?: { platform: string | null; pid: string; username?: string }) => {
   const { platform, pid, username } = opts ?? {};
   if (!platform) return '';
   switch (platform) {
@@ -32,4 +32,4 @@ export const genArtworkUrl = (opts?: { platform: string | null; pid: string; use
     case Platform.Twitter:
       return 'https://twitter.com/' + username + '/status/' + pid;
   }
-}
+};

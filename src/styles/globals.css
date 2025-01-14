@@ -1,7 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-@import './theme/index.css';
+@import './theme/shadcn.css';
 @import './components/loading.css';
 
 @layer base {
@@ -21,6 +18,10 @@
     @apply bg-primary;
     border-radius: 0.5rem;
   }
+
+  body {
+    overscroll-behavior-y: none;
+  }
 }
 
 @layer components {
@@ -34,4 +35,13 @@
 }
 
 @layer utilities {
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }

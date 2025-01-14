@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { pageAtom, totalPageAtom } from '@/store/app';
 import { useAtom, useAtomValue } from 'jotai';
 import React, { useState } from 'react';
-import { FaAnglesLeft, FaAnglesRight } from 'react-icons/fa6';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 export default function ImagePagination() {
   const [page, setPage] = useAtom(pageAtom);
@@ -33,21 +33,134 @@ export default function ImagePagination() {
     }
   };
 
-  return (
-    <div className="flex items-center justify-between px-2 pt-2">
-      <div className="flex items-center gap-2">
+  const renderPageNumbers = () => {
+    const items = [];
+
+    // 始终显示第一页
+    if (page !== 1 && page - 1 !== 1) {
+      items.push(
         <Button
-          className="flex-center rounded-full p-3"
+          key="first"
+          variant="ghost"
+          size="sm"
+          className="h-7 w-7 p-0"
           onClick={() => {
             setPage(1);
             setInputPage('1');
           }}
-          disabled={page === 1}
         >
-          <FaAnglesLeft className="h-4 w-4" />
-        </Button>
+          1
+        </Button>,
+      );
+    }
+
+    // 显示省略号
+    if (page > 3) {
+      items.push(
+        <React.Fragment key="dots1">
+          <span className="mx-1 opacity-50">...</span>
+        </React.Fragment>,
+      );
+    }
+
+    // 显示当前页前一页
+    if (page !== 1) {
+      items.push(
         <Button
-          className="px-3 py-2"
+          key="prev-num"
+          variant="ghost"
+          size="sm"
+          className="h-7 w-7 p-0"
+          onClick={() => {
+            setPage(page - 1);
+            setInputPage((page - 1).toString());
+          }}
+        >
+          {page - 1}
+        </Button>,
+      );
+    }
+
+    // 显示当前页
+    items.push(
+      <Button key="current" variant="ghost" size="sm" className="h-7 w-7 bg-accent p-0 font-medium">
+        {page}
+      </Button>,
+    );
+
+    // 显示当前页后一页
+    if (page !== totalPage) {
+      items.push(
+        <Button
+          key="next-num"
+          variant="ghost"
+          size="sm"
+          className="h-7 w-7 p-0"
+          onClick={() => {
+            setPage(page + 1);
+            setInputPage((page + 1).toString());
+          }}
+        >
+          {page + 1}
+        </Button>,
+      );
+    }
+
+    // 显示省略号
+    if (page < totalPage - 2) {
+      items.push(
+        <React.Fragment key="dots2">
+          <span className="mx-1 opacity-50">...</span>
+        </React.Fragment>,
+      );
+    }
+
+    // 始终显示最后一页
+    if (page !== totalPage && page + 1 !== totalPage) {
+      items.push(
+        <Button
+          key="last"
+          variant="ghost"
+          size="sm"
+          className="h-7 w-7 p-0"
+          onClick={() => {
+            setPage(totalPage);
+            setInputPage(totalPage.toString());
+          }}
+        >
+          {totalPage}
+        </Button>,
+      );
+    }
+
+    return items;
+  };
+
+  return (
+    <div className="flex items-center justify-between px-2 py-1 @container">
+      <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+        <input
+          type="text"
+          value={inputPage}
+          onChange={handlePageInputChange}
+          onBlur={handlePageInputBlur}
+          onKeyDown={handleKeyDown}
+          className="h-7 w-12 rounded border border-primary bg-primary/20 px-1 text-center text-sm text-foreground transition-colors focus:outline-primary"
+        />
+        <span className="opacity-50">/ {totalPage}</span>
+      </div>
+      <div className="hidden items-center justify-center gap-1 text-xs text-muted-foreground @lg:flex">
+        关注
+        <a className="text-blue-400 hover:underline" href="https://t.me/CosineGallery">
+          Cosine 🎨 Gallery
+        </a>
+        每天看甜妹！
+      </div>
+      <div className="flex items-center gap-1">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-7 w-7 p-0"
           onClick={() => {
             const newPage = page - 1;
             setPage(newPage);
@@ -55,24 +168,15 @@ export default function ImagePagination() {
           }}
           disabled={page === 1}
         >
-          上一页
+          <FaChevronLeft className="h-3.5 w-3.5" />
         </Button>
-      </div>
-      <div className="flex items-center gap-2 text-base">
-        第
-        <input
-          type="text"
-          value={inputPage}
-          onChange={handlePageInputChange}
-          onBlur={handlePageInputBlur}
-          onKeyDown={handleKeyDown}
-          className="w-12 rounded border border-gray-300 px-2 py-1 text-center dark:border-gray-600 dark:bg-gray-700"
-        />
-        / {totalPage} 页
-      </div>
-      <div className="flex items-center gap-2 px-2">
+
+        {renderPageNumbers()}
+
         <Button
-          className="px-3 py-2"
+          variant="ghost"
+          size="sm"
+          className="h-7 w-7 p-0"
           onClick={() => {
             const newPage = page + 1;
             setPage(newPage);
@@ -80,17 +184,7 @@ export default function ImagePagination() {
           }}
           disabled={page === totalPage}
         >
-          下一页
-        </Button>
-        <Button
-          className="flex-center rounded-full p-3"
-          onClick={() => {
-            setPage(totalPage);
-            setInputPage(totalPage.toString());
-          }}
-          disabled={page === totalPage}
-        >
-          <FaAnglesRight className="h-4 w-4" />
+          <FaChevronRight className="h-3.5 w-3.5" />
         </Button>
       </div>
     </div>

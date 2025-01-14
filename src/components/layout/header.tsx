@@ -28,7 +28,7 @@ export function Header() {
   };
 
   return (
-    <header className="flex select-none items-center justify-between gap-4 border-b border-gray-300 px-4 dark:border-gray-500">
+    <header className="sticky top-0 z-30 flex select-none items-center justify-between gap-4 border-b border-gray-300 bg-background px-4 dark:border-gray-500">
       <motion.div
         initial={{ rotate: -180, scale: 0 }}
         animate={{ scale: 1, rotate: 0 }}
@@ -38,12 +38,12 @@ export function Header() {
           damping: 20,
         }}
         whileHover={{ scale: 1.1, rotate: 2 }}
-        className="flex h-16 w-36 cursor-pointer items-center justify-center gap-2 whitespace-nowrap text-2xl font-bold"
+        className="flex h-14 w-36 cursor-pointer items-center justify-center gap-2 whitespace-nowrap text-2xl font-bold"
         onClick={() => router.push('/')}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <div className="relative h-16 overflow-hidden">
+        <div className="relative h-full overflow-hidden">
           <img className="absolute left-2.5 top-0 h-16.5" src="/img/logo.webp" alt="logo" />
           <Lottie ref={lottieRef} src="https://cdn.lottielab.com/l/APXV8RHbvRVEoH.json" className="-mt-1.5 h-21" />
         </div>

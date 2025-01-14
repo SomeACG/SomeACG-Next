@@ -1,22 +1,25 @@
 'use client';
 
 import ImagePagination from '@/app/(home)/components/ImagePagination';
+import { routers, Routes } from '@/constants/router';
 import { useIsMounted } from '@/hooks/useIsMounted';
+import { useScrollHide } from '@/hooks/useScrollHide';
+import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
 
 export function Footer() {
   const isMounted = useIsMounted();
   const pathname = usePathname();
+  const isVisible = useScrollHide();
+  routers;
   return (
-    <footer className="flex-center-y items-stretch">
-      {isMounted && pathname === '/' && <ImagePagination />}
-      <div className="flex items-center justify-center gap-1 py-3 text-xs">
-        关注余弦谢谢喵，关注
-        <a className="text-blue-400" href="https://t.me/CosineGallery">
-          Cosine 🎨 Gallery
-        </a>
-        每天看甜妹！
-      </div>
+    <footer
+      className={cn(
+        'bg-background/80 backdrop-blur transition-transform duration-300',
+        isVisible ? 'translate-y-0' : 'translate-y-full',
+      )}
+    >
+      {isMounted && pathname === Routes.Home && <ImagePagination />}
     </footer>
   );
 }
