@@ -88,7 +88,7 @@ function Drawer({
               <FloatingFocusManager context={context}>
                 <motion.div
                   className={cn(
-                    'absolute flex min-w-[10rem] flex-col bg-white p-0 dark:bg-[#1e1e1e] md:min-w-[5rem]',
+                    'absolute z-20 flex min-w-[10rem] flex-col bg-white p-0 dark:bg-[#1e1e1e] md:min-w-[5rem]',
                     posClass[position || 'left'],
                     fontVariants,
                     className,

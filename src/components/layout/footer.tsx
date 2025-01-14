@@ -4,14 +4,17 @@ import ImagePagination from '@/app/(home)/components/ImagePagination';
 import { routers, Routes } from '@/constants/router';
 import { useIsMounted } from '@/hooks/useIsMounted';
 import { useScrollHide } from '@/hooks/useScrollHide';
+import { viewModeAtom } from '@/store/app';
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
+import { useAtomValue } from 'jotai';
 
 export function Footer() {
   const isMounted = useIsMounted();
   const pathname = usePathname();
   const isVisible = useScrollHide();
-  routers;
+  const viewMode = useAtomValue(viewModeAtom);
+
   return (
     <footer
       className={cn(
@@ -19,7 +22,7 @@ export function Footer() {
         isVisible ? 'translate-y-0' : 'translate-y-full',
       )}
     >
-      {isMounted && pathname === Routes.Home && <ImagePagination />}
+      {isMounted && pathname === Routes.Home && viewMode === 'pagination' && <ImagePagination />}
     </footer>
   );
 }

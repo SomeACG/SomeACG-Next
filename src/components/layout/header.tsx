@@ -4,10 +4,15 @@ import { Navigator } from '../ui/navigator';
 import Lottie, { ILottie } from '@lottielab/lottie-player/react';
 import { useRef, useEffect, Suspense, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { Button } from '../ui/button';
+import { useAtom } from 'jotai';
+import { viewModeAtom } from '@/store/app';
+import { ViewIcon, ColumnsIcon } from 'lucide-react';
 
 export function Header() {
   const router = useRouter();
   const lottieRef = useRef<ILottie>(null);
+  const [viewMode, setViewMode] = useAtom(viewModeAtom);
 
   const { scrollYProgress } = useScroll();
 
@@ -54,7 +59,7 @@ export function Header() {
   return (
     <motion.header
       className={cn(
-        'sticky top-0 z-30 flex select-none items-center justify-between gap-4 border-b border-gray-300 bg-background px-4 dark:border-gray-500',
+        'sticky top-0 z-10 flex select-none items-center justify-between gap-4 border-b border-gray-300 bg-background px-4 dark:border-gray-500',
       )}
       initial={{ y: 0 }}
       animate={{ y: visible ? 0 : -100 }}

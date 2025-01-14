@@ -1,5 +1,4 @@
 'use client';
-import { ClientOnly } from '@/components/common/ClientOnly';
 import Loader from '@/components/ui/loading/Loader';
 import { Platform } from '@/lib/type';
 import { genArtistUrl, genArtworkUrl, transformPixivUrl } from '@/lib/utils';
@@ -40,46 +39,44 @@ export function ImageItem({ data }: ImageItemProps) {
   }, [width, height]);
 
   return (
-    <ClientOnly>
-      <motion.div
-        key={id}
-        layout
-        onHoverStart={() => setIsHover(true)}
-        onHoverEnd={() => setIsHover(false)}
-        className="group relative overflow-hidden rounded-lg hover:z-10 hover:ring-2 hover:ring-primary/50"
-      >
-        <PhotoView src={originShowUrl}>
-          <div className="relative bg-primary/20" style={{ width: '100%', paddingBottom }}>
-            {isLoading && <Loader className="absolute inset-0" />}
-            <div className="absolute inset-0">
-              <Image
-                src={thumbShowUrl}
-                alt={title ?? ''}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className={`cursor-pointer rounded-lg object-cover shadow-md transition-all duration-300 ${
-                  isLoading ? 'opacity-0' : 'opacity-100'
-                } group-hover:scale-105`}
-                onLoad={() => setIsLoading(false)}
-                priority={false}
-                quality={75}
-              />
-            </div>
-          </div>
-        </PhotoView>
-        <AnimatePresence mode="wait">
-          {isHover && (
-            <ImageHoverCard
-              id={id ?? ''}
-              title={title ?? ''}
-              author={author ?? ''}
-              platform={platform as Platform}
-              artworkUrl={artworkUrl ?? ''}
-              authorUrl={authorUrl ?? ''}
+    <motion.div
+      key={id}
+      layout
+      onHoverStart={() => setIsHover(true)}
+      onHoverEnd={() => setIsHover(false)}
+      className="group relative z-[1] overflow-hidden rounded-lg hover:ring-2 hover:ring-primary/50"
+    >
+      <PhotoView src={originShowUrl}>
+        <div className="relative bg-primary/20" style={{ width: '100%', paddingBottom }}>
+          {isLoading && <Loader className="absolute inset-0" />}
+          <div className="absolute inset-0">
+            <Image
+              src={thumbShowUrl}
+              alt={title ?? ''}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className={`cursor-pointer rounded-lg object-cover shadow-md transition-all duration-300 ${
+                isLoading ? 'opacity-0' : 'opacity-100'
+              } group-hover:scale-105`}
+              onLoad={() => setIsLoading(false)}
+              priority={false}
+              quality={75}
             />
-          )}
-        </AnimatePresence>
-      </motion.div>
-    </ClientOnly>
+          </div>
+        </div>
+      </PhotoView>
+      <AnimatePresence mode="wait">
+        {isHover && (
+          <ImageHoverCard
+            id={id ?? ''}
+            title={title ?? ''}
+            author={author ?? ''}
+            platform={platform as Platform}
+            artworkUrl={artworkUrl ?? ''}
+            authorUrl={authorUrl ?? ''}
+          />
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }
