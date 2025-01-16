@@ -16,11 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
         {process.env.NODE_ENV === 'production' && (
-          <Script
-            defer
-            src="https://stats.cosine.ren/script.js"
-            data-website-id={process.env?.NEXT_PUBLIC_ANALYZE_WEBSITE_ID}
-          />
+          <Script defer src="https://stats.cosine.ren/script.js" data-website-id="a3769128-94ac-4b7b-b8ca-7ff86d2f4dcd" />
         )}
       </head>
       <body className={cn(`m-0 h-full p-0 font-sans`, ...fontVariants)} suppressHydrationWarning>

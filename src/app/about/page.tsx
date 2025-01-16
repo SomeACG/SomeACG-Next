@@ -22,7 +22,7 @@ export default function About() {
           className="text-blue transition hover:underline"
         >
           cosine-pic-bot
-        </a>{' '}
+        </a>
         妲喵的 bot 驱动的图库频道就可以部署，但是他的标签结构太阴间了，等优化完了估计就不兼容了 <br />
       </p>
       <p>TODO:标签、友链页面、检索、反馈、SEO 优化、UI 优化、 MDX 页面！</p>
