@@ -15,8 +15,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="description" content="质量超高的 ACG 图片列表，包好看的！" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
-        {process.env.NODE_ENV === 'production' && (
-          <Script defer src="https://stats.cosine.ren/script.js" data-website-id="0d0ceb4b-b171-4831-ad6c-ae49f0672287" />
+        {process.env.NODE_ENV === 'production' && process.env?.ANALYZE_WEBSITE_ID && (
+          <Script defer src="https://stats.cosine.ren/script.js" data-website-id={process.env.ANALYZE_WEBSITE_ID} />
         )}
       </head>
       <body className={cn(`m-0 h-full p-0 font-sans`, ...fontVariants)} suppressHydrationWarning>
