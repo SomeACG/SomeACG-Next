@@ -14,6 +14,7 @@ const nextConfig = {
         pathname: '/**',
       },
     ],
+    unoptimized: false, // https://stackoverflow.com/questions/77772240/http-get-image-402-payment-required
   },
 };
 
