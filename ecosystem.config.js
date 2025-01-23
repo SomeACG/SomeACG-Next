@@ -14,7 +14,7 @@ module.exports = {
     {
       name: 'cos-pic-next',
       script: 'npm',
-      args: 'run dev',
+      args: 'run restart',
       env: {
         NODE_ENV: 'production',
       },
