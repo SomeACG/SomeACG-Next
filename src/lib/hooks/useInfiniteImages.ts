@@ -7,7 +7,7 @@ interface ImagesResponse {
 }
 
 async function fetchImages(page: number, pageSize: number): Promise<ImagesResponse> {
-  console.log('fetchImages', page, pageSize);
+  // console.log('fetchImages', page, pageSize);
   const response = await fetch(`/api/list?page=${page}&pageSize=${pageSize}`);
   if (!response.ok) {
     throw new Error('Failed to fetch images');
@@ -34,7 +34,7 @@ export function useInfiniteImages(pageSize: number, initialData: ImagesResponse)
   const total = data?.[0]?.total ?? 0;
   const totalPages = Math.ceil(total / pageSize);
   const hasNextPage = size < totalPages;
-  console.log({ allImages, size, totalPages, hasNextPage, isLoadingMore, error, data });
+  // console.log({ allImages, size, totalPages, hasNextPage, isLoadingMore, error, data });
   return {
     data,
     allImages,

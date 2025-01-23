@@ -50,17 +50,15 @@ export function ImageItem({ data }: ImageItemProps) {
         <div className="relative bg-primary/20" style={{ width: '100%', paddingBottom }}>
           {isLoading && <Loader className="absolute inset-0" />}
           <div className="absolute inset-0">
-            <Image
+            <img
               src={thumbShowUrl}
               alt={title ?? ''}
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className={`cursor-pointer rounded-lg object-cover shadow-md transition-all duration-300 ${
+              loading="lazy"
+              decoding="async"
+              className={`h-full w-full cursor-pointer rounded-lg object-cover shadow-md transition-all duration-300 ${
                 isLoading ? 'opacity-0' : 'opacity-100'
               } group-hover:scale-105`}
               onLoad={() => setIsLoading(false)}
-              priority={false}
-              quality={75}
             />
           </div>
         </div>
