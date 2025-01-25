@@ -3,9 +3,9 @@ import { microDampingPreset } from '@/constants/anim/spring';
 import { Platform } from '@/lib/type';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { FaExternalLinkAlt } from 'react-icons/fa';
-import { FaSquareXTwitter } from 'react-icons/fa6';
+import { FaLink, FaSquareXTwitter } from 'react-icons/fa6';
 import { SiPixiv } from 'react-icons/si';
+import { TiInfoLarge } from 'react-icons/ti';
 
 interface ImageHoverCardProps {
   id: string | number;
@@ -26,39 +26,46 @@ export function ImageHoverCard({ id, title = '', author = '', platform, artworkU
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: 50, opacity: 0 }}
       transition={{ ...microDampingPreset, duration: 0.2 }}
-      className="absolute inset-x-0 bottom-0 z-10 flex flex-col gap-2 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-3 pb-4 text-white backdrop-blur-sm"
+      className="absolute inset-x-0 bottom-0 z-10 flex cursor-pointer flex-col gap-2 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-3 pb-4 text-white backdrop-blur-sm"
+      onClick={() => router.push(`/artwork/${id}`)}
     >
-      <div className="flex items-center justify-between gap-2">
-        <h2 className="line-clamp-2 flex-1 text-sm/5 font-semibold">{title}</h2>
-        <motion.a
-          target="_blank"
-          className="flex-center h-8 w-8 rounded-full bg-primary/90 p-2 text-white hover:bg-primary"
-          href={artworkUrl}
-          whileHover={{ scale: 1.1 }}
-        >
-          <FaExternalLinkAlt className="h-3 w-3" />
-        </motion.a>
-      </div>
-
+      <h2 className="truncate text-sm/5 font-semibold">{title}</h2>
       <div className="flex items-center justify-between gap-2">
         <a
           target="_blank"
-          className="flex-center group/author flex-1 cursor-pointer gap-2 rounded-full border border-primary bg-primary/50 px-3 py-1.5 hover:bg-primary/80"
+          className="flex-center group/author cursor-pointer gap-2 rounded-full border border-primary bg-primary/50 px-3 py-1.5 hover:bg-primary/80"
           href={authorUrl}
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
         >
           {platform === Platform.Pixiv && <SiPixiv className="h-3.5 w-3.5 opacity-70 group-hover/author:opacity-100" />}
           {platform === Platform.Twitter && (
             <FaSquareXTwitter className="h-3.5 w-3.5 opacity-70 group-hover/author:opacity-100" />
           )}
-          <span className="truncate text-xs text-white/90 group-hover/author:text-white">{author}</span>
+          <span className="inline-block max-w-20 truncate text-xs text-white/90 group-hover/author:text-white">{author}</span>
         </a>
         <Button
           variant="ghost"
-          size="sm"
-          className="h-8 rounded-full border border-primary bg-primary/50 px-3 text-xs text-white/90 hover:bg-primary/80 hover:text-white"
-          onClick={() => router.push(`/artwork/${id}`)}
+          size="xs"
+          className="flex-center ml-auto size-6 rounded-full border border-primary bg-primary/50 p-0 px-0 text-white bg-blend-lighten hover:bg-primary/80 hover:text-white"
+          onClick={(e) => {
+            e.stopPropagation();
+            router.push(`/artwork/${id}`);
+          }}
         >
-          <FaExternalLinkAlt className="mr-1.5 h-3 w-3" /> 详细信息
+          <TiInfoLarge className="size-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="xs"
+          className="flex-center size-6 rounded-full border border-primary bg-primary/50 p-0 px-0 text-white hover:bg-primary/80 hover:text-white"
+          onClick={(e) => {
+            e.stopPropagation();
+            window.open(artworkUrl, '_blank');
+          }}
+        >
+          <FaLink className="size-3.5" />
         </Button>
       </div>
     </motion.div>

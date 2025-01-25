@@ -1,11 +1,15 @@
 'use client';
+import { Button } from '@/components/ui/button';
 import Loader from '@/components/ui/loading/Loader';
 import { Platform } from '@/lib/type';
 import { genArtistUrl, genArtworkUrl, transformPixivUrl } from '@/lib/utils';
 import { images } from '@prisma/client';
 import { AnimatePresence, motion } from 'framer-motion';
-import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
+import { FaLink, FaSquareXTwitter } from 'react-icons/fa6';
+import { SiPixiv } from 'react-icons/si';
+import { TiInfoLarge } from 'react-icons/ti';
 import { PhotoView } from 'react-photo-view';
 import { ImageHoverCard } from './ImageHoverCard';
 
@@ -17,6 +21,7 @@ export function ImageItem({ data }: ImageItemProps) {
   const { id, title, author, thumburl, rawurl, platform, authorid, pid, width, height } = data ?? {};
   const [isHover, setIsHover] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   const thumbShowUrl = useMemo(() => transformPixivUrl(thumburl ?? ''), [thumburl]);
   const originShowUrl = useMemo(() => transformPixivUrl(rawurl ?? ''), [rawurl]);
@@ -63,18 +68,62 @@ export function ImageItem({ data }: ImageItemProps) {
           </div>
         </div>
       </PhotoView>
+      {/* 桌面端使用hover卡片 */}
       <AnimatePresence mode="wait">
         {isHover && (
-          <ImageHoverCard
-            id={id ?? ''}
-            title={title ?? ''}
-            author={author ?? ''}
-            platform={platform as Platform}
-            artworkUrl={artworkUrl ?? ''}
-            authorUrl={authorUrl ?? ''}
-          />
+          <div className="block md:hidden">
+            <ImageHoverCard
+              id={id ?? ''}
+              title={title ?? ''}
+              author={author ?? ''}
+              platform={platform as Platform}
+              artworkUrl={artworkUrl ?? ''}
+              authorUrl={authorUrl ?? ''}
+            />
+          </div>
         )}
       </AnimatePresence>
+      {/* 移动端显示在底部 */}
+      <div
+        className="hidden bg-primary/20 px-2 py-3 text-white backdrop-blur-lg md:block"
+        onClick={() => router.push(`/artwork/${id}`)}
+      >
+        <h2 className="truncate text-sm/5 font-semibold">{title}</h2>
+
+        <div className="mt-2 flex items-center justify-between gap-1">
+          <a
+            target="_blank"
+            className="flex-center group/author h-6 cursor-pointer gap-2 rounded-full border border-primary bg-primary/50 px-1.5 hover:bg-primary/80 hover:text-white"
+            href={authorUrl}
+          >
+            {platform === Platform.Pixiv && <SiPixiv className="size-4 opacity-70 group-hover/author:opacity-100" />}
+            {platform === Platform.Twitter && <FaSquareXTwitter className="size-4 opacity-70 group-hover/author:opacity-100" />}
+            <span className="block max-w-16 truncate text-xs text-white/90 group-hover/author:text-white">{author}</span>
+          </a>
+          <Button
+            variant="ghost"
+            size="xs"
+            className="flex-center ml-auto size-6 rounded-full border border-primary bg-primary/50 p-0 px-0 text-white bg-blend-lighten hover:bg-primary/80 hover:text-white"
+            onClick={(e) => {
+              e.stopPropagation();
+              router.push(`/artwork/${id}`);
+            }}
+          >
+            <TiInfoLarge className="size-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="xs"
+            className="flex-center size-6 rounded-full border border-primary bg-primary/50 p-0 px-0 text-white hover:bg-primary/80"
+            onClick={(e) => {
+              e.stopPropagation();
+              window.open(artworkUrl, '_blank');
+            }}
+          >
+            <FaLink className="size-3.5" />
+          </Button>
+        </div>
+      </div>
     </motion.div>
   );
 }

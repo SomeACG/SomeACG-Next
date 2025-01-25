@@ -12,6 +12,7 @@ import { PhotoProvider } from 'react-photo-view';
 import { ImageItem } from './ImageItem';
 import { ImageToolbar } from './ImageToolbar';
 import InfiniteImageList from './InfiniteImageList';
+import { useWindowSize } from 'react-use';
 
 interface ImageListProps {
   initialData: {
@@ -26,7 +27,7 @@ export function ImageList({ initialData }: ImageListProps) {
   const setTotalPage = useSetAtom(totalPageAtom);
   const viewMode = useAtomValue(viewModeAtom);
   const { images, total, isLoading, isError } = useImages(page, pageSize);
-
+  const { width } = useWindowSize();
   // 使用 useCallback 缓存 render 函数
   const renderItem = useCallback((props: { data: images; index: number }) => {
     return <ImageItem data={props.data} />;
@@ -53,11 +54,21 @@ export function ImageList({ initialData }: ImageListProps) {
         </div>
       );
     }
-    return <Masonry items={images} columnGutter={26} columnWidth={250} render={renderItem} key={`masonry-${page}`} />;
-  }, [viewMode, images, page, initialData]);
+    const columnWidth = Math.min(250, width / 2 - 50);
+    const columnGutter = width < 768 ? 8 : 16;
+    return (
+      <Masonry
+        items={images}
+        columnGutter={columnGutter}
+        columnWidth={columnWidth}
+        render={renderItem}
+        key={`masonry-${page}`}
+      />
+    );
+  }, [viewMode, width, images, page, initialData]);
 
   return (
-    <div className="flex flex-col gap-4 px-3">
+    <div className="flex flex-col gap-4">
       <AnimatePresence mode="wait">
         <PhotoProvider
           toolbarRender={({ onRotate, onScale, rotate, scale }) => <ImageToolbar {...{ onRotate, onScale, rotate, scale }} />}
