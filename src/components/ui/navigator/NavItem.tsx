@@ -27,11 +27,13 @@ function NavItem({
     <motion.div variants={delayOpenAnimVariants}>
       <div
         className={cn(
-          'relative flex h-full w-full cursor-pointer items-center justify-center text-base hover:opacity-70',
+          'relative flex h-full w-full cursor-pointer items-center justify-center text-base',
           {
             'text-white': selected && type !== 'header',
             'text-primary': selected && type === 'header',
             'z-0': type === 'sider',
+            'after:absolute after:bottom-0.5 after:left-1/2 after:z-10 after:block after:h-0.5 after:w-0 after:-translate-x-1/2 after:bg-foreground after:transition-all after:duration-300 hover:after:w-[calc(100%_-_0.5rem)]':
+              !selected && type === 'header',
           },
           className,
         )}

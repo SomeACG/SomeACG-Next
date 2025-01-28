@@ -59,11 +59,15 @@ export function Header() {
   return (
     <motion.header
       className={cn(
-        'sticky top-0 z-10 flex select-none items-center justify-between gap-4 border-b border-gray-300 bg-background px-4 dark:border-gray-500',
+        'sticky top-0 z-10 flex select-none items-center justify-between',
+        'border-b border-gray-200/50 bg-background/80 backdrop-blur-md',
+        'px-6 py-1 dark:border-gray-700/50',
+        'transition-all duration-300 ease-in-out',
+        'shadow-sm hover:shadow-md',
       )}
       initial={{ y: 0 }}
       animate={{ y: visible ? 0 : -100 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
     >
       <motion.div
         initial={{ rotate: -180, scale: 0 }}
@@ -73,18 +77,17 @@ export function Header() {
           stiffness: 260,
           damping: 20,
         }}
-        whileHover={{ scale: 1.1, rotate: 2 }}
-        className="flex h-16 w-36 cursor-pointer items-center justify-center gap-2 whitespace-nowrap text-2xl font-bold"
+        whileHover={{ scale: 1.05, rotate: 1 }}
+        className="flex h-14 w-36 cursor-pointer items-center justify-center gap-2 whitespace-nowrap text-2xl font-bold"
         onClick={() => router.push('/')}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
         <div className="relative h-full overflow-hidden">
-          <img className="absolute left-2.5 top-0 h-16.5" src="/img/logo.webp" alt="logo" />
-          <Lottie ref={lottieRef} src="https://cdn.lottielab.com/l/APXV8RHbvRVEoH.json" className="-mt-1.5 h-21" />
+          <Lottie ref={lottieRef} src="https://cdn.lottielab.com/l/APXV8RHbvRVEoH.json" className="-mt-1.5 h-20" />
         </div>
       </motion.div>
-      <Navigator className="flex-grow" />
+      <Navigator className="flex-grow px-4" />
     </motion.header>
   );
 }
