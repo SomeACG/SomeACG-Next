@@ -1,7 +1,20 @@
 import prisma from '@/lib/db';
-import { genArtistUrl, genArtworkUrl, transformPixivUrl } from '@/lib/utils';
 import { notFound } from 'next/navigation';
 import ArtworkClient from './_components/ArtworkClient';
+import superjson from 'superjson';
+import { Platform } from '@/lib/type';
+import { headers } from 'next/headers';
+
+type ArtworkData = {
+  id: number;
+  title: string;
+  platform: Platform;
+  author: string;
+  authorid: bigint | null;
+  pid: string;
+  rawurl: string | null;
+  tags: string[];
+};
 
 // 生成静态页面参数
 export async function generateStaticParams() {
@@ -20,40 +33,30 @@ export async function generateStaticParams() {
   }
 }
 
-async function getArtwork(id: string) {
+async function getArtwork(id: string): Promise<ArtworkData> {
   try {
-    const artwork = await prisma.images.findFirst({
-      where: {
-        id: parseInt(id),
-      },
+    const headersList = headers();
+    const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
+    const host = headersList.get('host') || 'localhost:3000';
+    const response = await fetch(`${protocol}://${host}/api/artwork/${id}`, {
+      next: { revalidate: 3600 }, // 1小时缓存
     });
 
-    if (!artwork) {
-      notFound();
+    if (!response.ok) {
+      if (response.status === 404) {
+        notFound();
+      }
+      throw new Error('获取作品数据失败');
     }
 
-    return artwork;
+    const data = await response.json();
+    return superjson.deserialize(data);
   } catch (error) {
     console.error('获取作品数据时出错:', error);
-    throw error; // 或者根据需求处理错误
+    throw error;
   }
 }
 
 export default async function ArtworkPage({ params }: { params: { id: string } }) {
-  const artwork = await getArtwork(params.id);
-
-  const originShowUrl = transformPixivUrl(artwork.rawurl ?? '');
-  const authorUrl = genArtistUrl(artwork.platform, {
-    uid: artwork.authorid?.toString(),
-    username: artwork.author ?? '',
-  });
-  const artworkUrl = genArtworkUrl({
-    platform: artwork.platform,
-    pid: artwork.pid ?? '',
-    username: artwork.author ?? '',
-  });
-
-  return (
-    <ArtworkClient artwork={artwork} originShowUrl={originShowUrl} authorUrl={authorUrl ?? ''} artworkUrl={artworkUrl ?? ''} />
-  );
+  return <ArtworkClient id={params.id} />;
 }
