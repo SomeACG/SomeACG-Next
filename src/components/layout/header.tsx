@@ -63,7 +63,7 @@ export function Header() {
         'border-b border-gray-200/50 bg-background/80 backdrop-blur-md',
         'px-6 py-1 dark:border-gray-700/50',
         'transition-all duration-300 ease-in-out',
-        'shadow-sm hover:shadow-md',
+        'shadow-xs hover:shadow-md',
       )}
       initial={{ y: 0 }}
       animate={{ y: visible ? 0 : -100 }}
@@ -87,7 +87,7 @@ export function Header() {
           <Lottie ref={lottieRef} src="https://cdn.lottielab.com/l/APXV8RHbvRVEoH.json" className="-mt-1.5 h-20" />
         </div>
       </motion.div>
-      <Navigator className="flex-grow px-4" />
+      <Navigator className="grow px-4" />
     </motion.header>
   );
 }

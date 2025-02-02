@@ -84,7 +84,7 @@ function Drawer({
       <FloatingPortal>
         <AnimatePresence onExitComplete={onExitComplete}>
           {open && (
-            <FloatingOverlay lockScroll className="relative bg-black/30 backdrop-blur-sm" style={{ zIndex }}>
+            <FloatingOverlay lockScroll className="relative bg-black/30 backdrop-blur-xs" style={{ zIndex }}>
               <FloatingFocusManager context={context}>
                 <motion.div
                   className={cn(

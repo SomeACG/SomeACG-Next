@@ -1,6 +1,21 @@
 @import './theme/shadcn.css';
 @import './components/loading.css';
 
+@utility flex-center {
+  @apply flex items-center justify-center;
+}
+
+@utility flex-center-y {
+  @apply flex flex-col items-center justify-center;
+}
+
+@utility prose {
+  /* prose 自定义样式 */
+  & a {
+    @apply relative inline-block text-blue no-underline transition after:absolute after:bottom-0 after:left-1/2 after:block after:h-px after:w-0 after:-translate-x-1/2 after:bg-blue after:transition-all after:duration-300 hover:after:w-full;
+  }
+}
+
 @layer base {
   *::-webkit-scrollbar {
     display: none;
@@ -22,24 +37,6 @@
   body {
     overscroll-behavior-y: none;
   }
-}
-
-@layer components {
-  .flex-center {
-    @apply flex items-center justify-center;
-  }
-
-  .flex-center-y {
-    @apply flex flex-col items-center justify-center;
-  }
-
-  /* prose 自定义样式 */
-  .prose a {
-    @apply relative inline-block text-blue no-underline transition after:absolute after:bottom-0 after:left-1/2 after:block after:h-px after:w-0 after:-translate-x-1/2 after:bg-blue after:transition-all after:duration-300 hover:after:w-full;
-  }
-}
-
-@layer utilities {
 }
 
 @layer base {

@@ -49,7 +49,7 @@ export function ImageItem({ data }: ImageItemProps) {
       layout
       onHoverStart={() => setIsHover(true)}
       onHoverEnd={() => setIsHover(false)}
-      className="group relative z-[1] overflow-hidden rounded-lg hover:ring-2 hover:ring-primary/50"
+      className="group relative z-1 overflow-hidden rounded-lg hover:ring-2 hover:ring-primary/50"
     >
       <PhotoView src={originShowUrl}>
         <div className="relative bg-primary/20" style={{ width: '100%', paddingBottom }}>

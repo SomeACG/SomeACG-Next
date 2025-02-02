@@ -88,7 +88,7 @@ export const Navigator = ({ className }: NavigatorProps) => {
           initial="closed"
           animate="open"
           variants={childDelayOpenAnimVariants}
-          className="ml-4 flex h-full w-full flex-grow gap-4"
+          className="ml-4 flex h-full w-full grow gap-4"
         >
           {routers.map(({ name, path, key }, idx) => {
             return (
