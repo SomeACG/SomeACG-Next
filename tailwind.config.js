@@ -1,11 +1,7 @@
 module.exports = {
   darkMode: ['class'], // https://tailwindcss.com/docs/dark-mode
-  content: ['./src/app/**/*.{js,ts,jsx,tsx}', './src/components/**/*.{js,ts,jsx,tsx}', './src/hooks/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
-      container: {
-        center: true,
-      },
       screens: {
         xs: {
           max: '475px',
@@ -81,11 +77,6 @@ module.exports = {
           5: 'hsl(var(--chart-5))',
         },
       },
-      spacing: {
-        21: '5.25rem',
-        25: '6.25rem',
-        16.5: '4.125rem',
-      },
       backgroundImage: {
         gradient: 'var(--gradient-bg)',
       },
@@ -100,5 +91,5 @@ module.exports = {
       },
     },
   },
-  plugins: [require('tailwindcss-animate'), require('@tailwindcss/container-queries'), require('@tailwindcss/typography')],
+  plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography')],
 };

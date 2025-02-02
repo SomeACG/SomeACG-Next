@@ -18,7 +18,7 @@ export function Footer() {
   return (
     <footer
       className={cn(
-        'bg-background/80 backdrop-blur transition-transform duration-300',
+        'bg-background/80 backdrop-blur-sm transition-transform duration-300',
         isVisible ? 'translate-y-0' : 'translate-y-full',
       )}
     >

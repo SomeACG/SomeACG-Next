@@ -26,7 +26,7 @@ export function ImageHoverCard({ id, title = '', author = '', platform, artworkU
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: 50, opacity: 0 }}
       transition={{ ...microDampingPreset, duration: 0.2 }}
-      className="absolute inset-x-0 bottom-0 z-10 flex cursor-pointer flex-col gap-2 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-3 pb-4 text-white backdrop-blur-sm"
+      className="absolute inset-x-0 bottom-0 z-10 flex cursor-pointer flex-col gap-2 bg-linear-to-t from-black/90 via-black/70 to-transparent p-3 pb-4 text-white backdrop-blur-xs"
       onClick={() => router.push(`/artwork/${id}`)}
     >
       <h2 className="truncate text-sm/5 font-semibold">{title}</h2>
