@@ -74,7 +74,7 @@ def download_database():
     if success:
         print('Restarting next service...')
         try:
-            subprocess.run(['npm', 'run', 'restart'], check=True)
+            subprocess.run(['npm', 'run', 'pm2:restart-next'], check=True)
             print('Next service restarted successfully')
         except subprocess.CalledProcessError as e:
             print(f'Error restarting next service: {e}')
