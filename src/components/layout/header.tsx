@@ -59,9 +59,9 @@ export function Header() {
   return (
     <motion.header
       className={cn(
-        'sticky top-0 z-10 flex select-none items-center justify-between',
-        'border-b border-gray-200/50 bg-background/80 backdrop-blur-md',
-        'px-6 py-1 dark:border-gray-700/50',
+        'sticky top-0 z-10 flex items-center justify-between select-none',
+        'bg-background/80 border-b border-gray-200/50 backdrop-blur-md',
+        'px-6 py-1 md:pr-3 md:pl-0 dark:border-gray-700/50',
         'transition-all duration-300 ease-in-out',
         'shadow-xs hover:shadow-md',
       )}
@@ -78,7 +78,7 @@ export function Header() {
           damping: 20,
         }}
         whileHover={{ scale: 1.05, rotate: 1 }}
-        className="flex h-14 w-36 cursor-pointer items-center justify-center gap-2 whitespace-nowrap text-2xl font-bold"
+        className="flex h-14 w-36 cursor-pointer items-center justify-center gap-2 text-2xl font-bold whitespace-nowrap"
         onClick={() => router.push('/')}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -87,7 +87,7 @@ export function Header() {
           <Lottie ref={lottieRef} src="https://cdn.lottielab.com/l/APXV8RHbvRVEoH.json" className="-mt-1.5 h-20" />
         </div>
       </motion.div>
-      <Navigator className="grow px-4" />
+      <Navigator className="grow" />
     </motion.header>
   );
 }
