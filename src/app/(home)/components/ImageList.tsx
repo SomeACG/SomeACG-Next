@@ -65,7 +65,7 @@ export function ImageList({ initialData }: ImageListProps) {
         key={`masonry-${page}`}
       />
     );
-  }, [viewMode, width, images, page, initialData]);
+  }, [viewMode, initialData, isLoading, images, width, renderItem, page]);
 
   return (
     <div className="flex flex-col gap-4">

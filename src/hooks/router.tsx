@@ -40,7 +40,7 @@ export const useNavItems = () => {
         onClick: toggleTheme,
       },
     ],
-    [toggleTheme, viewMode],
+    [setViewMode, toggleTheme, viewMode],
   );
   return { routers, buttons };
 };

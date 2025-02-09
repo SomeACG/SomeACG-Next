@@ -3,7 +3,7 @@
 import { cn } from '@/lib/utils';
 import type { Variants } from 'motion/react';
 import { motion, useAnimation } from 'motion/react';
-import { forwardRef, useEffect } from 'react';
+import { forwardRef, memo, useEffect } from 'react';
 
 const lineVariants: Variants = {
   closed: {
@@ -73,4 +73,5 @@ const MenuIcon = forwardRef<HTMLDivElement, MenuIconProps>(({ className, id, isO
   );
 });
 
-export { MenuIcon };
+MenuIcon.displayName = 'MenuIcon';
+export default memo(MenuIcon);
