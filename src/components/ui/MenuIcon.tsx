@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { cn } from '@/lib/utils';
 import type { Variants } from 'motion/react';
 import { motion, useAnimation } from 'motion/react';
-import { cn } from '@lib/utils';
+import { forwardRef, useEffect } from 'react';
 
 const lineVariants: Variants = {
   closed: {
@@ -23,40 +23,33 @@ const lineVariants: Variants = {
   }),
 };
 
-const MenuIcon = ({ className, id }: { className?: string; id?: string }) => {
-  const [isOpen, setIsOpen] = useState(false);
+interface MenuIconProps {
+  className?: string;
+  id?: string;
+  isOpen: boolean;
+  onToggle: (isOpen: boolean) => void;
+}
+
+const MenuIcon = forwardRef<HTMLDivElement, MenuIconProps>(({ className, id, isOpen, onToggle }, ref) => {
   const controls = useAnimation();
 
   useEffect(() => {
-    const handleDrawerStateChange = (e: CustomEvent) => {
-      setIsOpen(e.detail.isOpen);
-      controls.start(e.detail.isOpen ? 'opened' : 'closed');
-    };
+    controls.start(isOpen ? 'opened' : 'closed');
+  }, [isOpen, controls]);
 
-    document.addEventListener('drawerStateChange', handleDrawerStateChange as EventListener);
-    return () => {
-      document.removeEventListener('drawerStateChange', handleDrawerStateChange as EventListener);
-    };
-  }, [controls]);
-
-  const toggleMenu = () => {
-    const newState = !isOpen;
-    setIsOpen(newState);
-    controls.start(newState ? 'opened' : 'closed');
-
-    // 触发抽屉事件
-    const event = new CustomEvent('toggleDrawer', { detail: { isOpen: newState } });
-    document.dispatchEvent(event);
+  const toggle = () => {
+    onToggle(!isOpen);
   };
 
   return (
     <div
+      ref={ref}
       className={cn(
         'hover:bg-foreground/10 text-primary flex-center cursor-pointer rounded-md transition-colors duration-200 select-none dark:text-white',
         className,
       )}
       id={id}
-      onClick={toggleMenu}
+      onClick={toggle}
       role="button"
       aria-label={isOpen ? '关闭菜单' : '打开菜单'}
       aria-expanded={isOpen}
@@ -78,6 +71,6 @@ const MenuIcon = ({ className, id }: { className?: string; id?: string }) => {
       </svg>
     </div>
   );
-};
+});
 
 export { MenuIcon };
