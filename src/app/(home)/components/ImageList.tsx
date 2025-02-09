@@ -4,7 +4,7 @@ import Loader from '@/components/ui/loading/Loader';
 import { useImages } from '@/lib/hooks/useImages';
 import { pageAtom, totalPageAtom, viewModeAtom } from '@/store/app';
 import { images } from '@prisma/client';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'motion/react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { Masonry } from 'masonic';
 import { useCallback, useEffect } from 'react';

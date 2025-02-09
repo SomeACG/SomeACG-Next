@@ -4,7 +4,7 @@ import Loader from '@/components/ui/loading/Loader';
 import { Platform } from '@/lib/type';
 import { genArtistUrl, genArtworkUrl, transformPixivUrl } from '@/lib/utils';
 import { images } from '@prisma/client';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { FaLink, FaSquareXTwitter } from 'react-icons/fa6';
@@ -49,10 +49,10 @@ export function ImageItem({ data }: ImageItemProps) {
       layout
       onHoverStart={() => setIsHover(true)}
       onHoverEnd={() => setIsHover(false)}
-      className="group relative z-1 overflow-hidden rounded-lg hover:ring-2 hover:ring-primary/50"
+      className="group hover:ring-primary/50 relative z-1 overflow-hidden rounded-lg hover:ring-2"
     >
       <PhotoView src={originShowUrl}>
-        <div className="relative bg-primary/20" style={{ width: '100%', paddingBottom }}>
+        <div className="bg-primary/20 relative" style={{ width: '100%', paddingBottom }}>
           {isLoading && <Loader className="absolute inset-0" />}
           <div className="absolute inset-0">
             <img
@@ -85,7 +85,7 @@ export function ImageItem({ data }: ImageItemProps) {
       </AnimatePresence>
       {/* 移动端显示在底部 */}
       <div
-        className="hidden bg-primary/20 px-2 py-3 text-white backdrop-blur-lg md:block"
+        className="bg-primary/20 hidden px-2 py-3 text-white backdrop-blur-lg md:block"
         onClick={() => router.push(`/artwork/${id}`)}
       >
         <h2 className="truncate text-sm/5 font-semibold">{title}</h2>
@@ -93,7 +93,7 @@ export function ImageItem({ data }: ImageItemProps) {
         <div className="mt-2 flex items-center justify-between gap-1">
           <a
             target="_blank"
-            className="flex-center group/author h-6 cursor-pointer gap-2 rounded-full border border-primary bg-primary/50 px-1.5 hover:bg-primary/80 hover:text-white"
+            className="flex-center group/author border-primary bg-primary/50 hover:bg-primary/80 h-6 cursor-pointer gap-2 rounded-full border px-1.5 hover:text-white"
             href={authorUrl}
           >
             {platform === Platform.Pixiv && <SiPixiv className="size-4 opacity-70 group-hover/author:opacity-100" />}
@@ -103,7 +103,7 @@ export function ImageItem({ data }: ImageItemProps) {
           <Button
             variant="ghost"
             size="xs"
-            className="flex-center ml-auto size-6 rounded-full border border-primary bg-primary/50 p-0 px-0 text-white bg-blend-lighten hover:bg-primary/80 hover:text-white"
+            className="flex-center border-primary bg-primary/50 hover:bg-primary/80 ml-auto size-6 rounded-full border p-0 px-0 text-white bg-blend-lighten hover:text-white"
             onClick={(e) => {
               e.stopPropagation();
               router.push(`/artwork/${id}`);
@@ -114,7 +114,7 @@ export function ImageItem({ data }: ImageItemProps) {
           <Button
             variant="ghost"
             size="xs"
-            className="flex-center size-6 rounded-full border border-primary bg-primary/50 p-0 px-0 text-white hover:bg-primary/80"
+            className="flex-center border-primary bg-primary/50 hover:bg-primary/80 size-6 rounded-full border p-0 px-0 text-white"
             onClick={(e) => {
               e.stopPropagation();
               window.open(artworkUrl, '_blank');

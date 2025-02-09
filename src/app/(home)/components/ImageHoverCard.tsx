@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { microDampingPreset } from '@/constants/anim/spring';
 import { Platform } from '@/lib/type';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
 import { FaLink, FaSquareXTwitter } from 'react-icons/fa6';
 import { SiPixiv } from 'react-icons/si';

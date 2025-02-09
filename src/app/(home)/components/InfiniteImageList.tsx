@@ -3,7 +3,7 @@ import { ClientOnly } from '@/components/common/ClientOnly';
 import Loader from '@/components/ui/loading/Loader';
 import { useInfiniteImages } from '@/lib/hooks/useInfiniteImages';
 import { images } from '@prisma/client';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'motion/react';
 import { useCallback } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { PhotoProvider } from 'react-photo-view';

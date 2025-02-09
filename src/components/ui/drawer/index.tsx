@@ -12,7 +12,7 @@ import {
   useInteractions,
   useRole,
 } from '@floating-ui/react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'motion/react';
 import React, { PropsWithChildren, cloneElement, useEffect, useState } from 'react';
 
 export type Position = 'top' | 'bottom' | 'left' | 'right';
@@ -88,7 +88,7 @@ function Drawer({
               <FloatingFocusManager context={context}>
                 <motion.div
                   className={cn(
-                    'absolute z-20 flex min-w-[10rem] flex-col bg-white p-0 dark:bg-[#1e1e1e] md:min-w-[5rem]',
+                    'absolute z-20 flex min-w-[10rem] flex-col bg-white p-0 md:min-w-[5rem] dark:bg-[#1e1e1e]',
                     posClass[position || 'left'],
                     fontVariants,
                     className,
@@ -102,7 +102,7 @@ function Drawer({
                   {title || renderHeader ? (
                     <header className="px-6 pt-6">
                       {!title && (
-                        <div className="relative h-auto px-6 text-center text-xl font-medium leading-[22px]">{title}</div>
+                        <div className="relative h-auto px-6 text-center text-xl leading-[22px] font-medium">{title}</div>
                       )}
                       {renderHeader?.()}
                     </header>
@@ -115,7 +115,7 @@ function Drawer({
                     {render({ close: () => onClose(false) })}
                   </main>
                   {renderFooter && (
-                    <footer className="absolute bottom-0 left-0 right-0 rounded-b-[10px] px-6 py-6 backdrop-blur-xl">
+                    <footer className="absolute right-0 bottom-0 left-0 rounded-b-[10px] px-6 py-6 backdrop-blur-xl">
                       {renderFooter?.()}
                     </footer>
                   )}

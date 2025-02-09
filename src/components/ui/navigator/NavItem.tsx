@@ -1,7 +1,7 @@
 import { delayOpenAnimVariants } from '@/lib/anim';
 import { cn } from '@/lib/utils';
 import { ClassValue } from 'clsx';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 
 export type NavItemProps = {
   selected?: boolean;
@@ -32,7 +32,7 @@ function NavItem({
             'text-white': selected && type !== 'header',
             'text-primary': selected && type === 'header',
             'z-0': type === 'sider',
-            'after:absolute after:bottom-0.5 after:left-1/2 after:z-10 after:block after:h-0.5 after:w-0 after:-translate-x-1/2 after:bg-foreground after:transition-all after:duration-300 hover:after:w-[calc(100%_-_0.5rem)]':
+            'after:bg-foreground after:absolute after:bottom-0.5 after:left-1/2 after:z-10 after:block after:h-0.5 after:w-0 after:-translate-x-1/2 after:transition-all after:duration-300 hover:after:w-[calc(100%_-_0.5rem)]':
               !selected && type === 'header',
           },
           className,
@@ -44,7 +44,7 @@ function NavItem({
         {selected && (
           <motion.div
             className={cn(
-              'absolute inset-x-1 bottom-0.5 border-t-2 border-primary',
+              'border-primary absolute inset-x-1 bottom-0.5 border-t-2',
               {
                 'bg-gradient-pink inset-0 -z-10 rounded-lg border-none': type === 'sider',
               },

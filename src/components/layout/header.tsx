@@ -1,4 +1,4 @@
-import { motion, useMotionValueEvent, useScroll } from 'framer-motion';
+import { motion, useMotionValueEvent, useScroll } from 'motion/react';
 import { useRouter } from 'next/navigation';
 import { Navigator } from '../ui/navigator';
 import Lottie, { ILottie } from '@lottielab/lottie-player/react';

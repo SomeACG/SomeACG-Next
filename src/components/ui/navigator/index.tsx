@@ -6,7 +6,7 @@ import { useIsMounted } from '@/hooks/useIsMounted';
 import { cn } from '@/lib/utils';
 import { oneLevelMenuExpandAtom, oneLevelTabSelectIdxAtom } from '@/store/app';
 import { ClassValue } from 'clsx';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { useAtom } from 'jotai';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
