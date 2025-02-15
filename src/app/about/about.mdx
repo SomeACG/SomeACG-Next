@@ -1,32 +1,96 @@
 import Lottie from '@lottielab/lottie-player/react';
-
+import Image from 'next/image';
+import { LinkCard } from '@/components/ui/card/LinkCard';
  
-Cosine 🎨 Gallery 是一个精选的 ACG 图片列表，旨在为用户提供高质量的图片资源。
+# 关于 Cosine 🎨 Gallery
 
-本页面持续建设中...
+<div className="flex-center">
+  <LinkCard
+    name="Cosine Gallery"
+    avatar="https://r2.cosine.ren/i/2025/02/15/14of99-6u.webp"
+    description="Cosine Gallery 是一个精选的 ACG 图片频道网站，旨在为用户提供高质量的图片资源。"
+    link="https://t.me/CosineGallery"
+  />
+  <Lottie src="https://cdn.lottielab.com/l/APXV8RHbvRVEoH.json" className="max-h-[37.5rem]" />
+</div>
 
-<Lottie src="https://cdn.lottielab.com/l/APXV8RHbvRVEoH.json" className="max-h-[37.5rem]" />
+Cosine 🎨 Gallery 是一个精选的 ACG 图片频道网站，旨在为用户提供高质量的图片资源。本频道为 [@cosine_front_end](https://t.me/cosine_front_end) 的图频，由 Nahida_Picbot（原）、现由 [SomeACG/cosine-pic-bot](https://github.com/SomeACG/cosine-pic-bot) 强力驱动。
 
-### 更新日志
+## 🌟 特色
 
-#### 2025-01-15 初版发布
+- 全部图片均为 SFW（Safe For Work），偶尔会有一些轻微的 NSFW 内容
+- 有很多很多的 #甜妹 ！
+- 偶尔买的动态壁纸等
+- 支持手动标签补充，提供更精准的分类
+- 由 [@cosPicBot](https://t.me/cosPicBot) 提供强大的机器人支持
+......
 
-可以先用啦，最核心的简单的看图功能有了，待添加的功能和优化还有很多，比如标签和标签筛选什么的。由于数据库还是要兼容之前的 Sqlite 数据库，所以更新不是实时，可能随缘同步，等 bot 迁移到 PostgreSQL 之后就可以实时更新了。 理论上只要是 [cosine-pic-bot](https://github.com/SomeACG/cosine-pic-bot) / [NahidaBot](https://github.com/NahidaBot/Nahida_Picbot) 驱动的图库频道就可以部署，但是他之前的标签结构太阴间了，等优化完了估计就不兼容了
+### 🔖 标签系统
 
+有的图片会手动补一些 tags，一般为频道主需要，目前主要的手动 tag 如下：
 
-#### 2025-01-25 加入移动端两列适配 完善功能
+#甜妹 #靓仔 #头像 #方形 #壁纸 #动态壁纸 #付费
 
-完成移动端瀑布流两列适配
+待频道主搞定数据库迁移，就能有更好的标签支持啦！
+
+### 🤖 机器人功能
+
+最新的 [@cosPicBot](https://t.me/cosPicBot) 支持以下功能：
+
+1. /echo url
+
+显示图片预览命令，支持 Twitter & Pixiv 平台，可私聊使用也可以在评论群组中使用
+
+2. /submit url
+
+投稿命令：仅支持在评论群组中使用，支持 Twitter & Pixiv 平台投稿
+
+3. #投稿 url
+
+投稿命令另一种形式：仅支持在评论群组中使用，支持 Twitter & Pixiv 平台投稿
+
+### 🫂 友情链接
+
+- [@SomeACG](https://t.me/SomeACG)
+- [@Daily0721](https://t.me/Daily0721)
+- [@NahidaGallery](https://t.me/NahidaGallery)
+- [@gongzhutonghao](https://t.me/gongzhutonghao)
+
+### 📢 关注我们
+
+- [Channel Boost](https://t.me/boost/CosineGallery)
+
+<LinkCard
+    name="Follow 列表订阅"
+    description="Cosine 🎨 Gallery | 精选 P 站 ACG 好图壁纸集，全 Follow 质量最高的 ACG 图片列表！都是我爱看的画风，包好看的，SFW，除非画师改行画 NSFW 了。会把自己最喜欢的关注画师都更新上去~ 可以关注 tg 频道 @CosineGallery 喵 里版列表：https://app.follow.is/share/lists/78371288603091968"
+    link="https://app.follow.is/share/lists/60616567344182272"
+/>
+
+## 更新日志
+
+#### 2025-02-15 添加友链页面
+
+添加友链页面，并优化 UI，添加友链申请方式等。
+
+#### 2025-01-30 添加原始标签，改进页面数据的获取
+
+添加原始标签，改进页面数据的获取
 
 #### 2025-01-28 优化 UI, 加入 MDX 页面
 
 About 页使用 MDX 编写，优化 UI。
 
-#### 2025-01-30 添加原始标签，改进页面数据的获取
+#### 2025-01-25 加入移动端两列适配 完善功能
 
-### TODO
+完成移动端瀑布流两列适配
+
+#### 2025-01-15 初版发布
+
+可以先用啦，最核心的简单的看图功能有了，待添加的功能和优化还有很多，比如标签和标签筛选什么的。由于数据库还是要兼容之前的 Sqlite 数据库，所以更新不是实时，可能随缘同步，等 bot 迁移到 PostgreSQL 之后就可以实时更新了。
+
+### 开发计划
 
 - [x] 初版看图功能、无限滚动和分页视图
 - [x] 简单移动端适配
-- [ ] MDX & 标签
-- [ ] 友链页面、检索、反馈、SEO 优化
+- [x] MDX & 友链页面
+- [ ] 标签、搜索、反馈、SEO 优化...
