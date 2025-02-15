@@ -1,13 +1,13 @@
 'use client';
 
 import { ClientOnly } from '@/components/common/ClientOnly';
-import AboutMdx from './about.mdx';
+import FriendsMdx from './friends.mdx';
 
-export default function About() {
+export default function Friends() {
   return (
     <ClientOnly>
       <div className="prose dark:prose-invert max-w-none">
-        <AboutMdx />
+        <FriendsMdx />
       </div>
     </ClientOnly>
   );
