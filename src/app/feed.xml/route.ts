@@ -20,8 +20,9 @@ async function generateFeed() {
   const rawData = (await getPaginatedImages(1, 20)) as { images: any[]; total: number };
   const { images } = rawData;
   const feed = new Feed({
-    title: 'Cosine Gallery',
-    description: '每天更新精选二次元插画',
+    title: 'Cosine 🎨 Gallery | 精选 ACG 好图壁纸集',
+    image: 'https://pic.cosine.ren/favicon.ico',
+    description: '质量超高的 ACG 图片列表，包好看的！',
     id: SITE_URL,
     link: SITE_URL,
     language: 'zh-CN',
