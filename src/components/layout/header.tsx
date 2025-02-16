@@ -56,14 +56,21 @@ export function Header() {
       <motion.header
         className={cn(
           'sticky top-0 z-10 flex items-center justify-between select-none md:justify-center',
-          'bg-background/80 border-b border-gray-200/50 backdrop-blur-md',
+          'bg-background/85 border-b border-gray-200/50 backdrop-blur-xl',
           'px-6 py-1 md:pr-3 md:pl-0 dark:border-gray-700/50',
-          'transition-all duration-300 ease-in-out',
-          'shadow-xs hover:shadow-md',
+          'transition-all duration-500 ease-in-out',
+          'shadow-sm hover:shadow-lg',
         )}
-        initial={{ y: 0 }}
-        animate={{ y: visible ? 0 : -100 }}
-        transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+        initial={{ y: -100, opacity: 0 }}
+        animate={{
+          y: visible ? 0 : -100,
+          opacity: visible ? 1 : 0,
+        }}
+        transition={{
+          duration: 0.6,
+          ease: [0.22, 1, 0.36, 1],
+          opacity: { duration: 0.3 },
+        }}
       >
         <motion.div
           initial={{ rotate: -180, scale: 0 }}
@@ -73,7 +80,15 @@ export function Header() {
             stiffness: 260,
             damping: 20,
           }}
-          whileHover={{ scale: 1.05, rotate: 1 }}
+          whileHover={{
+            scale: 1.05,
+            rotate: 2,
+            transition: {
+              type: 'spring',
+              stiffness: 400,
+              damping: 10,
+            },
+          }}
           className="flex h-14 w-36 cursor-pointer items-center justify-center gap-2 text-2xl font-bold whitespace-nowrap"
           onClick={() => router.push('/')}
           onMouseEnter={handleMouseEnter}

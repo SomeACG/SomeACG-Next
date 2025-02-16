@@ -5,17 +5,21 @@ export const childDelayOpenAnimVariants: Variants = {
   open: {
     clipPath: 'inset(0% 0% 0% 0% round 10px)',
     transition: {
-      ease: 'easeInOut',
-      duration: 0.4,
-      delayChildren: 0.3,
+      type: 'spring',
+      stiffness: 300,
+      damping: 24,
+      mass: 0.8,
+      delayChildren: 0.1,
       staggerChildren: 0.05,
     },
   },
   closed: {
     clipPath: 'inset(10% 50% 90% 50% round 10px)',
     transition: {
-      ease: 'easeInOut',
-      duration: 0.2,
+      type: 'spring',
+      stiffness: 300,
+      damping: 24,
+      mass: 0.8,
     },
   },
 };
@@ -24,9 +28,25 @@ export const delayOpenAnimVariants: Variants = {
   open: {
     opacity: 1,
     y: 0,
-    transition: microReboundPreset,
+    scale: 1,
+    transition: {
+      type: 'spring',
+      stiffness: 400,
+      damping: 30,
+      mass: 1,
+    },
   },
-  closed: { opacity: 0, y: 20, transition: { duration: 0.3 } },
+  closed: {
+    opacity: 0,
+    y: 20,
+    scale: 0.95,
+    transition: {
+      type: 'spring',
+      stiffness: 400,
+      damping: 30,
+      mass: 1,
+    },
+  },
 };
 
 export type AnimType = 'scale';

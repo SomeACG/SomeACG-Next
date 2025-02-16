@@ -85,15 +85,15 @@ export function ImageItem({ data }: ImageItemProps) {
       </AnimatePresence>
       {/* 移动端显示在底部 */}
       <div
-        className="bg-primary/20 hidden px-2 py-3 text-white backdrop-blur-lg md:block"
+        className="bg-primary/20 hidden px-2 py-2 text-white backdrop-blur-lg md:block"
         onClick={() => router.push(`/artwork/${id}`)}
       >
-        <h2 className="truncate text-sm/5 font-semibold">{title}</h2>
+        <h2 className="truncate text-sm/4 font-semibold">{title}</h2>
 
-        <div className="mt-2 flex items-center justify-between gap-1">
+        <div className="mt-1.5 flex items-center justify-between gap-1">
           <a
             target="_blank"
-            className="flex-center group/author border-primary bg-primary/50 hover:bg-primary/80 h-6 cursor-pointer gap-2 rounded-full border px-1.5 hover:text-white"
+            className="flex-center group/author border-primary bg-primary/50 hover:bg-primary/80 h-6 cursor-pointer gap-1.5 rounded-full border px-1.5 hover:text-white"
             href={authorUrl}
           >
             {platform === Platform.Pixiv && <SiPixiv className="size-4 opacity-70 group-hover/author:opacity-100" />}
@@ -103,24 +103,14 @@ export function ImageItem({ data }: ImageItemProps) {
           <Button
             variant="ghost"
             size="xs"
-            className="flex-center border-primary bg-primary/50 hover:bg-primary/80 ml-auto size-6 rounded-full border p-0 px-0 text-white bg-blend-lighten hover:text-white"
-            onClick={(e) => {
-              e.stopPropagation();
-              router.push(`/artwork/${id}`);
-            }}
-          >
-            <TiInfoLarge className="size-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="xs"
-            className="flex-center border-primary bg-primary/50 hover:bg-primary/80 size-6 rounded-full border p-0 px-0 text-white"
+            className="flex-center border-primary bg-primary/50 hover:bg-primary/80 size-6 w-auto cursor-pointer gap-0.5 rounded-full border p-0 px-1.5 text-xs text-white hover:text-white"
             onClick={(e) => {
               e.stopPropagation();
               window.open(artworkUrl, '_blank');
             }}
           >
             <FaLink className="size-3.5" />
+            原图链接
           </Button>
         </div>
       </div>
