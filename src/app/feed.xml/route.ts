@@ -30,7 +30,7 @@ async function generateFeed() {
     updated: new Date(),
     generator: 'Cosine Gallery RSS Feed',
     feedLinks: {
-      rss2: `${SITE_URL}/rss.xml`,
+      rss2: `${SITE_URL}/feed.xml`,
     },
   });
 
@@ -63,13 +63,7 @@ async function generateFeed() {
   return feed.rss2();
 }
 
-export async function GET(request: NextRequest, { params }: { params: { feed: string } }) {
-  const feed = params.feed;
-
-  if (feed !== 'rss.xml' && feed !== 'feed.xml') {
-    return new NextResponse('Not Found', { status: 404 });
-  }
-
+export async function GET(request: NextRequest) {
   try {
     const feedContent = await generateFeed();
     return new NextResponse(feedContent, {

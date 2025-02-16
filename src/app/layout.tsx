@@ -6,13 +6,28 @@ import Script from 'next/script';
 
 import 'react-photo-view/dist/react-photo-view.css';
 import '../styles/globals.css';
+import { Metadata } from 'next';
 
+export const metadata: Metadata = {
+  title: 'Cosine 🎨 Gallery | 精选 ACG 好图壁纸集',
+  description: '质量超高的 ACG 图片列表，包好看的！',
+  alternates: {
+    canonical: 'https://pic.cosine.ren',
+    types: {
+      'application/rss+xml': [{ url: 'feed.xml', title: 'RSS 订阅' }],
+    },
+  },
+  openGraph: {
+    title: 'Cosine 🎨 Gallery | 精选 ACG 好图壁纸集',
+    siteName: 'Cosine 🎨 Gallery',
+    description: '质量超高的 ACG 图片列表，包好看的！',
+    images: [{ url: 'https://r2.cosine.ren/og/cosine-gallery.webp' }],
+  },
+};
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <head>
-        <title>Cosine 🎨 Gallery | 精选 ACG 好图壁纸集</title>
-        <meta name="description" content="质量超高的 ACG 图片列表，包好看的！" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
         {process.env.NODE_ENV === 'production' && (

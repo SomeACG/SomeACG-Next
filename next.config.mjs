@@ -4,6 +4,20 @@ import createMDX from '@next/mdx';
 const nextConfig = {
   reactStrictMode: true,
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
+  rewrites: async () => [
+    {
+      source: '/rss',
+      destination: '/feed.xml',
+    },
+    {
+      source: '/rss.xml',
+      destination: '/feed.xml',
+    },
+    {
+      source: '/feed',
+      destination: '/feed.xml',
+    },
+  ],
 };
 
 const withMDX = createMDX({

@@ -1,14 +1,12 @@
-import { routers } from '@/constants/router';
-import { useMemo } from 'react';
-import { AiFillGithub } from 'react-icons/ai';
-import { CgDarkMode } from 'react-icons/cg';
-import { useToggleTheme } from './useToggleTheme';
-import { ColumnsIcon, ViewIcon } from 'lucide-react';
-import { viewModeAtom } from '@/store/app';
-import { useAtom } from 'jotai';
+import { DarkThemeIcon } from '@/components/ui/icons/DarkThemeIcon';
 import { GithubIcon } from '@/components/ui/icons/GithubIcon';
 import { RssIcon } from '@/components/ui/icons/RssIcon';
-import { DarkThemeIcon } from '@/components/ui/icons/DarkThemeIcon';
+import { routers } from '@/constants/router';
+import { viewModeAtom } from '@/store/app';
+import { useAtom } from 'jotai';
+import { ColumnsIcon, ViewIcon } from 'lucide-react';
+import { useMemo } from 'react';
+import { useToggleTheme } from './useToggleTheme';
 
 export const useNavItems = () => {
   const [viewMode, setViewMode] = useAtom(viewModeAtom);
