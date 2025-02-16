@@ -13,8 +13,8 @@ export const transformPixivUrl = (url: string) => {
   return url;
 };
 
-export const genArtistUrl = (platform: string | null, artist: { uid?: string; username?: string }) => {
-  if (!platform) return '';
+export const genArtistUrl = (platform?: string | null, artist?: { uid?: string; username?: string }) => {
+  if (!platform || !artist) return '';
   switch (platform) {
     case Platform.Pixiv:
       return 'https://www.pixiv.net/users/' + artist.uid;
@@ -23,7 +23,7 @@ export const genArtistUrl = (platform: string | null, artist: { uid?: string; us
   }
 };
 
-export const genArtworkUrl = (opts?: { platform: string | null; pid: string; username?: string }) => {
+export const genArtworkUrl = (opts?: { platform?: string | null; pid?: string; username?: string }) => {
   const { platform, pid, username } = opts ?? {};
   if (!platform) return '';
   switch (platform) {

@@ -8,16 +8,9 @@ interface ImagesResponse {
   total: number;
 }
 
-interface ArtworkData {
-  id: number;
-  title: string;
-  platform: Platform;
-  author: string;
-  authorid: bigint | null;
-  pid: string;
-  rawurl: string | null;
+export type ArtworkData = images & {
   tags: string[];
-}
+};
 
 const fetcher = async (url: string): Promise<ImagesResponse> => {
   const res = await fetch(url);

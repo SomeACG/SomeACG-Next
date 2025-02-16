@@ -33,30 +33,6 @@ export async function generateStaticParams() {
   }
 }
 
-async function getArtwork(id: string): Promise<ArtworkData> {
-  try {
-    const headersList = headers();
-    const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
-    const host = headersList.get('host') || 'localhost:3000';
-    const response = await fetch(`${protocol}://${host}/api/artwork/${id}`, {
-      next: { revalidate: 3600 }, // 1小时缓存
-    });
-
-    if (!response.ok) {
-      if (response.status === 404) {
-        notFound();
-      }
-      throw new Error('获取作品数据失败');
-    }
-
-    const data = await response.json();
-    return superjson.deserialize(data);
-  } catch (error) {
-    console.error('获取作品数据时出错:', error);
-    throw error;
-  }
-}
-
 export default async function ArtworkPage({ params }: { params: { id: string } }) {
   return <ArtworkClient id={params.id} />;
 }
