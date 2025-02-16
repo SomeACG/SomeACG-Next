@@ -9,7 +9,7 @@ import { cn, genArtistUrl, genArtworkUrl, transformPixivUrl } from '@/lib/utils'
 import { FaTags } from 'react-icons/fa';
 import { FaSquareXTwitter } from 'react-icons/fa6';
 import { SiPixiv } from 'react-icons/si';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import Card from '@/components/ui/card';
 
 type ArtworkClientProps = {
@@ -37,8 +37,16 @@ export default function ArtworkClient({ id }: ArtworkClientProps) {
     username: author ?? '',
   });
 
+  const renderTitle = useCallback(() => {
+    if (!title) return null;
+    if (platform === Platform.Pixiv) {
+      return <h1 className="text-3xl font-bold break-all">{title}</h1>;
+    }
+    return <Card desc={title} />;
+  }, [platform, title]);
+
   if (isError) {
-    return <div className="container mx-auto px-4 py-8 text-center">加载失败</div>;
+    return <div className="container mx-auto px-4 py-8 text-center">加载失败，请稍后再试，可能该作品信息还未同步</div>;
   }
 
   if (isLoading || !artwork) {
@@ -52,10 +60,8 @@ export default function ArtworkClient({ id }: ArtworkClientProps) {
             <PhotoViewer originUrl={originShowUrl} thumbUrl={originShowUrl} title={artwork?.title ?? ''} />
           </div>
 
-          <div className={`flex flex-col space-y-6 ${width && height && width > height ? 'mx-auto max-w-[1200px]' : ''}`}>
-            {platform === Platform.Pixiv && <h1 className="text-3xl font-bold break-all">{title}</h1>}
-
-            {platform === Platform.Twitter && <Card desc={title ?? ''} />}
+          <div className="flex flex-col space-y-6">
+            {renderTitle()}
             <div className="flex flex-col space-y-4">
               <div className="flex items-center gap-2">
                 <span className="text-gray-600 dark:text-gray-400">作者：</span>
@@ -70,7 +76,6 @@ export default function ArtworkClient({ id }: ArtworkClientProps) {
                 <span className="text-gray-600 dark:text-gray-400">平台：</span>
                 <span>{platform}</span>
               </div>
-
               <div className="flex items-center gap-2">
                 <span className="text-gray-600 dark:text-gray-400">尺寸：</span>
                 <span>
