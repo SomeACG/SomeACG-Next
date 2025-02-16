@@ -1,7 +1,6 @@
-import useSWR from 'swr';
 import { images } from '@prisma/client';
 import superjson from 'superjson';
-import { Platform } from '@/lib/type';
+import useSWR from 'swr';
 
 interface ImagesResponse {
   images: images[];

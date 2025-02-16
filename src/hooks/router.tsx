@@ -6,6 +6,9 @@ import { useToggleTheme } from './useToggleTheme';
 import { ColumnsIcon, ViewIcon } from 'lucide-react';
 import { viewModeAtom } from '@/store/app';
 import { useAtom } from 'jotai';
+import { GithubIcon } from '@/components/ui/icons/GithubIcon';
+import { RssIcon } from '@/components/ui/icons/RssIcon';
+import { DarkThemeIcon } from '@/components/ui/icons/DarkThemeIcon';
 
 export const useNavItems = () => {
   const [viewMode, setViewMode] = useAtom(viewModeAtom);
@@ -30,13 +33,18 @@ export const useNavItems = () => {
         onClick: () => setViewMode(viewMode === 'pagination' ? 'infinite' : 'pagination'),
       },
       {
+        key: 'RSS',
+        icon: <RssIcon className="size-6 cursor-pointer" />,
+        onClick: () => window?.open('/rss.xml', '_blank'),
+      },
+      {
         key: 'Github',
-        icon: <AiFillGithub className="h-8 w-8 cursor-pointer" />,
+        icon: <GithubIcon className="size-8 cursor-pointer" />,
         onClick: () => window?.open('https://github.com/yusixian/SomeACG-Next', '_blank'),
       },
       {
         key: 'CgDarkMode',
-        icon: <CgDarkMode className="h-8 w-8 cursor-pointer" />,
+        icon: <DarkThemeIcon className="size-8 cursor-pointer" />,
         onClick: toggleTheme,
       },
     ],

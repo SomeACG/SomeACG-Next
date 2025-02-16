@@ -12,6 +12,7 @@ export type NavItemProps = {
   indicatorClass?: string;
   type?: 'header' | 'sider';
   layoutIdPrefix?: string;
+  isButton?: boolean;
 };
 
 function NavItem({
@@ -23,6 +24,7 @@ function NavItem({
   indicatorClass,
   type = 'header',
   layoutIdPrefix = 'header',
+  isButton,
 }: NavItemProps) {
   return (
     <motion.div
@@ -39,7 +41,7 @@ function NavItem({
             'text-primary': selected && type === 'header',
             'z-0': type === 'sider',
             'after:bg-foreground after:absolute after:bottom-0 after:left-1/2 after:z-10 after:block after:h-[2px] after:w-0 after:-translate-x-1/2 after:opacity-0 after:transition-all after:duration-300 hover:after:w-[calc(100%_-_0.5rem)] hover:after:opacity-100':
-              !selected && type === 'header',
+              !isButton && !selected && type === 'header',
           },
           className,
         )}

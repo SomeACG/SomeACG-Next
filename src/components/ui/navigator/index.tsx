@@ -14,7 +14,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { useMediaQuery } from 'react-responsive';
 import Sider from '../../layout/sider';
-import MenuIcon from '../MenuIcon';
+import MenuIcon from '../icons/MenuIcon';
 import NavItem from './NavItem';
 
 type NavigatorProps = {
@@ -83,6 +83,7 @@ export const Navigator = ({ className }: NavigatorProps) => {
               key={key}
               onClick={onClick}
               icon={icon}
+              isButton
             />
           ))}
         </div>
