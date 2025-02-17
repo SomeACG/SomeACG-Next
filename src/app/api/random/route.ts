@@ -1,5 +1,5 @@
 import prisma from '@/lib/db';
-import { transformPixivUrl } from '@/lib/utils';
+import { genArtistUrl, genArtworkUrl, transformPixivUrl } from '@/lib/utils';
 import { NextResponse } from 'next/server';
 import superjson from 'superjson';
 
@@ -36,7 +36,9 @@ export async function GET() {
       ...image,
       rawurl: transformPixivUrl(image.rawurl || ''),
       thumburl: transformPixivUrl(image.thumburl || ''),
-      tags: tags.map((t) => t.tag).filter(Boolean),
+      originUrl: genArtworkUrl({ platform: image.platform ?? '', pid: image.pid ?? '', username: image.author ?? '' }) ,
+      authorUrl: genArtistUrl(image.platform ?? '', { uid: image.authorid?.toString() ?? '', username: image.author ?? '' }),
+      tags: tags.map((t) => t.tag?.replace(/#+/g, '#')).filter(Boolean),
     };
 
     // 序列化数据
