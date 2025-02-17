@@ -3,6 +3,9 @@ import { genArtistUrl, genArtworkUrl, transformPixivUrl } from '@/lib/utils';
 import { NextResponse } from 'next/server';
 import superjson from 'superjson';
 
+// 设置为动态路由
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     // 获取总数
