@@ -12,16 +12,30 @@ export async function GET(request: Request) {
     const count = parseInt(searchParams.get('count') ?? '1');
     const limit = Math.min(Math.max(count, 1), 20); // 限制最大返回20张图片
 
-    // 获取总数
-    const total = await prisma.images.count();
+    // 获取所有ID
+    const allIds = await prisma.images.findMany({
+      select: {
+        id: true,
+      },
+    });
 
-    // 生成随机跳过的数量
-    const skip = Math.floor(Math.random() * (total - limit));
+    if (!allIds.length) {
+      return NextResponse.json({ error: '未找到图片' }, { status: 404 });
+    }
 
-    // 随机获取图片
+    // 随机选择ID
+    const randomIds = allIds
+      .map((item) => item.id)
+      .sort(() => Math.random() - 0.5)
+      .slice(0, limit);
+
+    // 获取随机图片
     const images = await prisma.images.findMany({
-      skip,
-      take: limit,
+      where: {
+        id: {
+          in: randomIds,
+        },
+      },
     });
 
     if (!images.length) {
