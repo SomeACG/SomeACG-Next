@@ -1,5 +1,6 @@
 import { getPaginatedImages } from '@/lib/imageService';
 import { ImageList } from './components/ImageList';
+import { RandomImage } from './components/RandomImage';
 import superjson from 'superjson';
 
 export default async function Home() {
@@ -7,5 +8,10 @@ export default async function Home() {
   const initialData = await getPaginatedImages(1, 20);
   const serializedData = superjson.serialize(initialData);
 
-  return <ImageList initialData={superjson.deserialize(serializedData)} />;
+  return (
+    <div className="space-y-8">
+      <RandomImage />
+      <ImageList initialData={superjson.deserialize(serializedData)} />
+    </div>
+  );
 }

@@ -6,49 +6,74 @@ import superjson from 'superjson';
 // 设置为动态路由
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const count = parseInt(searchParams.get('count') ?? '1');
+    const limit = Math.min(Math.max(count, 1), 20); // 限制最大返回20张图片
+
     // 获取总数
     const total = await prisma.images.count();
-    
+
     // 生成随机跳过的数量
-    const skip = Math.floor(Math.random() * total);
-    
-    // 随机获取一张图片
-    const image = await prisma.images.findFirst({
+    const skip = Math.floor(Math.random() * (total - limit));
+
+    // 随机获取图片
+    const images = await prisma.images.findMany({
       skip,
-      take: 1,
+      take: limit,
     });
 
-    if (!image) {
+    if (!images.length) {
       return NextResponse.json({ error: '未找到图片' }, { status: 404 });
     }
 
-    // 获取图片标签
+    // 获取所有图片的pid
+    const pids = images.map((img) => img.pid?.toString()).filter(Boolean);
+
+    // 批量获取图片标签
     const tags = await prisma.imagetags.findMany({
       where: {
-        pid: image.pid?.toString(),
+        pid: {
+          in: pids as string[],
+        },
       },
       select: {
+        pid: true,
         tag: true,
       },
     });
 
+    // 按pid分组标签
+    const tagsByPid = tags.reduce(
+      (acc, curr) => {
+        if (!curr.pid) return acc;
+        if (!acc[curr.pid]) acc[curr.pid] = [];
+        if (curr.tag) acc[curr.pid].push(curr.tag.replace(/#+/g, '#'));
+        return acc;
+      },
+      {} as Record<string, string[]>,
+    );
+
     // 转换图片URL
-    const imageWithUrls = {
+    const imagesWithUrls = images.map((image) => ({
       ...image,
       rawurl: transformPixivUrl(image.rawurl || ''),
       thumburl: transformPixivUrl(image.thumburl || ''),
-      originUrl: genArtworkUrl({ platform: image.platform ?? '', pid: image.pid ?? '', username: image.author ?? '' }) ,
+      originUrl: genArtworkUrl({ platform: image.platform ?? '', pid: image.pid ?? '', username: image.author ?? '' }),
       authorUrl: genArtistUrl(image.platform ?? '', { uid: image.authorid?.toString() ?? '', username: image.author ?? '' }),
-      tags: tags.map((t) => t.tag?.replace(/#+/g, '#')).filter(Boolean),
-    };
+      tags: tagsByPid[image.pid?.toString() ?? ''] ?? [],
+    }));
 
+    if (imagesWithUrls.length === 1) {
+      const serialized = superjson.serialize(imagesWithUrls[0]);
+      return NextResponse.json(serialized);
+    }
     // 序列化数据
-    const serialized = superjson.serialize(imageWithUrls);
+    const serialized = superjson.serialize(imagesWithUrls);
     return NextResponse.json(serialized);
   } catch (error) {
     console.error('error:', error);
     return NextResponse.json({ error: '服务器错误' }, { status: 500 });
   }
-} 
+}

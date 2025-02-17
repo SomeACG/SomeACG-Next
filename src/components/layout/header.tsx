@@ -57,7 +57,7 @@ export function Header() {
         className={cn(
           'sticky top-0 z-10 flex items-center justify-between select-none md:justify-center',
           'bg-background/85 border-b border-gray-200/50 backdrop-blur-xl',
-          'px-6 py-1 md:pr-3 md:pl-0 dark:border-gray-700/50',
+          'py-1 pr-6 pl-3 md:pr-3 md:pl-0 dark:border-gray-700/50',
           'transition-all duration-500 ease-in-out',
           'shadow-sm hover:shadow-lg',
         )}

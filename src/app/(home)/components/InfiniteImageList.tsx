@@ -36,7 +36,7 @@ export function InfiniteImageList({ initialData }: InfiniteImageListProps) {
   }
 
   return (
-    <div className="flex w-full flex-col gap-4 px-3">
+    <div className="flex w-full flex-col gap-4">
       <AnimatePresence mode="wait">
         <PhotoProvider
           toolbarRender={({ onRotate, onScale, rotate, scale }) => <ImageToolbar {...{ onRotate, onScale, rotate, scale }} />}

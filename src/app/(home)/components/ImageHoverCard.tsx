@@ -30,7 +30,7 @@ export function ImageHoverCard({ id, title = '', author = '', platform, artworkU
       onClick={() => router.push(`/artwork/${id}`)}
     >
       <h2 className="truncate text-sm/4 font-semibold">{title}</h2>
-      <div className="flex items-center justify-between gap-1.5">
+      <div className="flex items-center justify-between gap-1.5 overflow-hidden">
         <a
           target="_blank"
           className="flex-center group/author border-primary bg-primary/50 hover:bg-primary/80 cursor-pointer gap-1.5 rounded-full border px-2 py-1 opacity-90 transition duration-300 hover:opacity-100"
@@ -46,14 +46,14 @@ export function ImageHoverCard({ id, title = '', author = '', platform, artworkU
         <Button
           variant="ghost"
           size="xs"
-          className="flex-center border-primary bg-primary/50 hover:bg-primary/80 size-6 w-auto cursor-pointer gap-0.5 rounded-full border p-0 px-1.5 text-xs text-white hover:text-white"
+          className="flex-center border-primary bg-primary/50 hover:bg-primary/80 cursor-pointer gap-0.5 rounded-full border p-0 px-1.5 text-xs text-white hover:text-white"
           onClick={(e) => {
             e.stopPropagation();
             window.open(artworkUrl, '_blank');
           }}
         >
           <FaLink className="size-3.5" />
-          原图链接
+          原图
         </Button>
       </div>
     </motion.div>

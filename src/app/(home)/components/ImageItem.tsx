@@ -2,22 +2,22 @@
 import { Button } from '@/components/ui/button';
 import Loader from '@/components/ui/loading/Loader';
 import { Platform } from '@/lib/type';
-import { genArtistUrl, genArtworkUrl, transformPixivUrl } from '@/lib/utils';
+import { cn, genArtistUrl, genArtworkUrl, transformPixivUrl } from '@/lib/utils';
 import { images } from '@prisma/client';
 import { AnimatePresence, motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { FaLink, FaSquareXTwitter } from 'react-icons/fa6';
 import { SiPixiv } from 'react-icons/si';
-import { TiInfoLarge } from 'react-icons/ti';
 import { PhotoView } from 'react-photo-view';
 import { ImageHoverCard } from './ImageHoverCard';
 
 interface ImageItemProps {
   data: images;
+  className?: string;
 }
 
-export function ImageItem({ data }: ImageItemProps) {
+export function ImageItem({ data, className }: ImageItemProps) {
   const { id, title, author, thumburl, rawurl, platform, authorid, pid, width, height } = data ?? {};
   const [isHover, setIsHover] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -49,7 +49,7 @@ export function ImageItem({ data }: ImageItemProps) {
       layout
       onHoverStart={() => setIsHover(true)}
       onHoverEnd={() => setIsHover(false)}
-      className="group hover:ring-primary/50 relative z-1 overflow-hidden rounded-lg hover:ring-2"
+      className={cn('group hover:ring-primary/50 relative z-1 overflow-hidden rounded-lg hover:ring-2', className)}
     >
       <PhotoView src={originShowUrl}>
         <div className="bg-primary/20 relative" style={{ width: '100%', paddingBottom }}>
@@ -60,7 +60,7 @@ export function ImageItem({ data }: ImageItemProps) {
               alt={title ?? ''}
               loading="lazy"
               decoding="async"
-              className={`h-full w-full cursor-pointer rounded-lg object-cover shadow-md transition-all duration-300 ${
+              className={`h-full w-full cursor-pointer rounded-lg object-contain shadow-md transition-all duration-300 ${
                 isLoading ? 'opacity-0' : 'opacity-100'
               } group-hover:scale-105`}
               onLoad={() => setIsLoading(false)}
@@ -103,14 +103,14 @@ export function ImageItem({ data }: ImageItemProps) {
           <Button
             variant="ghost"
             size="xs"
-            className="flex-center border-primary bg-primary/50 hover:bg-primary/80 size-6 w-auto cursor-pointer gap-0.5 rounded-full border p-0 px-1.5 text-xs text-white hover:text-white"
+            className="flex-center border-primary bg-primary/50 hover:bg-primary/80 cursor-pointer gap-0.5 rounded-full border p-0 px-1.5 text-xs text-white hover:text-white"
             onClick={(e) => {
               e.stopPropagation();
               window.open(artworkUrl, '_blank');
             }}
           >
             <FaLink className="size-3.5" />
-            原图链接
+            <span className="truncate">原图</span>
           </Button>
         </div>
       </div>
