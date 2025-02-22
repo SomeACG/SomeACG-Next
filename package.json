@@ -8,12 +8,10 @@
     "start": "next start -p 6645",
     "restart": "pnpm i && pnpm build && pnpm start",
     "lint": "next lint",
-    "db:view": "npx prisma studio",
     "pm2": "pm2 start ecosystem.config.js",
     "pm2:stop": "pm2 stop ecosystem.config.js",
-    "pm2:reload": "pm2 reload ecosystem.config.js",
     "pm2:logs": "pm2 logs",
-    "docker:up": "docker compose up -d --build"
+    "db:view": "npx prisma studio"
   },
   "dependencies": {
     "@floating-ui/react": "^0.25.4",

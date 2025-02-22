@@ -2,8 +2,8 @@ module.exports = {
   apps: [
     {
       name: 'SomeACG-Next',
-      script: 'npm',
-      args: 'run restart',
+      script: 'pnpm',
+      args: 'restart',
       env: {
         NODE_ENV: 'production',
       },
