@@ -3,20 +3,20 @@ import { ClientOnly } from '@/components/common/ClientOnly';
 import Loader from '@/components/ui/loading/Loader';
 import { useImages } from '@/lib/hooks/useImages';
 import { pageAtom, totalPageAtom, viewModeAtom } from '@/store/app';
-import { images } from '@prisma/client';
-import { AnimatePresence } from 'motion/react';
+import { Image } from '@prisma/client';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { Masonry } from 'masonic';
+import { AnimatePresence } from 'motion/react';
 import { useCallback, useEffect } from 'react';
 import { PhotoProvider } from 'react-photo-view';
+import { useWindowSize } from 'react-use';
 import { ImageItem } from './ImageItem';
 import { ImageToolbar } from './ImageToolbar';
 import InfiniteImageList from './InfiniteImageList';
-import { useWindowSize } from 'react-use';
 
 interface ImageListProps {
   initialData: {
-    images: images[];
+    images: Image[];
     total: number;
   };
 }
@@ -29,7 +29,7 @@ export function ImageList({ initialData }: ImageListProps) {
   const { images, total, isLoading, isError } = useImages(page, pageSize);
   const { width } = useWindowSize();
   // 使用 useCallback 缓存 render 函数
-  const renderItem = useCallback((props: { data: images; index: number }) => {
+  const renderItem = useCallback((props: { data: Image; index: number }) => {
     return <ImageItem data={props.data} />;
   }, []);
 

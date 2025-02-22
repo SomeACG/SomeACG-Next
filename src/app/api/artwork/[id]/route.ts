@@ -6,7 +6,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
   console.log(`[Artwork API] 开始获取作品信息，ID: ${params.id}`);
 
   try {
-    const artwork = await prisma.images.findFirst({
+    const artwork = await prisma.image.findFirst({
       where: {
         id: parseInt(params.id),
       },
@@ -24,7 +24,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
     });
 
     // 获取标签 - 确保 pid 是字符串类型
-    const tags = await prisma.imagetags.findMany({
+    const tags = await prisma.imageTag.findMany({
       where: {
         pid: artwork.pid?.toString(),
       },

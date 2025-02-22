@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import Loader from '@/components/ui/loading/Loader';
 import { Platform } from '@/lib/type';
 import { cn, genArtistUrl, genArtworkUrl, transformPixivUrl } from '@/lib/utils';
-import { images } from '@prisma/client';
 import { AnimatePresence, motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
@@ -11,9 +10,10 @@ import { FaLink, FaSquareXTwitter } from 'react-icons/fa6';
 import { SiPixiv } from 'react-icons/si';
 import { PhotoView } from 'react-photo-view';
 import { ImageHoverCard } from './ImageHoverCard';
+import { Image } from '@prisma/client';
 
 interface ImageItemProps {
-  data: images;
+  data: Image;
   className?: string;
 }
 

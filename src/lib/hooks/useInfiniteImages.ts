@@ -1,8 +1,8 @@
-import { images } from '@prisma/client';
+import { Image } from '@prisma/client';
 import useSWRInfinite from 'swr/infinite';
 
 interface ImagesResponse {
-  images: images[];
+  images: Image[];
   total: number;
 }
 

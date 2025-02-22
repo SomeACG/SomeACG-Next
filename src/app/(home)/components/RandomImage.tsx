@@ -5,7 +5,6 @@ import Card from '@/components/ui/card';
 import Loader from '@/components/ui/loading/Loader';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { images } from '@prisma/client';
 import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { PhotoProvider } from 'react-photo-view';
@@ -15,8 +14,9 @@ import { ImageToolbar } from './ImageToolbar';
 import { ArrowLeftIcon } from '@/components/ui/icons/ArrowLeftIcon';
 import { ArrowRightIcon } from '@/components/ui/icons/ArrowRightIcon';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { Image } from '@prisma/client';
 
-type RandomImage = images & {
+type RandomImage = Image & {
   originUrl: string;
   authorUrl: string;
 };

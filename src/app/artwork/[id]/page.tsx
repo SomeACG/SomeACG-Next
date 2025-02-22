@@ -1,9 +1,6 @@
 import prisma from '@/lib/db';
-import { notFound } from 'next/navigation';
-import ArtworkClient from './_components/ArtworkClient';
-import superjson from 'superjson';
 import { Platform } from '@/lib/type';
-import { headers } from 'next/headers';
+import ArtworkClient from './_components/ArtworkClient';
 
 type ArtworkData = {
   id: number;
@@ -19,7 +16,7 @@ type ArtworkData = {
 // 生成静态页面参数
 export async function generateStaticParams() {
   try {
-    const artworks = await prisma.images.findMany({
+    const artworks = await prisma.image.findMany({
       select: { id: true },
       take: 100,
     });

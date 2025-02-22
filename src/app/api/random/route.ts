@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     const limit = Math.min(Math.max(count, 1), 20); // 限制最大返回20张图片
 
     // 获取所有ID
-    const allIds = await prisma.images.findMany({
+    const allIds = await prisma.image.findMany({
       select: {
         id: true,
       },
@@ -30,7 +30,7 @@ export async function GET(request: Request) {
       .slice(0, limit);
 
     // 获取随机图片
-    const images = await prisma.images.findMany({
+    const images = await prisma.image.findMany({
       where: {
         id: {
           in: randomIds,
@@ -46,7 +46,7 @@ export async function GET(request: Request) {
     const pids = images.map((img) => img.pid?.toString()).filter(Boolean);
 
     // 批量获取图片标签
-    const tags = await prisma.imagetags.findMany({
+    const tags = await prisma.imageTag.findMany({
       where: {
         pid: {
           in: pids as string[],

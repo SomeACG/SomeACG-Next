@@ -1,13 +1,13 @@
-import { images } from '@prisma/client';
+import { Image } from '@prisma/client';
 import superjson from 'superjson';
 import useSWR from 'swr';
 
 interface ImagesResponse {
-  images: images[];
+  images: Image[];
   total: number;
 }
 
-export type ArtworkData = images & {
+export type ArtworkData = Image & {
   tags: string[];
 };
 

@@ -2,7 +2,6 @@
 import { ClientOnly } from '@/components/common/ClientOnly';
 import Loader from '@/components/ui/loading/Loader';
 import { useInfiniteImages } from '@/lib/hooks/useInfiniteImages';
-import { images } from '@prisma/client';
 import { AnimatePresence } from 'motion/react';
 import { useCallback } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -10,10 +9,11 @@ import { PhotoProvider } from 'react-photo-view';
 import { ImageItem } from './ImageItem';
 import { ImageToolbar } from './ImageToolbar';
 import { Masonry } from 'masonic';
+import { Image } from '@prisma/client';
 
 interface InfiniteImageListProps {
   initialData: {
-    images: images[];
+    images: Image[];
     total: number;
   };
 }
@@ -23,7 +23,7 @@ export function InfiniteImageList({ initialData }: InfiniteImageListProps) {
   const { allImages, isLoading, hasNextPage, fetchNextPage, error, size } = useInfiniteImages(pageSize, initialData);
 
   // 使用 useCallback 缓存 render 函数
-  const renderItem = useCallback((props: { data: images; index: number }) => {
+  const renderItem = useCallback((props: { data: Image; index: number }) => {
     return <ImageItem data={props.data} />;
   }, []);
 

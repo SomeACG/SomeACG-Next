@@ -1,44 +1,49 @@
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-1.1.x"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model images {
+model Image {
   id          Int       @id @default(autoincrement())
   userid      BigInt?
   username    String?
   create_time DateTime?
   platform    String?
   title       String?
-  page        Int?
-  size        Int?
-  filename    String?
-  author      String?
-  authorid    BigInt?
-  pid         String?
-  extension   String?
-  rawurl      String?
-  thumburl    String?
-  width       Int?
-  height      Int?
+  page        Int? // 第几张图 twitter 从1开始 pixiv从0开始
+  size        Int? // 图片大小 单位 byte
+  filename    String? // 最终存的实际名字 xxx.png 等
+  author      String? // 作者昵称 p站是名字，推特是handle(@xxx)
+  authorid    BigInt? // 作者 uid
+  pid         String? // 图 id, 对于 twitter, 是 tweet id, 其他平台类
+  extension   String? // 拓展名
+  rawurl      String? // 原始 url （Source）
+  thumburl    String? // 缩略图 实际上没有用到
+  width       Int? // px
+  height      Int? // px
   guest       Boolean?  @default(false)
   r18         Boolean?  @default(false)
   ai          Boolean?  @default(false)
+
+  @@map("images")
 }
 
-model imagetags {
+model ImageTag {
   id  Int     @id @default(autoincrement())
   pid String?
   tag String?
+
+  @@map("imagetags")
 }
 
-model stash {
+model Stash {
   id           Int       @id @default(autoincrement())
   original_msg String?
   create_time  DateTime?
+
+  @@map("stash")
 }

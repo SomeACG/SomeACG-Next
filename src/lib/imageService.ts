@@ -6,14 +6,14 @@ export async function getPaginatedImages(page: number, pageSize: number) {
   const take = pageSize;
 
   const [images, total] = await Promise.all([
-    prisma.images.findMany({
+    prisma.image.findMany({
       skip,
       take,
       orderBy: {
         create_time: 'desc',
       },
     }),
-    prisma.images.count(),
+    prisma.image.count(),
   ]);
 
   const serializedData = superjson.serialize({
@@ -34,7 +34,7 @@ export async function getTagByPids(pids: string[]) {
     if (!pids?.length) return [];
     const tags = await Promise.all(
       pids.map(async (pid) => {
-        const tags = await prisma.imagetags.findMany({
+        const tags = await prisma.imageTag.findMany({
           where: {
             pid,
           },
