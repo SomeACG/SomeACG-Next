@@ -6,14 +6,13 @@
     "dev": "next dev -p 6645",
     "build": "next build",
     "start": "next start -p 6645",
-    "restart": "pnpm i && npm run build && npm run start",
+    "restart": "pnpm i && pnpm build && pnpm start",
     "lint": "next lint",
     "db:view": "npx prisma studio",
     "pm2": "pm2 start ecosystem.config.js",
     "pm2:stop": "pm2 stop ecosystem.config.js",
-    "pm2:restart": "pm2 restart ecosystem.config.js",
+    "pm2:reload": "pm2 reload ecosystem.config.js",
     "pm2:logs": "pm2 logs",
-    "pm2:restart-next": "pm2 restart cos-pic-next",
     "docker:up": "docker compose up -d --build"
   },
   "dependencies": {
