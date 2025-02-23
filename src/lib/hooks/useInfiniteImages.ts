@@ -1,47 +1,51 @@
 import { Image } from '@prisma/client';
+import { useMemo } from 'react';
 import useSWRInfinite from 'swr/infinite';
+import useSWR from 'swr';
 
 interface ImagesResponse {
   images: Image[];
   total: number;
 }
 
-async function fetchImages(page: number, pageSize: number): Promise<ImagesResponse> {
-  // console.log('fetchImages', page, pageSize);
-  const response = await fetch(`/api/list?page=${page}&pageSize=${pageSize}`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch images');
+const fetcher = async (url: string): Promise<ImagesResponse> => {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+  } catch (error) {
+    console.error('获取图片失败:', error);
+    throw error;
   }
-  return response.json();
-}
+};
 
 export function useInfiniteImages(pageSize: number, initialData: ImagesResponse) {
   const getKey = (pageIndex: number) => {
-    return [`/api/list?page=${pageIndex + 1}&pageSize=${pageSize}`, pageIndex + 1, pageSize];
+    return `/api/list?page=${pageIndex + 1}&pageSize=${pageSize}`;
   };
 
-  const { data, error, size, setSize, isLoading } = useSWRInfinite<ImagesResponse>(
-    getKey,
-    ([url, page, pageSize]) => fetchImages(page, pageSize),
-    {
-      //   fallbackData: [initialData],
-      revalidateFirstPage: false,
-    },
-  );
+  const { data, error, size, setSize, isLoading, isValidating } = useSWRInfinite<ImagesResponse>(getKey, fetcher, {
+    fallbackData: [initialData],
+    revalidateFirstPage: false,
+  });
 
-  const allImages = data?.flatMap((page) => page.images) ?? [];
-  const isLoadingMore = isLoading || (size > 0 && data && typeof data[size - 1] === 'undefined');
+  const isLoadingMore = isLoading || isValidating || (size > 0 && data && typeof data[size - 1] === 'undefined');
   const total = data?.[0]?.total ?? 0;
   const totalPages = Math.ceil(total / pageSize);
   const hasNextPage = size < totalPages;
   // console.log({ allImages, size, totalPages, hasNextPage, isLoadingMore, error, data });
-  return {
-    data,
-    allImages,
-    error,
-    isLoading: isLoadingMore,
-    hasNextPage,
-    fetchNextPage: () => setSize(size + 1),
-    size,
-  };
+
+  return useMemo(() => {
+    return {
+      data,
+      allImages: data?.flatMap((page) => page.images) ?? [],
+      error,
+      isLoading: isLoadingMore,
+      hasNextPage,
+      fetchNextPage: () => setSize(size + 1),
+      size,
+    };
+  }, [data, error, isLoadingMore, hasNextPage, size, setSize]);
 }

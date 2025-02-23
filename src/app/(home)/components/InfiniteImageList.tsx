@@ -10,6 +10,7 @@ import { ImageItem } from './ImageItem';
 import { ImageToolbar } from './ImageToolbar';
 import { Masonry } from 'masonic';
 import { Image } from '@prisma/client';
+import { useColumnConfig } from '@/lib/hooks/useColumnConfig';
 
 interface InfiniteImageListProps {
   initialData: {
@@ -19,12 +20,13 @@ interface InfiniteImageListProps {
 }
 
 export function InfiniteImageList({ initialData }: InfiniteImageListProps) {
-  const pageSize = 20;
-  const { allImages, isLoading, hasNextPage, fetchNextPage, error, size } = useInfiniteImages(pageSize, initialData);
+  const { allImages, hasNextPage, fetchNextPage, error, size } = useInfiniteImages(40, initialData);
+  const columnConfig = useColumnConfig();
 
   // 使用 useCallback 缓存 render 函数
-  const renderItem = useCallback((props: { data: Image; index: number }) => {
-    return <ImageItem data={props.data} />;
+  const renderItem = useCallback(({ data, index }: { data: Image; index: number }) => {
+    if (!data) return null;
+    return <ImageItem data={data} key={data?.id + index} />;
   }, []);
 
   if (error) {
@@ -59,7 +61,12 @@ export function InfiniteImageList({ initialData }: InfiniteImageListProps) {
               }
             >
               {allImages.length > 0 ? (
-                <Masonry items={allImages} columnGutter={26} columnWidth={250} render={renderItem} key={`masonry-${size}`} />
+                <Masonry
+                  items={allImages}
+                  columnGutter={columnConfig.gutter}
+                  columnWidth={columnConfig.width}
+                  render={renderItem}
+                />
               ) : (
                 <div className="flex-center min-h-[200px]">
                   <div className="text-lg">暂无数据</div>

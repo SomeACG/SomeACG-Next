@@ -1,5 +1,4 @@
 'use client';
-import { ClientOnly } from '@/components/common/ClientOnly';
 import Loader from '@/components/ui/loading/Loader';
 import { useImages } from '@/lib/hooks/useImages';
 import { pageAtom, totalPageAtom, viewModeAtom } from '@/store/app';
@@ -9,10 +8,10 @@ import { Masonry } from 'masonic';
 import { AnimatePresence } from 'motion/react';
 import { useCallback, useEffect } from 'react';
 import { PhotoProvider } from 'react-photo-view';
-import { useWindowSize } from 'react-use';
 import { ImageItem } from './ImageItem';
 import { ImageToolbar } from './ImageToolbar';
 import InfiniteImageList from './InfiniteImageList';
+import { useColumnConfig } from '@/lib/hooks/useColumnConfig';
 
 interface ImageListProps {
   initialData: {
@@ -26,9 +25,10 @@ export function ImageList({ initialData }: ImageListProps) {
   const pageSize = 20;
   const setTotalPage = useSetAtom(totalPageAtom);
   const viewMode = useAtomValue(viewModeAtom);
-  const { images, total, isLoading, isError } = useImages(page, pageSize);
-  const { width } = useWindowSize();
-  // 使用 useCallback 缓存 render 函数
+  const { images, total, isLoading, isError } = useImages(page, pageSize, initialData);
+  const columnConfig = useColumnConfig();
+
+  // 使用 useCallback 缓存 render 函数，依赖项为空因为 ImageItem 是纯展示组件
   const renderItem = useCallback((props: { data: Image; index: number }) => {
     return <ImageItem data={props.data} />;
   }, []);
@@ -40,13 +40,22 @@ export function ImageList({ initialData }: ImageListProps) {
   }, [total, pageSize, setTotalPage]);
 
   const renderList = useCallback(() => {
-    if (viewMode === 'infinite') return <InfiniteImageList initialData={initialData} />;
-    if (isLoading)
+    if (isLoading) {
       return (
         <div className="min-h-[200px]">
           <Loader />
         </div>
       );
+    }
+
+    if (isError) {
+      return (
+        <div className="flex-center min-h-[200px]">
+          <div className="text-lg text-red-500">加载失败，请刷新重试</div>
+        </div>
+      );
+    }
+
     if (!images?.length) {
       return (
         <div className="flex-center min-h-[200px]">
@@ -54,28 +63,23 @@ export function ImageList({ initialData }: ImageListProps) {
         </div>
       );
     }
-    const columnWidth = Math.min(250, width / 2 - 50);
-    const columnGutter = width < 768 ? 8 : 16;
-    return (
-      <Masonry
-        items={images}
-        columnGutter={columnGutter}
-        columnWidth={columnWidth}
-        render={renderItem}
-        key={`masonry-${page}`}
-      />
-    );
-  }, [viewMode, initialData, isLoading, images, width, renderItem, page]);
+
+    return <Masonry items={images} columnGutter={columnConfig.gutter} columnWidth={columnConfig.width} render={renderItem} />;
+  }, [isLoading, isError, images, columnConfig, renderItem]);
 
   return (
     <div className="flex flex-col gap-4">
-      <AnimatePresence mode="wait">
-        <PhotoProvider
-          toolbarRender={({ onRotate, onScale, rotate, scale }) => <ImageToolbar {...{ onRotate, onScale, rotate, scale }} />}
-        >
-          <ClientOnly>{renderList()}</ClientOnly>
-        </PhotoProvider>
-      </AnimatePresence>
+      {viewMode === 'infinite' ? (
+        <InfiniteImageList initialData={initialData} />
+      ) : (
+        <AnimatePresence mode="wait">
+          <PhotoProvider
+            toolbarRender={({ onRotate, onScale, rotate, scale }) => <ImageToolbar {...{ onRotate, onScale, rotate, scale }} />}
+          >
+            {renderList()}
+          </PhotoProvider>
+        </AnimatePresence>
+      )}
     </div>
   );
 }
