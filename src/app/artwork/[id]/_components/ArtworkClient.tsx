@@ -92,20 +92,26 @@ export default function ArtworkClient({ id }: ArtworkClientProps) {
                 </div>
               )}
 
+              {platform === Platform.Twitter && twitterTags.length > 0 && (
+                <div className="flex items-start gap-2">
+                  <span className="whitespace-nowrap text-gray-600 dark:text-gray-400">推文标签：</span>
+                  <div className="flex flex-wrap gap-2">
+                    {twitterTags.map((tag: string, index: number) => (
+                      <span
+                        key={index}
+                        className="bg-primary/20 text-primary hover:bg-primary/30 flex items-center gap-1 rounded-full px-3 py-1 text-sm transition-colors duration-300"
+                      >
+                        <FaTags className="text-xs" />
+                        {tag.slice(1)}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="flex items-start gap-2">
                 <span className="whitespace-nowrap text-gray-600 dark:text-gray-400">原始标签：</span>
                 <div className="flex flex-wrap gap-2">
-                  {platform === Platform.Twitter && twitterTags.length > 0
-                    ? twitterTags.map((tag: string, index: number) => (
-                        <span
-                          key={index}
-                          className="bg-primary/20 text-primary hover:bg-primary/30 flex items-center gap-1 rounded-full px-3 py-1 text-sm transition-colors duration-300"
-                        >
-                          <FaTags className="text-xs" />
-                          {tag.slice(1)}
-                        </span>
-                      ))
-                    : null}
                   {Array.isArray(tags) && tags.length > 0 ? (
                     tags.map((tag: string, index: number) => (
                       <Link
