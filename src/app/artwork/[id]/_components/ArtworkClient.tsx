@@ -11,6 +11,7 @@ import { FaSquareXTwitter } from 'react-icons/fa6';
 import { SiPixiv } from 'react-icons/si';
 import { useCallback, useMemo } from 'react';
 import Card from '@/components/ui/card';
+import Link from 'next/link';
 
 type ArtworkClientProps = {
   id: string;
@@ -106,13 +107,14 @@ export default function ArtworkClient({ id }: ArtworkClientProps) {
                     : null}
                   {Array.isArray(tags) && tags.length > 0 ? (
                     tags.map((tag: string, index: number) => (
-                      <span
+                      <Link
                         key={index}
+                        href={`/tag/${encodeURIComponent(tag.replace(/#/g, ''))}`}
                         className="bg-primary/20 text-primary hover:bg-primary/30 flex items-center gap-1 rounded-full px-3 py-1 text-sm transition-colors duration-300"
                       >
                         <FaTags className="text-xs" />
                         {tag.replace(/#/g, '')}
-                      </span>
+                      </Link>
                     ))
                   ) : (
                     <span className="text-gray-500">暂无标签</span>
