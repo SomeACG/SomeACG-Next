@@ -1,16 +1,16 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import { ClientOnly } from '@/components/common/ClientOnly';
-import { Image } from '@prisma/client';
-import { Masonry } from 'masonic';
-import { PhotoProvider } from 'react-photo-view';
 import { ImageItem } from '@/app/(home)/components/ImageItem';
 import { ImageToolbar } from '@/app/(home)/components/ImageToolbar';
-import { useColumnConfig } from '@/lib/hooks/useColumnConfig';
-import { AnimatePresence } from 'motion/react';
-import InfiniteScroll from 'react-infinite-scroll-component';
+import { ClientOnly } from '@/components/common/ClientOnly';
 import Loader from '@/components/ui/loading/Loader';
+import { useColumnConfig } from '@/lib/hooks/useColumnConfig';
+import { Image } from '@prisma/client';
+import { Masonry } from 'masonic';
+import { AnimatePresence } from 'motion/react';
+import { useCallback } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import { PhotoProvider } from 'react-photo-view';
 import useSWRInfinite from 'swr/infinite';
 
 type TagClientProps = {
@@ -53,7 +53,7 @@ export default function TagClient({ tag }: TagClientProps) {
   }
 
   if (isLoading) {
-    return <div className="container mx-auto px-4 py-8 text-center">加载中...</div>;
+    return <Loader className="mt-8" />;
   }
 
   return (

@@ -74,7 +74,7 @@ export function RandomImage() {
           </Button>
           <Button variant="ghost" size="sm" className="group" onClick={fetchRandomImages} disabled={loading}>
             <RefreshCw className={cn('size-4 group-hover:animate-spin', { 'animate-spin': loading })} />
-            <span className="ml-2">来点新的</span>
+            <span>来点新的</span>
           </Button>
         </div>
       </div>

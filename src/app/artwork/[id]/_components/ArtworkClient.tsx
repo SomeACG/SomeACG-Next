@@ -12,6 +12,7 @@ import { SiPixiv } from 'react-icons/si';
 import { useCallback, useMemo } from 'react';
 import Card from '@/components/ui/card';
 import Link from 'next/link';
+import Loader from '@/components/ui/loading/Loader';
 
 type ArtworkClientProps = {
   id: string;
@@ -51,7 +52,7 @@ export default function ArtworkClient({ id }: ArtworkClientProps) {
   }
 
   if (isLoading || !artwork) {
-    return <div className="container mx-auto px-4 py-8 text-center">加载中...</div>;
+    return <Loader className="mt-8" />;
   }
   return (
     <ClientOnly>
