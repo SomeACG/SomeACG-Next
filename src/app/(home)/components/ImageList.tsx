@@ -12,6 +12,7 @@ import { ImageItem } from './ImageItem';
 import { ImageToolbar } from './ImageToolbar';
 import InfiniteImageList from './InfiniteImageList';
 import { useColumnConfig } from '@/lib/hooks/useColumnConfig';
+import { DEFAULT_PAGE_SIZE } from '@/constants';
 
 interface ImageListProps {
   initialData: {
@@ -22,10 +23,9 @@ interface ImageListProps {
 
 export function ImageList({ initialData }: ImageListProps) {
   const page = useAtomValue(pageAtom);
-  const pageSize = 20;
   const setTotalPage = useSetAtom(totalPageAtom);
   const viewMode = useAtomValue(viewModeAtom);
-  const { images, total, isLoading, isError } = useImages(page, pageSize, initialData);
+  const { images, total, isLoading, isError } = useImages(page, DEFAULT_PAGE_SIZE, initialData);
   const columnConfig = useColumnConfig();
 
   // 使用 useCallback 缓存 render 函数，依赖项为空因为 ImageItem 是纯展示组件
@@ -35,9 +35,9 @@ export function ImageList({ initialData }: ImageListProps) {
 
   useEffect(() => {
     if (total) {
-      setTotalPage(Math.ceil(total / pageSize));
+      setTotalPage(Math.ceil(total / DEFAULT_PAGE_SIZE));
     }
-  }, [total, pageSize, setTotalPage]);
+  }, [total, setTotalPage]);
 
   const renderList = useCallback(() => {
     if (isLoading) {
