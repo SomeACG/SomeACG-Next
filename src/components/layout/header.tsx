@@ -95,7 +95,7 @@ export function Header() {
           onMouseLeave={handleMouseLeave}
         >
           <div className="relative h-full overflow-hidden">
-            <Lottie ref={lottieRef} src="https://cdn.lottielab.com/l/APXV8RHbvRVEoH.json" className="-mt-1.5 h-20" />
+            <Lottie ref={lottieRef} src="https://r2.cosine.ren/og/cos-gallery-lottie.json" className="-mt-1.5 h-20" />
           </div>
         </motion.div>
         <Navigator className="grow" />
