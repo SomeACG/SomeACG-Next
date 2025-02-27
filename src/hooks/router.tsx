@@ -38,7 +38,7 @@ export const useNavItems = () => {
       {
         key: 'Github',
         icon: <GithubIcon className="size-8 cursor-pointer" />,
-        onClick: () => window?.open('https://github.com/yusixian/SomeACG-Next', '_blank'),
+        onClick: () => window?.open('https://github.com/SomeACG/SomeACG-Next', '_blank'),
       },
       {
         key: 'CgDarkMode',

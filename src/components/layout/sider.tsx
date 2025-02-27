@@ -1,13 +1,12 @@
 'use client';
 
-import { useNavItems } from '@/hooks/app';
 import { useIsMounted } from '@/hooks/useIsMounted';
 import { oneLevelMenuExpandAtom, oneLevelTabSelectIdxAtom } from '@/store/app';
 import { useAtom } from 'jotai';
 import { useRouter } from 'next/navigation';
-import { useRef } from 'react';
 import Drawer from '../ui/drawer';
 import NavItem, { NavItemProps } from '../ui/navigator/NavItem';
+import { routers } from '@/constants/router';
 
 type SiderProps = {
   bottomItems: (NavItemProps & { key?: string })[];
@@ -18,7 +17,6 @@ const Sider = ({ bottomItems, menuTriggerRef }: SiderProps) => {
   const isMounted = useIsMounted();
   const [selectIdx1, setSelectIdx1] = useAtom(oneLevelTabSelectIdxAtom);
   const [mobileExpand, setMobileExpand] = useAtom(oneLevelMenuExpandAtom);
-  const { routers } = useNavItems();
 
   if (!isMounted) return null;
   return (
