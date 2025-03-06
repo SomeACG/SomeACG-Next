@@ -32,7 +32,6 @@ const imageCardVariants = cva('group relative overflow-hidden rounded-lg transit
 
 interface ImageItem {
   id: string;
-  url: string;
   height: number;
   width: number;
   payload: Image;

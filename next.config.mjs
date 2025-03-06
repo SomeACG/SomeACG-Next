@@ -18,6 +18,14 @@ const nextConfig = {
       destination: '/feed.xml',
     },
   ],
+  images: {
+    unoptimized: true,
+    remotePatterns: [
+      {
+        hostname: '*',
+      },
+    ],
+  },
 };
 
 const withMDX = createMDX({

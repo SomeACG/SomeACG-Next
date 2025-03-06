@@ -6,7 +6,6 @@ import { PhotoProvider } from 'react-photo-view';
 import { ImageToolbar } from './ImageToolbar';
 import { Image } from '@prisma/client';
 import MasonryGrid from '@/components/ui/MasonryGrid';
-import { transformPixivUrl } from '@/lib/utils';
 import { useState, useCallback } from 'react';
 import { DEFAULT_PAGE_SIZE } from '@/constants';
 
@@ -50,7 +49,6 @@ export function InfiniteImageList({ initialData }: InfiniteImageListProps) {
   // 转换图片数据格式以匹配MasonryGrid需要的ImageItem接口
   const gridItems = allImages.map((image) => ({
     id: image.id.toString(),
-    url: transformPixivUrl(image.rawurl || image.thumburl || ''), // 优先使用原图，否则使用缩略图
     width: image.width || 800, // 设置默认宽度
     height: image.height || 600, // 设置默认高度
     payload: image,

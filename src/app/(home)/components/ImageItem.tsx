@@ -1,17 +1,18 @@
 'use client';
+import ImageFb from '@/components/common/ImageFb';
 import { Button } from '@/components/ui/button';
 import Loader from '@/components/ui/loading/Loader';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import { Platform } from '@/lib/type';
-import { cn, genArtistUrl, genArtworkUrl, transformPixivUrl } from '@/lib/utils';
+import { cn, genArtistUrl, genArtworkUrl, getImageThumbUrl } from '@/lib/utils';
+import { Image } from '@prisma/client';
 import { AnimatePresence, motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { FaLink, FaSquareXTwitter } from 'react-icons/fa6';
 import { SiPixiv } from 'react-icons/si';
 import { PhotoView } from 'react-photo-view';
 import { ImageHoverCard } from './ImageHoverCard';
-import { Image } from '@prisma/client';
-import { useIsMobile } from '@/hooks/useIsMobile';
 
 interface ImageItemProps {
   data: Image;
@@ -19,13 +20,21 @@ interface ImageItemProps {
 }
 
 export function ImageItem({ data, className }: ImageItemProps) {
-  const { id, title, author, thumburl, rawurl, platform, authorid, pid, width, height } = data ?? {};
+  const { id, title, author, thumburl, rawurl, platform, authorid, pid, width, height, filename } = data ?? {};
   const [isHover, setIsHover] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const isMobile = useIsMobile();
-  const thumbShowUrl = useMemo(() => transformPixivUrl(thumburl ?? ''), [thumburl]);
-  const originShowUrl = useMemo(() => transformPixivUrl(rawurl ?? ''), [rawurl]);
+  const thumbShowUrl = useMemo(
+    () => getImageThumbUrl({ thumbUrl: thumburl ?? '', platform, filename }),
+    [filename, platform, thumburl],
+  );
+  const [realShowUrl, setRealShowUrl] = useState(thumbShowUrl?.transformThumbUrl ?? '');
+
+  const onImgFallback = useCallback((fallbackSrc: string) => {
+    setRealShowUrl(fallbackSrc);
+  }, []);
+
   const authorUrl = useMemo(
     () => genArtistUrl(platform, { uid: authorid?.toString() ?? '', username: author ?? '' }),
     [platform, authorid, author],
@@ -52,14 +61,17 @@ export function ImageItem({ data, className }: ImageItemProps) {
       onHoverEnd={() => setIsHover(false)}
       className={cn('group hover:ring-primary/50 relative z-1 overflow-hidden rounded-lg hover:ring-2', className)}
     >
-      <PhotoView src={originShowUrl}>
+      <PhotoView src={realShowUrl}>
         <div className="bg-primary/20 relative" style={{ width: '100%', paddingBottom }}>
           {isLoading && <Loader className="absolute inset-0" />}
           <div className="absolute inset-0">
-            <img
-              src={thumbShowUrl}
+            <ImageFb
+              src={thumbShowUrl.transformThumbUrl}
+              fallbackSrc={thumbShowUrl.s3ThumbUrl}
+              onImgFallback={onImgFallback}
               alt={title ?? ''}
               loading="lazy"
+              fill
               decoding="async"
               className={`h-full w-full cursor-pointer rounded-lg object-contain shadow-md transition-all duration-300 ${
                 isLoading ? 'opacity-0' : 'opacity-100'
