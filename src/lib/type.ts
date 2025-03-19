@@ -1,3 +1,5 @@
+import { Image, ImageTag } from '@prisma/client';
+
 export enum Platform {
   Pixiv = 'pixiv',
   Twitter = 'twitter',
@@ -9,4 +11,8 @@ export type Artist = {
   name: string;
   username?: string;
   create_time?: string; // TODO: resolve DateTime problem
+};
+
+export type ImageWithTag = Image & {
+  tags: string[];
 };

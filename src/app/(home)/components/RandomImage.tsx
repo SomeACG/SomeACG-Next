@@ -2,23 +2,24 @@
 
 import { Button } from '@/components/ui/button';
 import Card from '@/components/ui/card';
+import { ArrowLeftIcon } from '@/components/ui/icons/ArrowLeftIcon';
+import { ArrowRightIcon } from '@/components/ui/icons/ArrowRightIcon';
 import Loader from '@/components/ui/loading/Loader';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import { cn } from '@/lib/utils';
-import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
+import { Image } from '@prisma/client';
+import { RefreshCw } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { PhotoProvider } from 'react-photo-view';
 import superjson from 'superjson';
 import { ImageItem } from './ImageItem';
 import { ImageToolbar } from './ImageToolbar';
-import { ArrowLeftIcon } from '@/components/ui/icons/ArrowLeftIcon';
-import { ArrowRightIcon } from '@/components/ui/icons/ArrowRightIcon';
-import { useIsMobile } from '@/hooks/useIsMobile';
-import { Image } from '@prisma/client';
 
 type RandomImage = Image & {
   originUrl: string;
   authorUrl: string;
+  tags: string[];
 };
 
 export function RandomImage() {
@@ -43,6 +44,14 @@ export function RandomImage() {
   useEffect(() => {
     fetchRandomImages();
   }, [fetchRandomImages]);
+
+  // 检查是否有精选图片
+  // const hasPremiumImages = useMemo(() => {
+  //   if (!images || images.length === 0) return false;
+  //   return images.some((image) => {
+  //     return image.tags && image.tags.some((tag) => tag.tag === '精选');
+  //   });
+  // }, [images]);
 
   const scrollToStart = () => {
     const viewport = scrollContainerRef.current?.querySelector('[data-radix-scroll-area-viewport]');
@@ -85,6 +94,7 @@ export function RandomImage() {
             'flex-center': loading,
           },
         )}
+        // isPremium={hasPremiumImages}
       >
         {loading ? (
           <Loader />

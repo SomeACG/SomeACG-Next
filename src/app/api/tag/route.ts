@@ -43,7 +43,23 @@ export async function GET(request: Request) {
       take: limit,
     });
 
-    return NextResponse.json(serialize(images));
+    const allTags = await prisma.imageTag.findMany({
+      where: {
+        pid: {
+          in: images.map((img) => img.pid?.toString() ?? ''),
+        },
+      },
+    });
+
+    const imagesWithTags = images.map((img, index) => {
+      const imgTags = allTags.filter((tag) => tag && tag.pid === img.pid?.toString());
+      return {
+        ...img,
+        tags: imgTags.map(({ tag }) => tag?.replace(/#/g, '')),
+      };
+    });
+
+    return NextResponse.json(serialize(imagesWithTags));
   } catch (error) {
     console.error('Error fetching artworks by tag:', error);
     return NextResponse.json({ error: '获取作品失败' }, { status: 500 });

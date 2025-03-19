@@ -1,10 +1,9 @@
-import { Image } from '@prisma/client';
 import { useMemo } from 'react';
 import useSWRInfinite from 'swr/infinite';
-import useSWR from 'swr';
+import { ImageWithTag } from '../type';
 
 interface ImagesResponse {
-  images: Image[];
+  images: ImageWithTag[];
   total: number;
 }
 

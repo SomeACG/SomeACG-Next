@@ -1,9 +1,10 @@
 import { Image } from '@prisma/client';
 import superjson from 'superjson';
 import useSWR from 'swr';
+import { ImageWithTag } from '../type';
 
 interface ImagesResponse {
-  images: Image[];
+  images: ImageWithTag[];
   total: number;
 }
 

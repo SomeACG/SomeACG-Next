@@ -16,8 +16,24 @@ export async function getPaginatedImages(page: number, pageSize: number) {
     prisma.image.count(),
   ]);
 
+  const allTags = await prisma.imageTag.findMany({
+    where: {
+      pid: {
+        in: images.map((img) => img.pid?.toString() ?? ''),
+      },
+    },
+  });
+
+  const imagesWithTags = images.map((img, index) => {
+    const imgTags = allTags.filter((tag) => tag && tag.pid === img.pid?.toString());
+    return {
+      ...img,
+      tags: imgTags.map(({ tag }) => tag?.replace(/#/g, '')),
+    };
+  });
+
   const serializedData = superjson.serialize({
-    images,
+    images: imagesWithTags,
     total,
   });
 

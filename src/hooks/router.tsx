@@ -18,15 +18,15 @@ export const useNavItems = () => {
         key: 'ToggleViewMode',
         icon:
           viewMode === 'pagination' ? (
-            <>
-              <ViewIcon className="h-5 w-5" />
-              <span className="text-sm">切换到无限滚动</span>
-            </>
+            <div className="flex items-center gap-1 md:flex-col">
+              <ViewIcon className="size-5" />
+              <span className="text-sm">当前为分页模式</span>
+            </div>
           ) : (
-            <>
-              <ColumnsIcon className="h-5 w-5" />
-              <span className="text-sm">切换到分页模式</span>
-            </>
+            <div className="flex items-center gap-1 md:flex-col">
+              <ColumnsIcon className="size-5" />
+              <span className="text-sm">当前为无限模式</span>
+            </div>
           ),
         onClick: () => setViewMode(viewMode === 'pagination' ? 'infinite' : 'pagination'),
       },

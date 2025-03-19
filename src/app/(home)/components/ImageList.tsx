@@ -13,10 +13,11 @@ import { ImageToolbar } from './ImageToolbar';
 import InfiniteImageList from './InfiniteImageList';
 import { useColumnConfig } from '@/lib/hooks/useColumnConfig';
 import { DEFAULT_PAGE_SIZE } from '@/constants';
+import { ImageWithTag } from '@/lib/type';
 
 interface ImageListProps {
   initialData: {
-    images: Image[];
+    images: ImageWithTag[];
     total: number;
   };
 }
@@ -28,9 +29,8 @@ export function ImageList({ initialData }: ImageListProps) {
   const { images, total, isLoading, isError } = useImages(page, DEFAULT_PAGE_SIZE, initialData);
   const columnConfig = useColumnConfig();
 
-  // 使用 useCallback 缓存 render 函数，依赖项为空因为 ImageItem 是纯展示组件
-  const renderItem = useCallback((props: { data: Image; index: number }) => {
-    return <ImageItem data={props.data} />;
+  const renderItem = useCallback(({ data, index }: { data: ImageWithTag; index: number }) => {
+    return <ImageItem key={index} data={data} />;
   }, []);
 
   useEffect(() => {

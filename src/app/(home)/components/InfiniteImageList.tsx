@@ -1,17 +1,17 @@
 'use client';
 import { ClientOnly } from '@/components/common/ClientOnly';
+import MasonryGrid from '@/components/ui/MasonryGrid';
+import { DEFAULT_PAGE_SIZE } from '@/constants';
 import { useInfiniteImages } from '@/lib/hooks/useInfiniteImages';
+import { ImageWithTag } from '@/lib/type';
 import { AnimatePresence } from 'motion/react';
+import { useCallback, useState } from 'react';
 import { PhotoProvider } from 'react-photo-view';
 import { ImageToolbar } from './ImageToolbar';
-import { Image } from '@prisma/client';
-import MasonryGrid from '@/components/ui/MasonryGrid';
-import { useState, useCallback } from 'react';
-import { DEFAULT_PAGE_SIZE } from '@/constants';
 
 interface InfiniteImageListProps {
   initialData: {
-    images: Image[];
+    images: ImageWithTag[];
     total: number;
   };
 }

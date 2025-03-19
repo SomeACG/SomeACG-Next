@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Image } from '@prisma/client';
 import { cn } from '@/lib/utils';
 import { cva } from 'class-variance-authority';
+import { ImageWithTag } from '@/lib/type';
 
 const masonryGridVariants = cva('grid w-full gap-4', {
   variants: {
@@ -34,7 +35,7 @@ interface ImageItem {
   id: string;
   height: number;
   width: number;
-  payload: Image;
+  payload: ImageWithTag;
 }
 
 interface MasonryGridProps {

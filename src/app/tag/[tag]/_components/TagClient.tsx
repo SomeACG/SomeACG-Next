@@ -5,7 +5,7 @@ import { ImageToolbar } from '@/app/(home)/components/ImageToolbar';
 import { ClientOnly } from '@/components/common/ClientOnly';
 import Loader from '@/components/ui/loading/Loader';
 import { useColumnConfig } from '@/lib/hooks/useColumnConfig';
-import { Image } from '@prisma/client';
+import { ImageWithTag } from '@/lib/type';
 import { Masonry } from 'masonic';
 import { AnimatePresence } from 'motion/react';
 import { useCallback } from 'react';
@@ -43,7 +43,7 @@ export default function TagClient({ tag }: TagClientProps) {
   const allImages = pages ? pages.flat() : [];
   const hasMore = pages ? pages[pages.length - 1]?.length === ITEMS_PER_PAGE : true;
 
-  const renderItem = useCallback(({ data, index }: { data: Image; index: number }) => {
+  const renderItem = useCallback(({ data, index }: { data: ImageWithTag; index: number }) => {
     if (!data) return null;
     return <ImageItem data={data} key={data?.id + index} />;
   }, []);
