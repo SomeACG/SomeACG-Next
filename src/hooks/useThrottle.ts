@@ -1,5 +1,5 @@
+import { throttle } from 'es-toolkit';
 import { useRef, useEffect, useCallback } from 'react';
-import _ from 'lodash-es';
 
 /**
  * 它返回传入函数的节流版本，每 `delay` 毫秒仅调用一次
@@ -16,7 +16,7 @@ export function useThrottle(fn: any, delay = 300) {
   });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   return useCallback(
-    _.throttle((...args) => fnRef.current(...args), delay, options),
+    throttle((...args) => fnRef.current(...args), delay, options),
     [delay],
   );
 }

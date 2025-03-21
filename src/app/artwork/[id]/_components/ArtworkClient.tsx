@@ -8,13 +8,13 @@ import Loader from '@/components/ui/loading/Loader';
 import { useArtwork } from '@/lib/hooks/useImages';
 import { Platform } from '@/lib/type';
 import { cn, genArtistUrl, genArtworkUrl, getImageOriginUrl } from '@/lib/utils';
+import { uniq } from 'es-toolkit';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FaTags } from 'react-icons/fa';
 import { FaArrowRotateRight, FaCircleMinus, FaCirclePlus, FaSquareXTwitter } from 'react-icons/fa6';
 import { SiPixiv } from 'react-icons/si';
 import { PhotoProvider, PhotoView } from 'react-photo-view';
-
 type ArtworkClientProps = {
   id: string;
 };
@@ -29,7 +29,10 @@ export default function ArtworkClient({ id }: ArtworkClientProps) {
   }, [platform, title]);
   const isLandscape = useMemo(() => width && height && width > height, [width, height]);
   const [isImgLoading, setIsImgLoading] = useState(true);
-
+  const finalTags = useMemo(() => {
+    // TODO: 多图的时候 tag 有 bug ，待修复
+    return uniq(tags ?? []);
+  }, [tags]);
   // 计算容器高度
   const aspectRatio = useMemo(() => {
     if (width && height && width > 0 && height > 0) {
@@ -166,8 +169,8 @@ export default function ArtworkClient({ id }: ArtworkClientProps) {
                 <div className="flex items-start gap-2">
                   <span className="whitespace-nowrap text-gray-600 dark:text-gray-400">原始标签：</span>
                   <div className="flex flex-wrap gap-2">
-                    {Array.isArray(tags) && tags.length > 0 ? (
-                      tags.map((tag: string, index: number) => (
+                    {Array.isArray(finalTags) && finalTags.length > 0 ? (
+                      finalTags.map((tag: string, index: number) => (
                         <Link
                           key={index}
                           href={`/tag/${encodeURIComponent(tag.replace(/#/g, ''))}`}
