@@ -8,7 +8,6 @@ import { useRef, useEffect, useCallback } from 'react';
  * @returns 一个被 300ms 限制的函数
  */
 export function useThrottle(fn: any, delay = 300) {
-  const options = { leading: true, trailing: false }; // add custom lodash options
   const fnRef = useRef(fn);
   // use mutable ref to make useCallback/throttle not depend on `fn` dep
   useEffect(() => {
@@ -16,7 +15,7 @@ export function useThrottle(fn: any, delay = 300) {
   });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   return useCallback(
-    throttle((...args) => fnRef.current(...args), delay, options),
+    throttle((...args) => fnRef.current(...args), delay),
     [delay],
   );
 }
