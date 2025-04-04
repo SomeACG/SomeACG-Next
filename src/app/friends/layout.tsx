@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import DocLayout from '@/components/layout/doc-layout';
 
 export const metadata: Metadata = {
   title: '友链 - Cosine Gallery',
@@ -6,9 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function FriendsLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="prose prose-invert mx-auto max-w-4xl">{children}</div>
-    </div>
-  );
+  return <DocLayout>{children}</DocLayout>;
 }

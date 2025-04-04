@@ -1,9 +1,26 @@
+'use client';
 import { cn } from '@/lib/utils';
-import Lottie, { ILottie } from '@lottielab/lottie-player/react';
-import { motion, useMotionValueEvent, useScroll } from 'motion/react';
+import type { ILottie } from '@lottielab/lottie-player/react';
+import { AnimatePresence, motion, useMotionValueEvent, useScroll, Variants } from 'motion/react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Navigator } from '../ui/navigator';
+
+// 动态导入Lottie组件，禁用SSR
+const Lottie = dynamic(() => import('@lottielab/lottie-player/react').then((mod) => mod.default), { ssr: false });
+
+// 定义动画常量
+const HEADER_VARIANTS: Variants = {
+  hide: { y: -100 },
+  visible: { y: 0 },
+};
+
+const LOGO_VARIANTS: Variants = {
+  hide: { rotate: -180, scale: 0 },
+  visible: { rotate: 0, scale: 1 },
+  hover: { scale: 1.05, rotate: 2 },
+};
 
 export function Header() {
   const router = useRouter();
@@ -39,20 +56,20 @@ export function Header() {
     }
   }, []);
 
-  const handleMouseEnter = () => {
+  const onHoverStart = useCallback(() => {
     if (lottieRef.current) {
       lottieRef.current.play();
     }
-  };
+  }, []);
 
-  const handleMouseLeave = () => {
+  const onHoverEnd = useCallback(() => {
     if (lottieRef.current) {
       lottieRef.current.pause();
     }
-  };
+  }, []);
 
   return (
-    <>
+    <AnimatePresence mode="sync">
       <motion.header
         className={cn(
           'sticky top-0 z-10 flex items-center justify-between select-none md:justify-center',
@@ -61,38 +78,24 @@ export function Header() {
           'transition-all duration-500 ease-in-out',
           'shadow-sm hover:shadow-lg',
         )}
-        initial={{ y: -100, opacity: 0 }}
-        animate={{
-          y: visible ? 0 : -100,
-          opacity: visible ? 1 : 0,
-        }}
-        transition={{
-          duration: 0.6,
-          ease: [0.22, 1, 0.36, 1],
-          opacity: { duration: 0.3 },
-        }}
+        initial="visible"
+        animate={visible ? 'visible' : 'hide'}
+        variants={HEADER_VARIANTS}
       >
         <motion.div
-          initial={{ rotate: -180, scale: 0 }}
-          animate={{ scale: 1, rotate: 0 }}
+          initial="hide"
+          animate="visible"
+          whileHover="hover"
+          variants={LOGO_VARIANTS}
           transition={{
             type: 'spring',
             stiffness: 260,
             damping: 20,
           }}
-          whileHover={{
-            scale: 1.05,
-            rotate: 2,
-            transition: {
-              type: 'spring',
-              stiffness: 400,
-              damping: 10,
-            },
-          }}
           className="flex h-14 w-36 cursor-pointer items-center justify-center gap-2 text-2xl font-bold whitespace-nowrap"
           onClick={() => router.push('/')}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
+          onHoverStart={onHoverStart}
+          onHoverEnd={onHoverEnd}
         >
           <div className="relative h-full overflow-hidden">
             <Lottie ref={lottieRef} src="https://r2.cosine.ren/og/cos-gallery-lottie.json" className="-mt-1.5 h-20" />
@@ -100,6 +103,6 @@ export function Header() {
         </motion.div>
         <Navigator className="grow" />
       </motion.header>
-    </>
+    </AnimatePresence>
   );
 }
