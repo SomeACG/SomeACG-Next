@@ -41,12 +41,16 @@ export default function ArtworkClient({ id }: ArtworkClientProps) {
     return 1; // 默认 4:3 比例
   }, [width, height]);
 
-  const originShowUrl = getImageOriginUrl({
-    rawUrl: rawurl ?? '',
-    platform,
-    filename,
-  });
-  const [realShowUrl, setRealShowUrl] = useState(originShowUrl?.transformOriginUrl ?? '');
+  const originShowUrl = useMemo(
+    () =>
+      getImageOriginUrl({
+        rawUrl: rawurl ?? '',
+        platform,
+        filename,
+      }),
+    [rawurl, platform, filename],
+  );
+  const [realShowUrl, setRealShowUrl] = useState(originShowUrl?.s3OriginUrl ?? '');
 
   const onImgFallback = useCallback((fallbackSrc: string) => {
     setRealShowUrl(fallbackSrc);
@@ -72,9 +76,10 @@ export default function ArtworkClient({ id }: ArtworkClientProps) {
 
   useEffect(() => {
     if (!isImgLoading) {
-      setRealShowUrl(originShowUrl?.transformOriginUrl ?? '');
+      setRealShowUrl(originShowUrl?.s3OriginUrl ?? '');
     }
   }, [originShowUrl, isImgLoading]);
+
   if (isError) {
     return <div className="container mx-auto px-4 py-8 text-center">加载失败，请稍后再试，可能该作品信息还未同步</div>;
   }
@@ -103,8 +108,8 @@ export default function ArtworkClient({ id }: ArtworkClientProps) {
                 {isImgLoading && <Loader className="absolute inset-0" />}
                 <div className="absolute inset-0">
                   <ImageFb
-                    src={originShowUrl.transformOriginUrl}
-                    fallbackSrc={originShowUrl.s3OriginUrl}
+                    src={originShowUrl.s3OriginUrl}
+                    fallbackSrc={originShowUrl.transformOriginUrl}
                     onImgFallback={onImgFallback}
                     alt={title ?? ''}
                     loading="lazy"

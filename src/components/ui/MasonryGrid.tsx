@@ -1,10 +1,8 @@
 'use client';
 import { ImageItem } from '@/app/(home)/components/ImageItem';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Image } from '@prisma/client';
-import { cn } from '@/lib/utils';
-import { cva } from 'class-variance-authority';
 import { ImageWithTag } from '@/lib/type';
+import { cva } from 'class-variance-authority';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 const masonryGridVariants = cva('grid w-full gap-4', {
   variants: {
@@ -31,7 +29,7 @@ const imageCardVariants = cva('group relative overflow-hidden rounded-lg transit
   },
 });
 
-interface ImageItem {
+interface TImageItem {
   id: string;
   height: number;
   width: number;
@@ -39,7 +37,7 @@ interface ImageItem {
 }
 
 interface MasonryGridProps {
-  items: ImageItem[];
+  items: TImageItem[];
   loadMore: () => Promise<void>;
   hasMore: boolean;
 }
@@ -50,8 +48,8 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({ items, loadMore, hasMore }) =
   const loadingRef = useRef<HTMLDivElement>(null);
 
   // 将图片分配到不同的列中，尽量保持每列高度平衡
-  const getColumns = (items: ImageItem[], columnCount: number) => {
-    const columns: ImageItem[][] = Array.from({ length: columnCount }, () => []);
+  const getColumns = (items: TImageItem[], columnCount: number) => {
+    const columns: TImageItem[][] = Array.from({ length: columnCount }, () => []);
     const columnHeights = new Array(columnCount).fill(0);
 
     items.forEach((item) => {

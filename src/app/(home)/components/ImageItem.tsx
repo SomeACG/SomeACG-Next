@@ -33,12 +33,11 @@ export function ImageItem({ data, className, premiumMode }: ImageItemProps) {
     () => getImageThumbUrl({ thumbUrl: thumburl ?? '', platform, filename }),
     [filename, platform, thumburl],
   );
-  const [realShowUrl, setRealShowUrl] = useState(thumbShowUrl?.transformThumbUrl ?? '');
+  const [realShowUrl, setRealShowUrl] = useState(thumbShowUrl?.s3ThumbUrl ?? '');
   // console.log('image item', data);
   const onImgFallback = useCallback((fallbackSrc: string) => {
     setRealShowUrl(fallbackSrc);
   }, []);
-
   const authorUrl = useMemo(
     () => genArtistUrl(platform, { uid: authorid?.toString() ?? '', username: author ?? '' }),
     [platform, authorid, author],
@@ -77,8 +76,8 @@ export function ImageItem({ data, className, premiumMode }: ImageItemProps) {
           {isLoading && <Loader className="absolute inset-0" />}
           <div className="absolute inset-0">
             <ImageFb
-              src={thumbShowUrl.transformThumbUrl}
-              fallbackSrc={thumbShowUrl.s3ThumbUrl}
+              src={thumbShowUrl.s3ThumbUrl}
+              fallbackSrc={thumbShowUrl.transformThumbUrl}
               onImgFallback={onImgFallback}
               alt={title ?? ''}
               loading="lazy"
