@@ -60,6 +60,7 @@ export default function ArtworkClient({ id }: ArtworkClientProps) {
     uid: authorid?.toString() ?? '',
     username: author ?? '',
   });
+  const internalArtistUrl = `/artist/${platform}/${authorid}`;
   const artworkUrl = genArtworkUrl({
     platform,
     pid: pid ?? '',
@@ -129,11 +130,24 @@ export default function ArtworkClient({ id }: ArtworkClientProps) {
               <div className="flex flex-col space-y-4">
                 <div className="flex items-center gap-2">
                   <span className="text-gray-600 dark:text-gray-400">作者：</span>
-                  <a href={authorUrl} target="_blank" className="text-primary flex items-center gap-2 hover:underline">
-                    {platform === Platform.Pixiv && <SiPixiv className="text-xl" />}
-                    {platform === Platform.Twitter && <FaSquareXTwitter className="text-xl" />}
-                    {author}
-                  </a>
+                  <div className="flex items-center gap-2">
+                    <Link href={internalArtistUrl} className="text-primary flex items-center gap-2 hover:underline">
+                      {platform === Platform.Pixiv && <SiPixiv className="text-xl" />}
+                      {platform === Platform.Twitter && <FaSquareXTwitter className="text-xl" />}
+                      {author}
+                    </Link>
+                    {authorUrl && (
+                      <a
+                        href={authorUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                        title={`在 ${platform} 上查看`}
+                      >
+                        [外链]
+                      </a>
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-2">

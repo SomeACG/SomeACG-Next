@@ -12,6 +12,7 @@ import { FaLink, FaSquareXTwitter } from 'react-icons/fa6';
 import { SiPixiv } from 'react-icons/si';
 import { PhotoView } from 'react-photo-view';
 import { ImageHoverCard } from './ImageHoverCard';
+import Link from 'next/link';
 
 interface ImageItemProps {
   data: ImageWithTag;
@@ -42,6 +43,7 @@ export function ImageItem({ data, className, premiumMode }: ImageItemProps) {
     () => genArtistUrl(platform, { uid: authorid?.toString() ?? '', username: author ?? '' }),
     [platform, authorid, author],
   );
+  const internalArtistUrl = useMemo(() => `/artist/${platform}/${authorid}`, [platform, authorid]);
   const artworkUrl = useMemo(
     () => genArtworkUrl({ platform: platform ?? '', pid: pid ?? '', username: author ?? '' }),
     [platform, author, pid],
@@ -100,17 +102,17 @@ export function ImageItem({ data, className, premiumMode }: ImageItemProps) {
           <h2 className="truncate text-sm/4 font-semibold">{title}</h2>
 
           <div className="mt-1.5 flex items-center justify-between gap-1 text-white">
-            <a
-              target="_blank"
+            <Link
+              href={internalArtistUrl}
               className="flex-center group/author border-primary bg-primary/50 hover:bg-primary/80 h-6 cursor-pointer gap-1.5 rounded-full border px-1.5"
-              href={authorUrl}
+              onClick={(e) => e.stopPropagation()}
             >
               {platform === Platform.Pixiv && <SiPixiv className="size-4 opacity-70 group-hover/author:opacity-100" />}
               {platform === Platform.Twitter && (
                 <FaSquareXTwitter className="size-4 opacity-70 group-hover/author:opacity-100" />
               )}
               <span className="block max-w-16 truncate text-xs">{author}</span>
-            </a>
+            </Link>
             <Button
               variant="ghost"
               size="xs"
@@ -137,6 +139,7 @@ export function ImageItem({ data, className, premiumMode }: ImageItemProps) {
                 platform={platform as Platform}
                 artworkUrl={artworkUrl ?? ''}
                 authorUrl={authorUrl ?? ''}
+                authorid={authorid?.toString() ?? ''}
               />
             </div>
           )}

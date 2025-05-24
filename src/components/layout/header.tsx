@@ -2,13 +2,10 @@
 import { cn } from '@/lib/utils';
 import type { ILottie } from '@lottielab/lottie-player/react';
 import { AnimatePresence, motion, useMotionValueEvent, useScroll, Variants } from 'motion/react';
-import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import DynamicLottie from '../ui/DynamicLottie';
 import { Navigator } from '../ui/navigator';
-
-// 动态导入Lottie组件，禁用SSR
-const Lottie = dynamic(() => import('@lottielab/lottie-player/react').then((mod) => mod.default), { ssr: false });
 
 // 定义动画常量
 const HEADER_VARIANTS: Variants = {
@@ -98,7 +95,7 @@ export function Header() {
           onHoverEnd={onHoverEnd}
         >
           <div className="relative h-full overflow-hidden">
-            <Lottie ref={lottieRef} src="https://r2.cosine.ren/og/cos-gallery-lottie.json" className="-mt-1.5 h-20" />
+            <DynamicLottie ref={lottieRef} src="https://r2.cosine.ren/og/cos-gallery-lottie.json" className="-mt-1.5 h-20" />
           </div>
         </motion.div>
         <Navigator className="grow" />

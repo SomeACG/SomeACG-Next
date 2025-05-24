@@ -3,6 +3,7 @@ import { microDampingPreset } from '@/constants/anim/spring';
 import { Platform } from '@/lib/type';
 import { motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { FaLink, FaSquareXTwitter } from 'react-icons/fa6';
 import { SiPixiv } from 'react-icons/si';
 import { TiInfoLarge } from 'react-icons/ti';
@@ -14,10 +15,20 @@ interface ImageHoverCardProps {
   platform?: Platform;
   artworkUrl: string;
   authorUrl: string;
+  authorid?: string | number;
 }
 
-export function ImageHoverCard({ id, title = '', author = '', platform, artworkUrl, authorUrl }: ImageHoverCardProps) {
+export function ImageHoverCard({
+  id,
+  title = '',
+  author = '',
+  platform,
+  artworkUrl,
+  authorUrl,
+  authorid,
+}: ImageHoverCardProps) {
   const router = useRouter();
+  const internalArtistUrl = `/artist/${platform}/${authorid}`;
 
   return (
     <motion.div
@@ -31,10 +42,9 @@ export function ImageHoverCard({ id, title = '', author = '', platform, artworkU
     >
       <h2 className="truncate text-sm/4 font-semibold">{title}</h2>
       <div className="flex items-center justify-between gap-1.5 overflow-hidden">
-        <a
-          target="_blank"
+        <Link
+          href={internalArtistUrl}
           className="flex-center group/author border-primary bg-primary/50 hover:bg-primary/80 cursor-pointer gap-1.5 rounded-full border px-2 py-1 opacity-90 transition duration-300 hover:opacity-100"
-          href={authorUrl}
           onClick={(e) => {
             e.stopPropagation();
           }}
@@ -42,7 +52,7 @@ export function ImageHoverCard({ id, title = '', author = '', platform, artworkU
           {platform === Platform.Pixiv && <SiPixiv className="size-3.5" />}
           {platform === Platform.Twitter && <FaSquareXTwitter className="size-3.5" />}
           <span className="inline-block max-w-20 truncate text-xs text-white">{author}</span>
-        </a>
+        </Link>
         <Button
           variant="ghost"
           size="xs"
