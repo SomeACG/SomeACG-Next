@@ -1,27 +1,73 @@
 'use client';
 
 import { ClientOnly } from '@/components/common/ClientOnly';
+import MasonryGrid from '@/components/ui/MasonryGrid';
 import { useInfinitePopularArtists } from '@/lib/hooks/usePopularArtists';
+import { PopularArtist } from '@/lib/type';
 import { AnimatePresence } from 'motion/react';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { FaFire, FaRandom, FaSort, FaTrophy, FaUsers } from 'react-icons/fa';
 import { PhotoProvider } from 'react-photo-view';
 import { ImageToolbar } from '../../(home)/components/ImageToolbar';
-import ArtistsMasonryGrid from './ArtistsMasonryGrid';
+import ArtistCard from './ArtistCard';
 
 type SortType = 'artworks' | 'random';
 
 const pageSize = 20;
 const COOLDOWN_TIME = 1000;
 
+// Artist item interface for MasonryGrid
+interface ArtistItem {
+  id: string;
+  artist: PopularArtist;
+  estimatedHeight: number;
+}
+
 export default function ArtistsClient() {
   const [sortBy, setSortBy] = useState<SortType>('artworks');
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [lastLoadTime, setLastLoadTime] = useState(0);
 
   const { allArtists, total, isLoading, error, hasNextPage, fetchNextPage, mutate, isValidating } = useInfinitePopularArtists(
     pageSize,
     sortBy,
+  );
+
+  // Estimate card height based on artist data
+  const getEstimatedHeight = useCallback((artist: PopularArtist): number => {
+    let baseHeight = 200; // Base content height (padding, text, buttons)
+
+    // Determine likely aspect ratio and add corresponding image height
+    const isLikelyPortrait = artist.artworkCount % 3 === 0; // Every 3rd artist gets portrait treatment
+    const isLikelySquare = artist.artworkCount % 4 === 0; // Every 4th artist gets square treatment
+
+    if (isLikelyPortrait) {
+      baseHeight += 300; // Portrait image height
+      baseHeight += 40; // Add extra height for portrait label overlay
+    } else if (isLikelySquare) {
+      baseHeight += 250; // Square image height
+    } else {
+      baseHeight += 200; // Landscape image height
+    }
+
+    // Add height based on content
+    if (artist.author && artist.author.length > 15) {
+      baseHeight += 30; // Longer names need more space
+    }
+
+    // Add small random variation to avoid too uniform layout
+    const variation = Math.random() * 40 - 20; // -20 to +20 pixels
+
+    return Math.max(250, baseHeight + variation);
+  }, []);
+
+  // Convert artists to MasonryGrid items
+  const artistItems: ArtistItem[] = useMemo(
+    () =>
+      allArtists.map((artist, index) => ({
+        id: `${artist.platform}-${artist.authorid}`,
+        artist,
+        estimatedHeight: getEstimatedHeight(artist),
+      })),
+    [allArtists, getEstimatedHeight],
   );
 
   const handleSortChange = async (newSortBy: SortType) => {
@@ -32,34 +78,38 @@ export default function ArtistsClient() {
   };
 
   const handleLoadMore = useCallback(async () => {
-    const now = Date.now();
-    console.log('🔄 handleLoadMore called', {
-      isLoadingMore,
-      hasNextPage,
-      timeSinceLastLoad: now - lastLoadTime,
-      COOLDOWN_TIME,
-      isValidating,
-      currentArtistsCount: allArtists.length,
-    });
-
-    if (isLoadingMore || !hasNextPage || now - lastLoadTime < COOLDOWN_TIME || isValidating) {
-      console.log('⚠️ handleLoadMore: early return due to conditions');
+    if (!hasNextPage || isValidating) {
       return;
     }
 
-    console.log('🚀 handleLoadMore: starting load...');
-    setIsLoadingMore(true);
-    setLastLoadTime(now);
+    console.log('🔄 Loading more artists...', {
+      currentCount: allArtists.length,
+      hasNextPage,
+      isValidating,
+    });
+
     try {
-      const result = await fetchNextPage();
-      console.log('✅ handleLoadMore: fetchNextPage result', result);
+      await fetchNextPage();
+      console.log('✅ Successfully loaded more artists, new count:', allArtists.length);
     } catch (error) {
       console.error('❌ Failed to load more artists:', error);
-    } finally {
-      setIsLoadingMore(false);
-      console.log('🏁 handleLoadMore: finished, new count:', allArtists.length);
     }
-  }, [fetchNextPage, hasNextPage, isLoadingMore, lastLoadTime, isValidating, allArtists.length]);
+  }, [fetchNextPage, hasNextPage, isValidating, allArtists.length]);
+
+  // Custom column count for artists page
+  const getColumnCount = useCallback(() => {
+    if (typeof window === 'undefined') return 2;
+    if (window.innerWidth >= 1280) return 4; // xl
+    if (window.innerWidth >= 1024) return 3; // lg
+    if (window.innerWidth >= 640) return 2; // sm
+    return 1; // mobile
+  }, []);
+
+  // Render function for artist items
+  const renderArtistItem = useCallback(
+    (item: ArtistItem, index: number) => <ArtistCard artist={item.artist} index={index} />,
+    [],
+  );
 
   const glassCard = 'border border-white/20 bg-white/10 backdrop-blur-xl dark:border-gray-800/50 dark:bg-gray-900/10';
   const errorCard =
@@ -239,11 +289,14 @@ export default function ArtistsClient() {
                     </div>
                   </div>
                 ) : (
-                  <ArtistsMasonryGrid
-                    artists={allArtists}
+                  <MasonryGrid
+                    items={artistItems}
                     hasMore={hasNextPage}
                     loadMore={handleLoadMore}
-                    isLoading={isLoadingMore}
+                    isLoading={isLoading}
+                    renderItem={renderArtistItem}
+                    enableHover={false}
+                    getColumnCount={getColumnCount}
                   />
                 )}
               </AnimatePresence>

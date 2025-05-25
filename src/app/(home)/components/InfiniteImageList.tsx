@@ -5,8 +5,9 @@ import { DEFAULT_PAGE_SIZE } from '@/constants';
 import { useInfiniteImages } from '@/lib/hooks/useInfiniteImages';
 import { ImageWithTag } from '@/lib/type';
 import { AnimatePresence } from 'motion/react';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { PhotoProvider } from 'react-photo-view';
+import { ImageItem } from './ImageItem';
 import { ImageToolbar } from './ImageToolbar';
 
 interface InfiniteImageListProps {
@@ -14,6 +15,14 @@ interface InfiniteImageListProps {
     images: ImageWithTag[];
     total: number;
   };
+}
+
+// Image item interface for MasonryGrid
+interface ImageGridItem {
+  id: string;
+  width: number;
+  height: number;
+  payload: ImageWithTag;
 }
 
 export function InfiniteImageList({ initialData }: InfiniteImageListProps) {
@@ -38,6 +47,21 @@ export function InfiniteImageList({ initialData }: InfiniteImageListProps) {
     }
   }, [fetchNextPage, isLoading, lastLoadTime]);
 
+  // 转换图片数据格式以匹配MasonryGrid需要的接口
+  const gridItems: ImageGridItem[] = useMemo(
+    () =>
+      allImages.map((image) => ({
+        id: image.id.toString(),
+        width: image.width || 800, // 设置默认宽度
+        height: image.height || 600, // 设置默认高度
+        payload: image,
+      })),
+    [allImages],
+  );
+
+  // Render function for image items
+  const renderImageItem = useCallback((item: ImageGridItem, index: number) => <ImageItem data={item.payload} />, []);
+
   if (error) {
     return (
       <div className="flex-center min-h-[200px]">
@@ -45,14 +69,6 @@ export function InfiniteImageList({ initialData }: InfiniteImageListProps) {
       </div>
     );
   }
-
-  // 转换图片数据格式以匹配MasonryGrid需要的ImageItem接口
-  const gridItems = allImages.map((image) => ({
-    id: image.id.toString(),
-    width: image.width || 800, // 设置默认宽度
-    height: image.height || 600, // 设置默认高度
-    payload: image,
-  }));
 
   return (
     <div className="flex w-full flex-col gap-4">
@@ -62,7 +78,14 @@ export function InfiniteImageList({ initialData }: InfiniteImageListProps) {
         >
           <ClientOnly>
             {allImages.length > 0 ? (
-              <MasonryGrid items={gridItems} loadMore={handleLoadMore} hasMore={hasNextPage} />
+              <MasonryGrid
+                items={gridItems}
+                loadMore={handleLoadMore}
+                hasMore={hasNextPage}
+                isLoading={isLoading}
+                renderItem={renderImageItem}
+                enableHover={true}
+              />
             ) : (
               <div className="flex-center min-h-[200px]">
                 <div className="text-lg">暂无数据</div>

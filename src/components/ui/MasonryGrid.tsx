@@ -1,6 +1,4 @@
 'use client';
-import { ImageItem } from '@/app/(home)/components/ImageItem';
-import { ImageWithTag } from '@/lib/type';
 import { cva } from 'class-variance-authority';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -8,6 +6,7 @@ const masonryGridVariants = cva('grid w-full gap-4', {
   variants: {
     columns: {
       // TODO: 因为目前就需要这么几列，所以先这么写了，tailwind 动态值目前还不支持
+      1: 'grid-cols-1',
       2: 'grid-cols-2',
       3: 'grid-cols-3',
       4: 'grid-cols-4',
@@ -29,35 +28,58 @@ const imageCardVariants = cva('group relative overflow-hidden rounded-lg transit
   },
 });
 
-interface TImageItem {
+interface BaseMasonryItem {
   id: string;
-  height: number;
-  width: number;
-  payload: ImageWithTag;
+  estimatedHeight?: number;
 }
 
-interface MasonryGridProps {
-  items: TImageItem[];
+interface MasonryGridProps<T extends BaseMasonryItem> {
+  items: T[];
   loadMore: () => Promise<void>;
-  hasMore: boolean;
+  hasMore: boolean | undefined;
+  isLoading?: boolean;
+  renderItem: (item: T, index: number) => React.ReactNode;
+  getItemHeight?: (item: T) => number;
+  enableHover?: boolean;
+  getColumnCount?: () => number;
 }
 
-const MasonryGrid: React.FC<MasonryGridProps> = ({ items, loadMore, hasMore }) => {
+function MasonryGrid<T extends BaseMasonryItem>({
+  items,
+  loadMore,
+  hasMore,
+  isLoading = false,
+  renderItem,
+  getItemHeight,
+  enableHover = true,
+  getColumnCount: customGetColumnCount,
+}: MasonryGridProps<T>) {
   const [loading, setLoading] = useState(false);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement>(null);
 
   // 将图片分配到不同的列中，尽量保持每列高度平衡
-  const getColumns = (items: TImageItem[], columnCount: number) => {
-    const columns: TImageItem[][] = Array.from({ length: columnCount }, () => []);
+  const getColumns = (items: T[], columnCount: number) => {
+    const columns: T[][] = Array.from({ length: columnCount }, () => []);
     const columnHeights = new Array(columnCount).fill(0);
 
     items.forEach((item) => {
-      const aspectRatio = item.width / item.height;
-      const normalizedHeight = item.height / item.width; // 归一化高度，考虑宽度会被拉伸到列宽
+      let itemHeight = 1;
+      let aspectRatio = 1;
 
-      if (aspectRatio > 1.2 && columnCount > 1) {
-        // 处理宽图：找到最短的两列
+      if (getItemHeight) {
+        itemHeight = getItemHeight(item);
+      } else if (item.estimatedHeight) {
+        itemHeight = item.estimatedHeight;
+      } else if ('height' in item && 'width' in item) {
+        const typedItem = item as any;
+        aspectRatio = typedItem.width / typedItem.height;
+        itemHeight = typedItem.height / typedItem.width; // 归一化高度，考虑宽度会被拉伸到列宽
+      }
+
+      // 处理宽图情况
+      if (aspectRatio > 1.2 && columnCount > 1 && 'height' in item && 'width' in item) {
+        // 找到最短的两列
         let shortestCol = 0;
         let secondShortestCol = 1;
 
@@ -74,18 +96,18 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({ items, loadMore, hasMore }) =
         const finalCol = Math.min(shortestCol, secondShortestCol);
         if (finalCol < columnCount - 1) {
           columns[finalCol].push(item);
-          columnHeights[finalCol] += normalizedHeight;
+          columnHeights[finalCol] += itemHeight;
         } else {
           // 如果找不到合适的相邻列，就放在最短的列
           const shortestCol = columnHeights.indexOf(Math.min(...columnHeights));
           columns[shortestCol].push(item);
-          columnHeights[shortestCol] += normalizedHeight;
+          columnHeights[shortestCol] += itemHeight;
         }
       } else {
-        // 普通图片：放在最短的列
+        // 普通图片或艺术家卡片：放在最短的列
         const shortestCol = columnHeights.indexOf(Math.min(...columnHeights));
         columns[shortestCol].push(item);
-        columnHeights[shortestCol] += normalizedHeight;
+        columnHeights[shortestCol] += itemHeight;
       }
     });
 
@@ -95,13 +117,13 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({ items, loadMore, hasMore }) =
   const handleObserver = useCallback(
     async (entries: IntersectionObserverEntry[]) => {
       const [entry] = entries;
-      if (entry.isIntersecting && !loading && hasMore) {
+      if (entry.isIntersecting && !loading && !isLoading && hasMore) {
         setLoading(true);
         await loadMore();
         setLoading(false);
       }
     },
-    [loading, hasMore, loadMore],
+    [loading, isLoading, hasMore, loadMore],
   );
 
   useEffect(() => {
@@ -120,16 +142,18 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({ items, loadMore, hasMore }) =
     return () => {
       observer.disconnect();
     };
-  }, [loading, hasMore, loadMore, handleObserver]);
+  }, [handleObserver]);
 
   // 响应式列数
-  const getColumnCount = () => {
+  const defaultGetColumnCount = () => {
     if (typeof window === 'undefined') return 1;
-    if (window.innerWidth >= 1024) return 4; // lg
-    if (window.innerWidth >= 768) return 3; // sm
-    return 2;
+    if (window.innerWidth >= 1280) return 4; // xl
+    if (window.innerWidth >= 1024) return 3; // lg
+    if (window.innerWidth >= 640) return 2; // sm
+    return 1;
   };
 
+  const getColumnCount = customGetColumnCount || defaultGetColumnCount;
   const [columnCount, setColumnCount] = useState(getColumnCount());
 
   useEffect(() => {
@@ -139,28 +163,30 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({ items, loadMore, hasMore }) =
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [getColumnCount]);
 
   const columns = getColumns(items, columnCount);
 
   return (
     <div className="w-full">
-      <div className={masonryGridVariants({ columns: columnCount as 2 | 3 | 4 })}>
+      <div className={masonryGridVariants({ columns: columnCount as 1 | 2 | 3 | 4 })}>
         {columns.map((column, columnIndex) => (
           <div key={columnIndex} className="w-full space-y-4">
-            {column.map((item) => (
-              <div key={item.id}>
-                <div className={imageCardVariants()}>
-                  <ImageItem data={item?.payload} />
+            {column.map((item, itemIndex) => {
+              // 计算全局索引
+              const globalIndex = items.findIndex((globalItem) => globalItem.id === item.id);
+              return (
+                <div key={item.id}>
+                  <div className={enableHover ? imageCardVariants() : ''}>{renderItem(item, globalIndex)}</div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ))}
       </div>
 
       <div ref={loadingRef} className="mt-8 flex h-20 items-center justify-center">
-        {loading && (
+        {(loading || isLoading) && (
           <div className="group relative overflow-hidden rounded-2xl border border-white/20 bg-white/10 px-8 py-6 backdrop-blur-xl dark:border-gray-800/50 dark:bg-gray-900/10">
             {/* Background decoration */}
             <div className="absolute inset-0 opacity-30">
@@ -187,7 +213,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({ items, loadMore, hasMore }) =
             </div>
           </div>
         )}
-        {!hasMore && (
+        {!hasMore && items.length > 0 && (
           <div className="relative overflow-hidden rounded-2xl border border-gray-200/30 bg-gradient-to-br from-gray-50/80 via-white/60 to-gray-50/80 px-8 py-6 shadow-lg shadow-gray-100/20 backdrop-blur-xl dark:border-gray-700/30 dark:from-gray-800/20 dark:via-gray-700/15 dark:to-gray-800/20 dark:shadow-gray-900/20">
             {/* Background decoration */}
             <div className="absolute inset-0 opacity-20">
@@ -214,6 +240,6 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({ items, loadMore, hasMore }) =
       </div>
     </div>
   );
-};
+}
 
 export default MasonryGrid;

@@ -34,6 +34,8 @@ export function useInfinitePopularArtists(pageSize = 20, sortBy: 'artworks' | 'r
   const { data, error, size, setSize, mutate, isValidating } = useSWRInfinite(getKey, fetcher, {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
+    revalidateFirstPage: false,
+    parallel: false,
   });
 
   const allArtists = data ? data.flatMap((page) => page.artists) : [];
@@ -53,46 +55,13 @@ export function useInfinitePopularArtists(pageSize = 20, sortBy: 'artworks' | 'r
 
       console.log('📡 fetchNextPage called', { currentSize, newSize, currentDataLength: data?.length });
 
-      // Set new size to trigger fetch
-      setSize(newSize);
-
-      // Wait for the data to be fetched by checking isValidating
-      return new Promise((resolve, reject) => {
-        let timeoutId: NodeJS.Timeout;
-        let retryCount = 0;
-        const maxRetries = 30; // 3 seconds timeout (100ms * 30)
-
-        const checkForNewData = () => {
-          // Clear previous timeout
-          if (timeoutId) clearTimeout(timeoutId);
-
-          console.log(`🔍 checkForNewData attempt ${retryCount + 1}`, {
-            currentDataLength: data?.length,
-            expectedLength: newSize,
-            isValidating,
-          });
-
-          // Check if we got new data or if validation finished
-          if (data && data.length >= newSize) {
-            console.log('✅ fetchNextPage: got new data', data);
-            resolve(data);
-            return;
-          }
-
-          // Check if we've exceeded max retries
-          if (retryCount >= maxRetries) {
-            console.log('❌ fetchNextPage: timeout');
-            reject(new Error('Timeout waiting for new data'));
-            return;
-          }
-
-          retryCount++;
-          timeoutId = setTimeout(checkForNewData, 100);
-        };
-
-        // Start checking
-        checkForNewData();
-      });
+      try {
+        await setSize(newSize);
+        console.log('✅ fetchNextPage: successfully loaded page', newSize);
+      } catch (error) {
+        console.error('❌ fetchNextPage: failed to load page', newSize, error);
+        throw error;
+      }
     },
     mutate,
   };

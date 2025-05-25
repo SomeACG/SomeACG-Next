@@ -1,5 +1,6 @@
 'use client';
 
+import { ImageItem } from '@/app/(home)/components/ImageItem';
 import { ImageToolbar } from '@/app/(home)/components/ImageToolbar';
 import { ClientOnly } from '@/components/common/ClientOnly';
 import Loader from '@/components/ui/loading/Loader';
@@ -7,7 +8,7 @@ import MasonryGrid from '@/components/ui/MasonryGrid';
 import { useArtistInfo, useInfiniteArtistImages } from '@/lib/hooks/useImages';
 import { ImageWithTag, Platform } from '@/lib/type';
 import { genArtistUrl } from '@/lib/utils';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { FaCalendar, FaExternalLinkAlt, FaHashtag, FaImages } from 'react-icons/fa';
 import { FaSquareXTwitter } from 'react-icons/fa6';
 import { SiPixiv } from 'react-icons/si';
@@ -21,6 +22,14 @@ type ArtistClientProps = {
     total: number;
   };
 };
+
+// Image item interface for MasonryGrid
+interface ImageGridItem {
+  id: string;
+  width: number;
+  height: number;
+  payload: ImageWithTag;
+}
 
 export default function ArtistClient({ platform, uid, initialData }: ArtistClientProps) {
   const pageSize = 24;
@@ -60,13 +69,20 @@ export default function ArtistClient({ platform, uid, initialData }: ArtistClien
     username: artistInfo?.author ?? '',
   });
 
-  // 转换图片数据格式以匹配MasonryGrid需要的ImageItem接口
-  const gridItems = allImages.map((image) => ({
-    id: image.id.toString(),
-    width: image.width || 800, // 设置默认宽度
-    height: image.height || 600, // 设置默认高度
-    payload: image,
-  }));
+  // 转换图片数据格式以匹配MasonryGrid需要的接口
+  const gridItems: ImageGridItem[] = useMemo(
+    () =>
+      allImages.map((image) => ({
+        id: image.id.toString(),
+        width: image.width || 800, // 设置默认宽度
+        height: image.height || 600, // 设置默认高度
+        payload: image,
+      })),
+    [allImages],
+  );
+
+  // Render function for image items
+  const renderImageItem = useCallback((item: ImageGridItem, index: number) => <ImageItem data={item.payload} />, []);
 
   // Shared styles
   const glassCard = 'border border-white/20 bg-white/10 backdrop-blur-xl dark:border-gray-800/50 dark:bg-gray-900/10';
@@ -351,7 +367,14 @@ export default function ArtistClient({ platform, uid, initialData }: ArtistClien
               >
                 <ClientOnly>
                   {allImages.length > 0 ? (
-                    <MasonryGrid items={gridItems} loadMore={handleLoadMore} hasMore={hasNextPage} />
+                    <MasonryGrid
+                      items={gridItems}
+                      loadMore={handleLoadMore}
+                      hasMore={hasNextPage}
+                      isLoading={isLoadingMore}
+                      renderItem={renderImageItem}
+                      enableHover={true}
+                    />
                   ) : (
                     <div className="flex-center min-h-[200px]">
                       <div className="text-lg">该画师暂无作品</div>
