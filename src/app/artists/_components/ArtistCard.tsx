@@ -235,7 +235,7 @@ export default function ArtistCard({ artist, index }: ArtistCardProps) {
           </div>
         </div>
         <div className="mb-5 grid grid-cols-2 gap-3">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <div className="rounded-2xl bg-gradient-to-br from-blue-500/20 to-blue-600/20 p-3 ring-1 shadow-lg ring-blue-500/30 backdrop-blur-sm">
               <FaImages className="h-4 w-4 text-blue-500" />
             </div>
@@ -247,13 +247,13 @@ export default function ArtistCard({ artist, index }: ArtistCardProps) {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <div className="rounded-2xl bg-gradient-to-br from-green-500/20 to-emerald-600/20 p-3 ring-1 shadow-lg ring-green-500/30 backdrop-blur-sm">
               <FaCalendar className="h-4 w-4 text-green-500" />
             </div>
             <div>
-              <div className="text-xs text-gray-600 dark:text-gray-400">最近更新</div>
-              <div className="bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-lg font-semibold text-transparent">
+              <div className="text-xs text-gray-600 dark:text-gray-400">最近收录</div>
+              <div className="bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-lg font-semibold whitespace-nowrap text-transparent">
                 {formatDate(lastUpdateTime)}
               </div>
             </div>
