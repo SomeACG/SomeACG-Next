@@ -158,3 +158,180 @@ export async function getArtistInfo(platform: string, authorid: string) {
     artworkCount,
   };
 }
+
+/**
+ * 获取热门画师列表
+ * @param page 页数
+ * @param pageSize 每页数量
+ * @param sortBy 排序方式: 'artworks' | 'random'
+ * @returns 热门画师数据
+ */
+export async function getPopularArtists(page: number, pageSize: number, sortBy: 'artworks' | 'random' = 'artworks') {
+  const skip = (page - 1) * pageSize;
+  const take = pageSize;
+
+  try {
+    if (sortBy === 'random') {
+      // 随机排序：先获取所有唯一的画师，然后随机选择
+      const allArtists = await prisma.image.groupBy({
+        by: ['platform', 'authorid'],
+        _count: {
+          id: true,
+        },
+        where: {
+          platform: {
+            not: null,
+          },
+          authorid: {
+            not: null,
+          },
+          author: {
+            not: null,
+          },
+        },
+        having: {
+          authorid: {
+            not: null,
+          },
+        },
+      });
+
+      // 随机打乱数组
+      const shuffledArtists = allArtists.sort(() => Math.random() - 0.5);
+
+      // 取指定页面的数据
+      const pageArtists = shuffledArtists.slice(skip, skip + take);
+
+      // 获取每个画师的最新作品作为头像和author信息
+      const artistsWithLatestImage = await Promise.all(
+        pageArtists.map(async (artist) => {
+          const latestImage = await prisma.image.findFirst({
+            where: {
+              platform: artist.platform,
+              authorid: artist.authorid,
+            },
+            orderBy: {
+              create_time: 'desc',
+            },
+            select: {
+              thumburl: true,
+              create_time: true,
+              filename: true,
+              author: true,
+            },
+          });
+
+          return {
+            platform: artist.platform,
+            authorid: artist.authorid?.toString(),
+            author: latestImage?.author || null,
+            artworkCount: artist._count.id,
+            latestImageThumb: latestImage?.thumburl || null,
+            latestImageFilename: latestImage?.filename || null,
+            lastUpdateTime: latestImage?.create_time || null,
+          };
+        }),
+      );
+
+      return {
+        artists: artistsWithLatestImage,
+        total: allArtists.length,
+        hasNextPage: skip + take < allArtists.length,
+      };
+    } else {
+      // 按作品数量排序
+      const artists = await prisma.image.groupBy({
+        by: ['platform', 'authorid'],
+        _count: {
+          id: true,
+        },
+        where: {
+          platform: {
+            not: null,
+          },
+          authorid: {
+            not: null,
+          },
+          author: {
+            not: null,
+          },
+        },
+        orderBy: {
+          _count: {
+            id: 'desc',
+          },
+        },
+        skip,
+        take,
+        having: {
+          authorid: {
+            not: null,
+          },
+        },
+      });
+
+      // 获取总数
+      const totalArtistsResult = await prisma.image.groupBy({
+        by: ['platform', 'authorid'],
+        where: {
+          platform: {
+            not: null,
+          },
+          authorid: {
+            not: null,
+          },
+          author: {
+            not: null,
+          },
+        },
+        having: {
+          authorid: {
+            not: null,
+          },
+        },
+      });
+
+      const total = totalArtistsResult.length;
+
+      // 获取每个画师的最新作品作为头像和author信息
+      const artistsWithLatestImage = await Promise.all(
+        artists.map(async (artist) => {
+          const latestImage = await prisma.image.findFirst({
+            where: {
+              platform: artist.platform,
+              authorid: artist.authorid,
+            },
+            orderBy: {
+              create_time: 'desc',
+            },
+            select: {
+              thumburl: true,
+              create_time: true,
+              filename: true,
+              author: true,
+            },
+          });
+
+          return {
+            platform: artist.platform,
+            authorid: artist.authorid?.toString(),
+            author: latestImage?.author || null,
+            artworkCount: artist._count.id,
+            latestImageThumb: latestImage?.thumburl || null,
+            latestImageFilename: latestImage?.filename || null,
+            lastUpdateTime: latestImage?.create_time || null,
+          };
+        }),
+      );
+
+      return {
+        artists: artistsWithLatestImage,
+        total,
+        hasNextPage: skip + take < total,
+      };
+    }
+  } catch (error) {
+    console.error('获取热门画师失败:', error);
+    throw error;
+  }
+}

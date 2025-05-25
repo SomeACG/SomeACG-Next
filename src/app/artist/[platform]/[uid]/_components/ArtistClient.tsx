@@ -222,7 +222,7 @@ export default function ArtistClient({ platform, uid, initialData }: ArtistClien
                     href={externalArtistUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-purple-500 to-blue-500 px-6 py-3 font-medium text-white transition-all duration-300 hover:scale-[1.02] hover:from-purple-600 hover:to-blue-600 hover:shadow-lg hover:shadow-purple-500/25"
+                    className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-purple-600/50 to-blue-600/50 px-6 py-3 font-medium text-white transition-all duration-300 hover:scale-[1.02] hover:from-purple-700/50 hover:to-blue-700/50 hover:shadow-lg hover:shadow-purple-500/25"
                   >
                     <div className="absolute inset-0 translate-x-[-200%] -skew-x-12 bg-gradient-to-r from-white/0 via-white/20 to-white/0 transition-transform duration-700 group-hover:translate-x-[200%]" />
                     <span className="relative capitalize">在 {platform} 上查看</span>

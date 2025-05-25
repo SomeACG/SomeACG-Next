@@ -9,6 +9,7 @@ export const Routes = {
   About: '/about',
   Friends: '/friends',
   Tags: '/tag',
+  Artists: '/artists',
 };
 
 export const routers: Router[] = [
@@ -16,4 +17,5 @@ export const routers: Router[] = [
   { name: '关于', path: Routes.About },
   { name: '友链', path: Routes.Friends },
   { name: '标签', path: Routes.Tags },
+  { name: '画师', path: Routes.Artists },
 ];
