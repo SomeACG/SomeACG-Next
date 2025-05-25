@@ -4,7 +4,7 @@ import ImageFb from '@/components/common/ImageFb';
 import { PopularArtist } from '@/lib/type';
 import { genArtistUrl, getImageThumbUrl, transformPixivUrl } from '@/lib/utils';
 import Link from 'next/link';
-import { useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { FaCalendar, FaExternalLinkAlt, FaHashtag, FaImages, FaUser } from 'react-icons/fa';
 import { FaSquareXTwitter } from 'react-icons/fa6';
 import { SiPixiv } from 'react-icons/si';
@@ -15,7 +15,7 @@ type ArtistCardProps = {
   index: number;
 };
 
-export default function ArtistCard({ artist, index }: ArtistCardProps) {
+function ArtistCard({ artist, index }: ArtistCardProps) {
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null);
@@ -292,3 +292,5 @@ export default function ArtistCard({ artist, index }: ArtistCardProps) {
     </div>
   );
 }
+
+export default memo(ArtistCard);

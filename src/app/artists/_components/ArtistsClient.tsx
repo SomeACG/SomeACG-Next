@@ -14,7 +14,6 @@ import ArtistCard from './ArtistCard';
 type SortType = 'artworks' | 'random';
 
 const pageSize = 20;
-const COOLDOWN_TIME = 1000;
 
 // Artist item interface for MasonryGrid
 interface ArtistItem {
@@ -82,19 +81,13 @@ export default function ArtistsClient() {
       return;
     }
 
-    console.log('🔄 Loading more artists...', {
-      currentCount: allArtists.length,
-      hasNextPage,
-      isValidating,
-    });
-
     try {
       await fetchNextPage();
-      console.log('✅ Successfully loaded more artists, new count:', allArtists.length);
+      console.log('✅ Successfully loaded more artists');
     } catch (error) {
       console.error('❌ Failed to load more artists:', error);
     }
-  }, [fetchNextPage, hasNextPage, isValidating, allArtists.length]);
+  }, [fetchNextPage, hasNextPage, isValidating]);
 
   // Custom column count for artists page
   const getColumnCount = useCallback(() => {

@@ -52,12 +52,8 @@ export function useInfinitePopularArtists(pageSize = 20, sortBy: 'artworks' | 'r
     fetchNextPage: async () => {
       const currentSize = size;
       const newSize = currentSize + 1;
-
-      console.log('📡 fetchNextPage called', { currentSize, newSize, currentDataLength: data?.length });
-
       try {
         await setSize(newSize);
-        console.log('✅ fetchNextPage: successfully loaded page', newSize);
       } catch (error) {
         console.error('❌ fetchNextPage: failed to load page', newSize, error);
         throw error;
