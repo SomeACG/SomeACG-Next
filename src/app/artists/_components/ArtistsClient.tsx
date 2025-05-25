@@ -34,28 +34,30 @@ export default function ArtistsClient() {
   const getEstimatedHeight = useCallback((artist: PopularArtist): number => {
     let baseHeight = 200; // Base content height (padding, text, buttons)
 
-    // Determine likely aspect ratio and add corresponding image height
-    const isLikelyPortrait = artist.artworkCount % 3 === 0; // Every 3rd artist gets portrait treatment
-    const isLikelySquare = artist.artworkCount % 4 === 0; // Every 4th artist gets square treatment
+    // 使用与 ArtistCard 一致的宽高比计算逻辑
+    const isPortrait = artist.artworkCount % 3 === 0; // Every 3rd artist gets portrait treatment
+    const isSquare = artist.artworkCount % 4 === 0; // Every 4th artist gets square treatment
 
-    if (isLikelyPortrait) {
-      baseHeight += 300; // Portrait image height
-      baseHeight += 40; // Add extra height for portrait label overlay
-    } else if (isLikelySquare) {
-      baseHeight += 250; // Square image height
+    // 假设卡片宽度约为 300px，根据 paddingBottom 比例计算图片高度
+    const assumedWidth = 300;
+    let imageHeight: number;
+
+    if (isPortrait) {
+      imageHeight = assumedWidth * (133.33 / 100); // 3:4 portrait ratio
+    } else if (isSquare) {
+      imageHeight = assumedWidth * (100 / 100); // 1:1 square ratio
     } else {
-      baseHeight += 200; // Landscape image height
+      imageHeight = assumedWidth * (75 / 100); // 4:3 landscape ratio (default)
     }
 
-    // Add height based on content
+    baseHeight += imageHeight;
+
+    // Add height based on content (fixed, no random)
     if (artist.author && artist.author.length > 15) {
       baseHeight += 30; // Longer names need more space
     }
 
-    // Add small random variation to avoid too uniform layout
-    const variation = Math.random() * 40 - 20; // -20 to +20 pixels
-
-    return Math.max(250, baseHeight + variation);
+    return Math.max(250, baseHeight);
   }, []);
 
   // Convert artists to MasonryGrid items

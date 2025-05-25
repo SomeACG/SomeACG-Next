@@ -100,29 +100,20 @@ function ArtistCard({ artist, index }: ArtistCardProps) {
     }).format(new Date(date));
   };
 
-  // Check if image is portrait (taller than wide) or simulate portrait for demo
-  const isPortrait = imageDimensions ? imageDimensions.height > imageDimensions.width : artworkCount % 3 === 0; // Every 3rd artist gets portrait treatment
+  // 计算容器高度 - 确保稳定性，避免布局跳动
+  const paddingBottom = useMemo(() => {
+    // 优先使用稳定的默认比例，避免因图片加载而改变布局
+    const isPortrait = artworkCount % 3 === 0; // Every 3rd artist gets portrait treatment
+    const isSquare = artworkCount % 4 === 0; // Every 4th artist gets square treatment
 
-  // Calculate aspect ratio for responsive image display
-  const getImageAspectRatio = () => {
-    if (!imageDimensions) {
-      // Default aspect ratios for different image types
-      return isPortrait ? 'aspect-[3/4]' : 'aspect-[4/3]';
-    }
-
-    const ratio = imageDimensions.width / imageDimensions.height;
-
-    if (ratio < 0.8) {
-      // Very tall image (portrait)
-      return 'aspect-[3/4]';
-    } else if (ratio < 1.2) {
-      // Square-ish image
-      return 'aspect-square';
+    if (isPortrait) {
+      return '133.33%'; // 3:4 portrait ratio
+    } else if (isSquare) {
+      return '100%'; // 1:1 square ratio
     } else {
-      // Wide image (landscape)
-      return 'aspect-[4/3]';
+      return '75%'; // 4:3 landscape ratio (default)
     }
-  };
+  }, [artworkCount]);
 
   const handleImageLoad = (event: React.SyntheticEvent<HTMLImageElement>) => {
     const img = event.currentTarget;
@@ -130,6 +121,11 @@ function ArtistCard({ artist, index }: ArtistCardProps) {
       width: img.naturalWidth,
       height: img.naturalHeight,
     });
+    setImageLoaded(true);
+  };
+
+  const handleImageError = () => {
+    setImageError(true);
     setImageLoaded(true);
   };
 
@@ -161,13 +157,19 @@ function ArtistCard({ artist, index }: ArtistCardProps) {
         </div>
       </div>
 
-      {/* Image section with creative masking and responsive aspect ratio */}
+      {/* Image section with proper placeholder technique */}
       <div
-        className={`relative overflow-hidden rounded-t-3xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 ${getImageAspectRatio()}`}
+        className="relative overflow-hidden rounded-t-3xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700"
+        style={{ width: '100%', paddingBottom }}
       >
+        {/* Loading skeleton */}
+        {!imageLoaded && (
+          <div className="absolute inset-0 animate-pulse rounded-t-3xl bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600" />
+        )}
+
         {thumbUrl && !imageError ? (
           <PhotoView src={thumbUrl}>
-            <div className="relative h-full w-full cursor-pointer overflow-hidden rounded-t-3xl">
+            <div className="absolute inset-0 cursor-pointer overflow-hidden rounded-t-3xl">
               <ImageFb
                 src={thumbShowUrl.s3ThumbUrl}
                 fallbackSrc={thumbShowUrl.transformThumbUrl}
@@ -180,11 +182,8 @@ function ArtistCard({ artist, index }: ArtistCardProps) {
                   imageLoaded ? 'group-hover:scale-105' : 'opacity-0'
                 } group-hover:scale-105`}
                 onLoad={handleImageLoad}
+                onError={handleImageError}
               />
-              {/* Loading skeleton */}
-              {!imageLoaded && (
-                <div className="absolute inset-0 animate-pulse rounded-t-3xl bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600" />
-              )}
 
               {/* Creative hover overlay with animated elements */}
               <div className="absolute inset-0 rounded-t-3xl bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 transition-all duration-500 group-hover:opacity-100">
@@ -196,7 +195,7 @@ function ArtistCard({ artist, index }: ArtistCardProps) {
             </div>
           </PhotoView>
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-gray-400 dark:text-gray-600">
+          <div className="absolute inset-0 flex h-full w-full items-center justify-center text-gray-400 dark:text-gray-600">
             <div className="text-center">
               <div className="mb-2 flex justify-center">
                 <div className="rounded-full bg-white/20 p-4 backdrop-blur-sm transition-transform duration-300 group-hover:scale-110">
