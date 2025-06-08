@@ -3,7 +3,7 @@ module.exports = {
     {
       name: 'SomeACG-Next',
       script: 'pnpm',
-      args: 'restart',
+      args: 'start',
       env: {
         NODE_ENV: 'production',
       },

@@ -6,7 +6,6 @@
     "dev": "next dev -p 6645",
     "build": "next build",
     "start": "next start -p 6645",
-    "restart": "pnpm i && pnpm build && pnpm start",
     "lint": "next lint",
     "pm2": "pm2 start ecosystem.config.js",
     "pm2:stop": "pm2 stop ecosystem.config.js",
