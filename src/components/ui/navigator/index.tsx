@@ -45,7 +45,7 @@ export const Navigator = ({ className }: NavigatorProps) => {
   return isMdScreen ? (
     <FloatingPortal>
       <MenuIcon
-        className="fixed top-5 left-4 z-21 hidden md:block"
+        className="bg-foreground/10 border-foreground fixed top-3 left-4 z-[31] hidden rounded-full border p-1.5 backdrop-blur-xl md:block"
         ref={menuRef}
         isOpen={mobileExpand}
         onToggle={setMobileExpand}

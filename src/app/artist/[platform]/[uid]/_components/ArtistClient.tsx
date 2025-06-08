@@ -373,7 +373,6 @@ export default function ArtistClient({ platform, uid, initialData }: ArtistClien
                       hasMore={hasNextPage}
                       isLoading={isLoadingMore}
                       renderItem={renderImageItem}
-                      enableHover={true}
                     />
                   ) : (
                     <div className="flex-center min-h-[200px]">

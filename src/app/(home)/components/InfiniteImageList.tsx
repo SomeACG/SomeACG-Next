@@ -84,7 +84,6 @@ export function InfiniteImageList({ initialData }: InfiniteImageListProps) {
                 hasMore={hasNextPage}
                 isLoading={isLoading}
                 renderItem={renderImageItem}
-                enableHover={true}
               />
             ) : (
               <div className="flex-center min-h-[200px]">

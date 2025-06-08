@@ -69,7 +69,7 @@ export function Header() {
     <AnimatePresence mode="sync">
       <motion.header
         className={cn(
-          'sticky top-0 z-10 flex items-center justify-between select-none md:justify-center',
+          'sticky top-0 z-30 flex items-center justify-between select-none md:justify-center',
           'bg-background/85 border-b border-gray-200/50 backdrop-blur-xl',
           'py-1 pr-6 pl-3 md:pr-3 md:pl-0 dark:border-gray-700/50',
           'transition-all duration-500 ease-in-out',

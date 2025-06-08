@@ -1,32 +1,7 @@
 'use client';
-import { cva } from 'class-variance-authority';
+import { cn } from '@/lib/utils';
+import { throttle } from 'es-toolkit';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-
-const masonryGridVariants = cva('grid w-full gap-4', {
-  variants: {
-    columns: {
-      // TODO: 因为目前就需要这么几列，所以先这么写了，tailwind 动态值目前还不支持
-      1: 'grid-cols-1',
-      2: 'grid-cols-2',
-      3: 'grid-cols-3',
-      4: 'grid-cols-4',
-    },
-  },
-  defaultVariants: {
-    columns: 2,
-  },
-});
-
-const imageCardVariants = cva('group relative overflow-hidden rounded-lg transition-all duration-300', {
-  variants: {
-    hover: {
-      default: 'hover:z-10 hover:scale-[1.02] hover:shadow-xl',
-    },
-  },
-  defaultVariants: {
-    hover: 'default',
-  },
-});
 
 interface BaseMasonryItem {
   id: string;
@@ -55,7 +30,6 @@ function MasonryGrid<T extends BaseMasonryItem>({
   getColumnCount: customGetColumnCount,
 }: MasonryGridProps<T>) {
   const [loading, setLoading] = useState(false);
-  const observerRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement>(null);
 
   // 将图片分配到不同的列中，尽量保持每列高度平衡
@@ -146,20 +120,19 @@ function MasonryGrid<T extends BaseMasonryItem>({
 
   // 响应式列数
   const defaultGetColumnCount = () => {
-    if (typeof window === 'undefined') return 1;
-    if (window.innerWidth >= 1280) return 4; // xl
-    if (window.innerWidth >= 1024) return 3; // lg
-    if (window.innerWidth >= 640) return 2; // sm
-    return 1;
+    if (typeof window === 'undefined') return 2;
+    if (window.innerWidth >= 1024) return 4; // lg
+    if (window.innerWidth >= 768) return 3; // sm
+    return 2;
   };
 
   const getColumnCount = customGetColumnCount || defaultGetColumnCount;
   const [columnCount, setColumnCount] = useState(getColumnCount());
 
   useEffect(() => {
-    const handleResize = () => {
+    const handleResize = throttle(() => {
       setColumnCount(getColumnCount());
-    };
+    }, 100);
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -169,7 +142,7 @@ function MasonryGrid<T extends BaseMasonryItem>({
 
   return (
     <div className="w-full">
-      <div className={masonryGridVariants({ columns: columnCount as 1 | 2 | 3 | 4 })}>
+      <div className="grid w-full gap-4" style={{ gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }}>
         {columns.map((column, columnIndex) => (
           <div key={columnIndex} className="w-full space-y-4">
             {column.map((item, itemIndex) => {
@@ -177,7 +150,14 @@ function MasonryGrid<T extends BaseMasonryItem>({
               const globalIndex = items.findIndex((globalItem) => globalItem.id === item.id);
               return (
                 <div key={item.id}>
-                  <div className={enableHover ? imageCardVariants() : ''}>{renderItem(item, globalIndex)}</div>
+                  <div
+                    className={cn({
+                      'group relative overflow-hidden rounded-lg transition-all duration-300 hover:z-10 hover:scale-[1.02] hover:shadow-xl':
+                        enableHover,
+                    })}
+                  >
+                    {renderItem(item, globalIndex)}
+                  </div>
                 </div>
               );
             })}

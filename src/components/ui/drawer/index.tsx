@@ -49,7 +49,7 @@ function Drawer({
   className,
   renderHeader,
   renderFooter,
-  zIndex = 20,
+  zIndex = 30,
   scroll = true,
   position = 'left',
   triggerRef,
@@ -95,11 +95,11 @@ function Drawer({
         <AnimatePresence onExitComplete={onExitComplete}>
           {open && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
-              <FloatingOverlay lockScroll className="relative bg-black/30 backdrop-blur-xs" style={{ zIndex }}>
+              <FloatingOverlay className="relative bg-black/30 backdrop-blur-xs" style={{ zIndex }}>
                 <FloatingFocusManager context={context}>
                   <motion.div
                     className={cn(
-                      'absolute z-20 flex min-w-[10rem] flex-col bg-white p-0 md:min-w-[5rem] dark:bg-[#1e1e1e]',
+                      'absolute flex min-w-[10rem] flex-col bg-white p-0 md:min-w-[5rem] dark:bg-[#1e1e1e]',
                       posClass[position || 'left'],
                       fontVariants,
                       className,
