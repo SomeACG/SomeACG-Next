@@ -1,5 +1,5 @@
 module.exports = {
-  darkMode: ['class'], // https://tailwindcss.com/docs/dark-mode
+  darkMode: 'class',
   theme: {
     extend: {
       screens: {
