@@ -26,7 +26,9 @@ export function RandomImage() {
   const [images, setImages] = useState<RandomImage[]>([]);
   const [loading, setLoading] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const hasInitialized = useRef(false);
   const isMobile = useIsMobile();
+  
   const fetchRandomImages = useCallback(async () => {
     try {
       setLoading(true);
@@ -42,7 +44,10 @@ export function RandomImage() {
   }, []);
 
   useEffect(() => {
-    fetchRandomImages();
+    if (!hasInitialized.current) {
+      hasInitialized.current = true;
+      fetchRandomImages();
+    }
   }, [fetchRandomImages]);
 
   // 检查是否有精选图片

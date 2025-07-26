@@ -22,7 +22,7 @@ const fetcher = async (url: string): Promise<ImagesResponse> => {
 
 export function useInfiniteImages(pageSize: number, initialData: ImagesResponse) {
   const getKey = (pageIndex: number) => {
-    return `/api/list?page=${pageIndex + 1}&pageSize=${pageSize}`;
+    return `/api/list?page=${pageIndex + 1}&pageSize=${pageSize}&mode=infinite`;
   };
 
   const { data, error, size, setSize, isLoading, isValidating } = useSWRInfinite<ImagesResponse>(getKey, fetcher, {

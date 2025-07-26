@@ -34,10 +34,14 @@ const artworkFetcher = async (url: string): Promise<ArtworkData> => {
   return superjson.deserialize(data);
 };
 
-export function useImages(page: number, pageSize: number, initialData?: ImagesResponse) {
-  const { data, error, isLoading, mutate } = useSWR<ImagesResponse>(`/api/list?page=${page}&pageSize=${pageSize}`, fetcher, {
-    fallbackData: initialData,
-  });
+export function useImages(page: number, pageSize: number, initialData?: ImagesResponse, enabled: boolean = true) {
+  const { data, error, isLoading, mutate } = useSWR<ImagesResponse>(
+    enabled ? `/api/list?page=${page}&pageSize=${pageSize}&mode=pagination` : null, 
+    fetcher, 
+    {
+      fallbackData: initialData,
+    }
+  );
 
   return {
     images: data?.images,

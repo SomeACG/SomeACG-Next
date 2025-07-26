@@ -29,7 +29,7 @@ export default function TagCloudClient() {
   const [displayTags, setDisplayTags] = useState<Tag[] | null>(null);
 
   if (error) {
-    return <div className="container mx-auto px-4 py-8 text-center text-red-500">加载失败，请刷新重试</div>;
+    return <div className="px-4 py-8 text-center text-red-500">加载失败，请刷新重试</div>;
   }
 
   if (isLoading) {
@@ -55,7 +55,7 @@ export default function TagCloudClient() {
   const tagsToShow = displayTags || tags;
 
   return (
-    <div className="container mx-auto min-h-[50vh] px-2 py-6 sm:px-4 sm:py-8">
+    <div className="min-h-[50vh] px-2 py-6 sm:px-4 sm:py-8">
       <div className="mb-4 flex flex-wrap justify-center gap-1.5 sm:mb-6 sm:gap-3">
         <Button
           onClick={handleRandomize}
@@ -94,7 +94,7 @@ export default function TagCloudClient() {
           <span>降序</span>
         </Button>
       </div>
-      <div className="mx-auto flex max-w-6xl flex-wrap justify-center gap-1.5 sm:gap-4">
+      <div className="flex flex-wrap justify-center gap-1.5 sm:gap-4">
         {tagsToShow?.map((tag: Tag) => (
           <div key={tag.tag} className="group relative">
             <Link

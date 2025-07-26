@@ -1,7 +1,8 @@
 'use client';
 import { cn } from '@/lib/utils';
 import { throttle } from 'es-toolkit';
-import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import { AnimatePresence, m } from 'motion/react';
+import React, { useCallback, useEffect, useRef, useState, useMemo, memo } from 'react';
 
 interface WaterfallItem {
   id: string | number;
@@ -17,8 +18,23 @@ interface WaterfallGridProps<T extends WaterfallItem> {
   renderItem: (item: T, index?: number) => React.ReactNode;
   className?: string;
   gap?: number;
+  columnWidth?: number;
+  columnCount?: number;
   minColumnWidth?: number;
+  enableAnimation?: boolean;
 }
+
+const FIRST_SCREEN_ITEMS_COUNT = 30;
+
+const Spring = {
+  presets: {
+    smooth: {
+      type: 'spring' as const,
+      stiffness: 300,
+      damping: 30,
+    },
+  },
+};
 
 function WaterfallGrid<T extends WaterfallItem>({
   items,
@@ -28,13 +44,17 @@ function WaterfallGrid<T extends WaterfallItem>({
   renderItem,
   className,
   gap = 16,
+  columnWidth,
+  columnCount,
   minColumnWidth = 200,
+  enableAnimation = true,
 }: WaterfallGridProps<T>) {
   const containerRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(false);
+  const hasAnimatedRef = useRef(false);
   
-  // 获取响应式列数
+  // 获取响应式列数（fallback逻辑）
   const getColumnCount = useCallback(() => {
     if (!containerRef.current) return 2;
     const containerWidth = containerRef.current.offsetWidth;
@@ -42,27 +62,31 @@ function WaterfallGrid<T extends WaterfallItem>({
     return Math.max(1, Math.min(columns, 6)); // 最少1列，最多6列
   }, [minColumnWidth, gap]);
 
-  const [columnCount, setColumnCount] = useState(2);
+  const [fallbackColumnCount, setFallbackColumnCount] = useState(2);
 
-  // 响应式处理
+  // 响应式处理（仅在没有传入columnCount时使用）
   useEffect(() => {
+    if (columnCount) return; // 如果传入了columnCount，则不使用fallback逻辑
+
     const updateColumnCount = throttle(() => {
       const newCount = getColumnCount();
-      if (newCount !== columnCount) {
-        setColumnCount(newCount);
+      if (newCount !== fallbackColumnCount) {
+        setFallbackColumnCount(newCount);
       }
     }, 150);
 
     updateColumnCount(); // 初始设置
     window.addEventListener('resize', updateColumnCount);
     return () => window.removeEventListener('resize', updateColumnCount);
-  }, [getColumnCount, columnCount]);
+  }, [getColumnCount, fallbackColumnCount, columnCount]);
+
+  const actualColumnCount = columnCount || fallbackColumnCount;
 
   // 计算瀑布流布局
   const layout = useMemo(() => {
     if (!items.length) return { columns: [], maxHeight: 0 };
 
-    const columns: Array<{ items: T[]; height: number }> = Array.from({ length: columnCount }, () => ({
+    const columns: Array<{ items: T[]; height: number }> = Array.from({ length: actualColumnCount }, () => ({
       items: [],
       height: 0,
     }));
@@ -88,7 +112,7 @@ function WaterfallGrid<T extends WaterfallItem>({
     const maxHeight = Math.max(...columns.map(col => col.height));
 
     return { columns: columns.map(col => col.items), maxHeight };
-  }, [items, columnCount, gap]);
+  }, [items, actualColumnCount, gap]);
 
   // 无限滚动观察器
   const handleObserver = useCallback(
@@ -119,7 +143,11 @@ function WaterfallGrid<T extends WaterfallItem>({
     return () => observer.disconnect();
   }, [handleObserver]);
 
-  const columnWidth = `calc((100% - ${(columnCount - 1) * gap}px) / ${columnCount})`;
+  const actualColumnWidth = typeof columnWidth === 'number' ? `${columnWidth}px` : columnWidth || `calc((100% - ${(actualColumnCount - 1) * gap}px) / ${actualColumnCount})`;
+
+  const handleAnimationComplete = useCallback(() => {
+    hasAnimatedRef.current = true;
+  }, []);
 
   return (
     <div className={cn('w-full', className)}>
@@ -133,19 +161,22 @@ function WaterfallGrid<T extends WaterfallItem>({
             key={columnIndex}
             className="flex flex-col"
             style={{ 
-              width: columnWidth,
+              width: actualColumnWidth,
               gap: `${gap}px`
             }}
           >
             {column.map((item, itemIndex) => {
               const globalIndex = items.indexOf(item);
               return (
-                <div
+                <WaterfallItem
                   key={`${item.id}`}
-                  className="w-full"
-                >
-                  {renderItem(item, globalIndex)}
-                </div>
+                  item={item}
+                  index={globalIndex}
+                  renderItem={renderItem}
+                  hasAnimated={hasAnimatedRef.current}
+                  onAnimationComplete={handleAnimationComplete}
+                  enableAnimation={enableAnimation}
+                />
               );
             })}
           </div>
@@ -204,5 +235,62 @@ function WaterfallGrid<T extends WaterfallItem>({
     </div>
   );
 }
+
+const WaterfallItem = memo(<T extends WaterfallItem>({
+  item,
+  index,
+  renderItem,
+  hasAnimated,
+  onAnimationComplete,
+  enableAnimation = true,
+}: {
+  item: T;
+  index: number;
+  renderItem: (item: T, index?: number) => React.ReactNode;
+  hasAnimated: boolean;
+  onAnimationComplete: () => void;
+  enableAnimation: boolean;
+}) => {
+  // 只对第一屏的 items 做动画，且只在首次加载时
+  const shouldAnimate = enableAnimation && !hasAnimated && index < FIRST_SCREEN_ITEMS_COUNT;
+
+  // 计算动画延迟
+  const delay = shouldAnimate ? Math.min(index * 0.05, 0.3) : 0;
+
+  if (!enableAnimation || !shouldAnimate) {
+    return (
+      <div className="w-full">
+        {renderItem(item, index)}
+      </div>
+    );
+  }
+
+  return (
+    <m.div
+      initial={{
+        opacity: 0,
+        y: 30,
+        scale: 0.95,
+        filter: 'blur(4px)',
+      }}
+      animate={{
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        filter: 'blur(0px)',
+      }}
+      transition={{
+        ...Spring.presets.smooth,
+        delay,
+      }}
+      onAnimationComplete={onAnimationComplete}
+      className="w-full"
+    >
+      {renderItem(item, index)}
+    </m.div>
+  );
+});
+
+WaterfallItem.displayName = 'WaterfallItem';
 
 export default WaterfallGrid;

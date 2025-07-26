@@ -25,7 +25,14 @@ export function ImageList({ initialData }: ImageListProps) {
   const page = useAtomValue(pageAtom);
   const setTotalPage = useSetAtom(totalPageAtom);
   const viewMode = useAtomValue(viewModeAtom);
-  const { images, total, isLoading, isError } = useImages(page, DEFAULT_PAGE_SIZE, initialData);
+
+  // 只在分页模式下启用 useImages hook
+  const { images, total, isLoading, isError } = useImages(
+    page,
+    DEFAULT_PAGE_SIZE,
+    initialData,
+    viewMode === 'pagination' // 只在分页模式下启用
+  );
   const columnConfig = useColumnConfig();
 
   const renderItem = useCallback((data: ImageWithTag, index?: number) => {
@@ -65,6 +72,7 @@ export function ImageList({ initialData }: ImageListProps) {
 
     return (
       <WaterfallGrid
+        key={page} // 添加key强制重新渲染，重置动画状态
         items={images || []}
         loadMore={async () => {}} // 分页模式不需要无限加载
         hasMore={false}
@@ -72,9 +80,10 @@ export function ImageList({ initialData }: ImageListProps) {
         renderItem={renderItem}
         gap={columnConfig.gutter}
         minColumnWidth={columnConfig.width}
+        enableAnimation={false} // 分页模式禁用动画
       />
     );
-  }, [isLoading, isError, images, columnConfig, renderItem]);
+  }, [isLoading, isError, images, columnConfig, renderItem, page]);
 
   return (
     <div className="flex flex-col gap-4">
