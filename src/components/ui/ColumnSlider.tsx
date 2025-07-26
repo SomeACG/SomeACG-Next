@@ -14,9 +14,12 @@ interface ColumnSliderProps {
   disabled?: boolean;
 }
 
+// 预设的列数选项：自动、1、2、3、4、5、6、8、10
+const COLUMN_OPTIONS = ['auto', 1, 2, 3, 4, 5, 6, 8, 10] as const;
+
 export const ColumnSlider = ({
-  min = 2,
-  max = 8,
+  min = 1,
+  max = 10,
   step = 1,
   autoLabel = '自动',
   className,
@@ -40,21 +43,29 @@ export const ColumnSlider = ({
   const getPositionFromValue = useCallback(
     (val: number | 'auto') => {
       if (val === 'auto') return 5; // 自动档位置稍微偏右一点
+      // 根据预设选项计算位置
+      const numericOptions = COLUMN_OPTIONS.filter(opt => opt !== 'auto') as number[];
+      const index = numericOptions.indexOf(val as number);
+      if (index === -1) return 15; // 如果不在预设中，默认位置
       // 数值档从 15% 开始到 100%
-      return 15 + ((val - min) / (max - min)) * 85;
+      return 15 + (index / (numericOptions.length - 1)) * 85;
     },
-    [min, max],
+    [],
   );
 
   // 将位置百分比转换为值
   const getValueFromPosition = useCallback(
     (position: number) => {
       if (position <= 12) return 'auto'; // 左侧 12% 区域为自动档
+      
+      const numericOptions = COLUMN_OPTIONS.filter(opt => opt !== 'auto') as number[];
       const normalizedPosition = (position - 15) / 85; // 从 15% 开始的 85% 区域为数值
-      const rawValue = min + Math.max(0, normalizedPosition) * (max - min);
-      return Math.round(Math.max(min, rawValue) / step) * step;
+      const index = Math.round(normalizedPosition * (numericOptions.length - 1));
+      const clampedIndex = Math.max(0, Math.min(numericOptions.length - 1, index));
+      
+      return numericOptions[clampedIndex];
     },
-    [min, max, step],
+    [],
   );
 
   const handlePointerDown = useCallback(
@@ -102,7 +113,7 @@ export const ColumnSlider = ({
       {/* 标签 */}
       <div className="mb-2 flex justify-between text-xs text-gray-500 dark:text-gray-400">
         <span>{autoLabel}</span>
-        <span>{max} 列</span>
+        <span>10 列</span>
       </div>
 
       {/* 滑块轨道 */}
@@ -161,7 +172,7 @@ export const ColumnSlider = ({
             </span>
           </div>
           <div className="flex w-[85%] justify-between">
-            {Array.from({ length: max - min + 1 }, (_, i) => min + i).map(
+            {COLUMN_OPTIONS.filter(opt => opt !== 'auto').map(
               (num) => (
                 <span
                   key={num}

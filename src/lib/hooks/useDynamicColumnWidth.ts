@@ -9,14 +9,6 @@ const COLUMN_WIDTH_CONFIG = {
     desktop: 250,
     maxColumns: 8,
   },
-  min: {
-    mobile: 120,
-    desktop: 200,
-  },
-  max: {
-    mobile: 250,
-    desktop: 500,
-  },
 };
 
 
@@ -63,7 +55,7 @@ export function useDynamicColumnWidth() {
       return { columnWidth: 150, columnCount: 2 };
     }
 
-    const { auto, min, max } = COLUMN_WIDTH_CONFIG;
+    const { auto } = COLUMN_WIDTH_CONFIG;
     const gutter = 4; // 列间距
     // 当使用实际容器宽度时，不需要减去 padding，因为 clientWidth 已经是内容区域宽度
     const availableWidth = containerWidth;
@@ -91,27 +83,7 @@ export function useDynamicColumnWidth() {
     // 自定义列数模式：直接根据容器宽度和列数计算列宽，确保填满容器
     const calculatedWidth = (availableWidth - (columns - 1) * gutter) / columns;
 
-    // 检查是否超出最小最大限制
-    const minWidth = isMobile ? min.mobile : min.desktop;
-    const maxWidth = isMobile ? max.mobile : max.desktop;
-
-    if (calculatedWidth < minWidth) {
-      // 如果计算出的宽度太小，减少列数
-      const maxCols = Math.floor((availableWidth + gutter) / (minWidth + gutter));
-      const adjustedColumns = Math.max(1, Math.min(columns, maxCols));
-      const adjustedWidth = (availableWidth - (adjustedColumns - 1) * gutter) / adjustedColumns;
-      return { columnWidth: adjustedWidth, columnCount: adjustedColumns };
-    }
-
-    if (calculatedWidth > maxWidth) {
-      // 如果计算出的宽度太大，增加列数
-      const minCols = Math.ceil((availableWidth + gutter) / (maxWidth + gutter));
-      const adjustedColumns = Math.max(columns, minCols);
-      const adjustedWidth = (availableWidth - (adjustedColumns - 1) * gutter) / adjustedColumns;
-      return { columnWidth: adjustedWidth, columnCount: adjustedColumns };
-    }
-
-    // 在合理范围内，直接使用计算出的宽度，确保填满容器
+    // 移除最小最大宽度限制，直接使用用户设置的列数
     return { columnWidth: calculatedWidth, columnCount: columns };
   }, [isMobile, columns, containerWidth]);
 

@@ -60,7 +60,7 @@ export function ImageControls({ showColumnSlider = false }: ImageControlsProps) 
                   调整图片网格的列数
                 </p>
               </div>
-              <ColumnSlider min={2} max={8} />
+              <ColumnSlider min={1} max={10} />
             </div>
           </PopoverContent>
         </Popover>

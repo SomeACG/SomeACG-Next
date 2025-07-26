@@ -20,7 +20,6 @@ interface WaterfallGridProps<T extends WaterfallItem> {
   gap?: number;
   columnWidth?: number;
   columnCount?: number;
-  minColumnWidth?: number;
   enableAnimation?: boolean;
 }
 
@@ -46,7 +45,6 @@ function WaterfallGrid<T extends WaterfallItem>({
   gap = 16,
   columnWidth,
   columnCount,
-  minColumnWidth = 200,
   enableAnimation = true,
 }: WaterfallGridProps<T>) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -58,9 +56,10 @@ function WaterfallGrid<T extends WaterfallItem>({
   const getColumnCount = useCallback(() => {
     if (!containerRef.current) return 2;
     const containerWidth = containerRef.current.offsetWidth;
-    const columns = Math.floor(containerWidth / (minColumnWidth + gap));
-    return Math.max(1, Math.min(columns, 6)); // 最少1列，最多6列
-  }, [minColumnWidth, gap]);
+    // 移除最小列宽限制，使用更灵活的计算方式
+    const columns = Math.floor(containerWidth / (150 + gap)); // 使用固定的基础宽度150px
+    return Math.max(1, columns); // 只限制最少1列，不限制最多列数
+  }, [gap]);
 
   const [fallbackColumnCount, setFallbackColumnCount] = useState(2);
 
@@ -162,7 +161,7 @@ function WaterfallGrid<T extends WaterfallItem>({
               gap: `${gap}px`,
             }}
           >
-            {column.map((item, itemIndex) => {
+            {column.map((item) => {
               const globalIndex = items.indexOf(item);
               return (
                 <WaterfallItem<T>
@@ -180,30 +179,32 @@ function WaterfallGrid<T extends WaterfallItem>({
         ))}
       </div>
 
-      {/* 加载状态 */}
-      {(loading || isLoading) && (
+      {/* 加载触发器 - 始终存在以触发无限滚动 */}
+      {hasMore && (
         <div ref={loadingRef} className="mt-8 flex h-20 items-center justify-center">
-          <div className="group relative overflow-hidden rounded-2xl border border-white/20 bg-white/10 px-8 py-6 backdrop-blur-xl dark:border-gray-800/50 dark:bg-gray-900/10">
-            <div className="absolute inset-0 opacity-30">
-              <div className="absolute top-2 right-2 h-8 w-8 rounded-full bg-blue-400/20 blur-lg" />
-              <div className="absolute bottom-2 left-2 h-10 w-10 rounded-full bg-purple-400/20 blur-lg" />
-            </div>
-
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-400/20 via-purple-400/20 to-blue-400/20 opacity-50" />
-
-            <div className="relative z-10 flex items-center space-x-4">
-              <div className="relative">
-                <div className="h-8 w-8 animate-spin rounded-full border-2 border-transparent border-t-blue-500/60 border-r-purple-500/60" />
-                <div className="absolute inset-1 animate-pulse rounded-full bg-gradient-to-br from-blue-400/40 to-purple-400/40" />
+          {(loading || isLoading) && (
+            <div className="group relative overflow-hidden rounded-2xl border border-white/20 bg-white/10 px-8 py-6 backdrop-blur-xl dark:border-gray-800/50 dark:bg-gray-900/10">
+              <div className="absolute inset-0 opacity-30">
+                <div className="absolute top-2 right-2 h-8 w-8 rounded-full bg-blue-400/20 blur-lg" />
+                <div className="absolute bottom-2 left-2 h-10 w-10 rounded-full bg-purple-400/20 blur-lg" />
               </div>
-              <div className="space-y-1">
-                <div className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-sm font-medium text-transparent dark:from-blue-400 dark:to-purple-400">
-                  加载更多
+
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-400/20 via-purple-400/20 to-blue-400/20 opacity-50" />
+
+              <div className="relative z-10 flex items-center space-x-4">
+                <div className="relative">
+                  <div className="h-8 w-8 animate-spin rounded-full border-2 border-transparent border-t-blue-500/60 border-r-purple-500/60" />
+                  <div className="absolute inset-1 animate-pulse rounded-full bg-gradient-to-br from-blue-400/40 to-purple-400/40" />
                 </div>
-                <div className="text-xs text-gray-500/80 dark:text-gray-400/80">正在获取更多精彩内容...</div>
+                <div className="space-y-1">
+                  <div className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-sm font-medium text-transparent dark:from-blue-400 dark:to-purple-400">
+                    加载更多
+                  </div>
+                  <div className="text-xs text-gray-500/80 dark:text-gray-400/80">正在获取更多精彩内容...</div>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       )}
     </div>
