@@ -2,9 +2,8 @@
 import Loader from '@/components/ui/loading/Loader';
 import { useImages } from '@/lib/hooks/useImages';
 import { pageAtom, totalPageAtom, viewModeAtom } from '@/store/app';
-import { Image } from '@prisma/client';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { Masonry } from 'masonic';
+import WaterfallGrid from '@/components/ui/WaterfallGrid';
 import { AnimatePresence } from 'motion/react';
 import { useCallback, useEffect } from 'react';
 import { PhotoProvider } from 'react-photo-view';
@@ -29,8 +28,8 @@ export function ImageList({ initialData }: ImageListProps) {
   const { images, total, isLoading, isError } = useImages(page, DEFAULT_PAGE_SIZE, initialData);
   const columnConfig = useColumnConfig();
 
-  const renderItem = useCallback(({ data, index }: { data: ImageWithTag; index: number }) => {
-    return <ImageItem key={index} data={data} />;
+  const renderItem = useCallback((data: ImageWithTag, index?: number) => {
+    return <ImageItem key={index || data.id} data={data} />;
   }, []);
 
   useEffect(() => {
@@ -64,7 +63,17 @@ export function ImageList({ initialData }: ImageListProps) {
       );
     }
 
-    return <Masonry items={images} columnGutter={columnConfig.gutter} columnWidth={columnConfig.width} render={renderItem} />;
+    return (
+      <WaterfallGrid
+        items={images || []}
+        loadMore={async () => {}} // 分页模式不需要无限加载
+        hasMore={false}
+        isLoading={false}
+        renderItem={renderItem}
+        gap={columnConfig.gutter}
+        minColumnWidth={columnConfig.width}
+      />
+    );
   }, [isLoading, isError, images, columnConfig, renderItem]);
 
   return (

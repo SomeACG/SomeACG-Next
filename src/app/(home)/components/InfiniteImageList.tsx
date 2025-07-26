@@ -1,6 +1,6 @@
 'use client';
 import { ClientOnly } from '@/components/common/ClientOnly';
-import MasonryGrid from '@/components/ui/MasonryGrid';
+import WaterfallGrid from '@/components/ui/WaterfallGrid';
 import { DEFAULT_PAGE_SIZE } from '@/constants';
 import { useInfiniteImages } from '@/lib/hooks/useInfiniteImages';
 import { ImageWithTag } from '@/lib/type';
@@ -17,13 +17,6 @@ interface InfiniteImageListProps {
   };
 }
 
-// Image item interface for MasonryGrid
-interface ImageGridItem {
-  id: string;
-  width: number;
-  height: number;
-  payload: ImageWithTag;
-}
 
 export function InfiniteImageList({ initialData }: InfiniteImageListProps) {
   const { allImages, hasNextPage, fetchNextPage, error } = useInfiniteImages(DEFAULT_PAGE_SIZE, initialData);
@@ -47,20 +40,19 @@ export function InfiniteImageList({ initialData }: InfiniteImageListProps) {
     }
   }, [fetchNextPage, isLoading, lastLoadTime]);
 
-  // 转换图片数据格式以匹配MasonryGrid需要的接口
-  const gridItems: ImageGridItem[] = useMemo(
+  // 转换图片数据格式以匹配WaterfallGrid需要的接口
+  const gridItems: ImageWithTag[] = useMemo(
     () =>
       allImages.map((image) => ({
-        id: image.id.toString(),
+        ...image,
         width: image.width || 800, // 设置默认宽度
         height: image.height || 600, // 设置默认高度
-        payload: image,
       })),
     [allImages],
   );
 
   // Render function for image items
-  const renderImageItem = useCallback((item: ImageGridItem, index: number) => <ImageItem data={item.payload} />, []);
+  const renderImageItem = useCallback((item: ImageWithTag) => <ImageItem data={item} />, []);
 
   if (error) {
     return (
@@ -78,12 +70,14 @@ export function InfiniteImageList({ initialData }: InfiniteImageListProps) {
         >
           <ClientOnly>
             {allImages.length > 0 ? (
-              <MasonryGrid
+              <WaterfallGrid
                 items={gridItems}
                 loadMore={handleLoadMore}
                 hasMore={hasNextPage}
                 isLoading={isLoading}
                 renderItem={renderImageItem}
+                gap={16}
+                minColumnWidth={250}
               />
             ) : (
               <div className="flex-center min-h-[200px]">
