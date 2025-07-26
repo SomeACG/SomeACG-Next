@@ -10,6 +10,7 @@ import { PhotoProvider } from 'react-photo-view';
 import { ImageItem } from './ImageItem';
 import { ImageToolbar } from './ImageToolbar';
 import InfiniteImageList from './InfiniteImageList';
+import { ImageControls } from './ImageControls';
 import { useColumnConfig } from '@/lib/hooks/useColumnConfig';
 import { DEFAULT_PAGE_SIZE } from '@/constants';
 import { ImageWithTag } from '@/lib/type';
@@ -31,7 +32,7 @@ export function ImageList({ initialData }: ImageListProps) {
     page,
     DEFAULT_PAGE_SIZE,
     initialData,
-    viewMode === 'pagination' // 只在分页模式下启用
+    viewMode === 'pagination', // 只在分页模式下启用
   );
   const columnConfig = useColumnConfig();
 
@@ -87,6 +88,7 @@ export function ImageList({ initialData }: ImageListProps) {
 
   return (
     <div className="flex flex-col gap-4">
+      <ImageControls showColumnSlider={viewMode === 'infinite'} />
       {viewMode === 'infinite' ? (
         <InfiniteImageList initialData={initialData} />
       ) : (
