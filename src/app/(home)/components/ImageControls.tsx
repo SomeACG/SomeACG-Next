@@ -6,6 +6,7 @@ import { viewModeAtom } from '@/store/app';
 import { useAtom } from 'jotai';
 import { ColumnsIcon, ViewIcon, Settings } from 'lucide-react';
 import { useCallback, useState } from 'react';
+import { CompactPagination } from './CompactPagination';
 
 interface ImageControlsProps {
   showColumnSlider?: boolean;
@@ -26,7 +27,7 @@ export function ImageControls({ showColumnSlider = false }: ImageControlsProps) 
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <Button variant="outline" size="sm" onClick={toggleViewMode} className="h-8 gap-2 text-xs font-medium">
             {viewMode === 'pagination' ? (
               <>
@@ -40,6 +41,8 @@ export function ImageControls({ showColumnSlider = false }: ImageControlsProps) 
               </>
             )}
           </Button>
+
+          {viewMode === 'pagination' && <CompactPagination />}
         </div>
 
         {showColumnSlider && (

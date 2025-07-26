@@ -11,6 +11,7 @@ import { ImageItem } from './ImageItem';
 import { ImageToolbar } from './ImageToolbar';
 import InfiniteImageList from './InfiniteImageList';
 import { ImageControls } from './ImageControls';
+import { CompactPagination } from './CompactPagination';
 import { useColumnConfig } from '@/lib/hooks/useColumnConfig';
 import { DEFAULT_PAGE_SIZE } from '@/constants';
 import { ImageWithTag } from '@/lib/type';
@@ -72,17 +73,23 @@ export function ImageList({ initialData }: ImageListProps) {
     }
 
     return (
-      <WaterfallGrid
-        key={page} // 添加key强制重新渲染，重置动画状态
-        items={images || []}
-        loadMore={async () => {}} // 分页模式不需要无限加载
-        hasMore={false}
-        isLoading={false}
-        renderItem={renderItem}
-        gap={columnConfig.gutter}
-        minColumnWidth={columnConfig.width}
-        enableAnimation={false} // 分页模式禁用动画
-      />
+      <div className="flex flex-col gap-4">
+        <WaterfallGrid
+          key={page} // 添加key强制重新渲染，重置动画状态
+          items={images || []}
+          loadMore={async () => {}} // 分页模式不需要无限加载
+          hasMore={false}
+          isLoading={false}
+          renderItem={renderItem}
+          gap={4}
+          minColumnWidth={columnConfig.width}
+          enableAnimation={false} // 分页模式禁用动画
+        />
+        {/* 分页模式底部分页控件 */}
+        <div className="flex justify-center py-4">
+          <CompactPagination />
+        </div>
+      </div>
     );
   }, [isLoading, isError, images, columnConfig, renderItem, page]);
 

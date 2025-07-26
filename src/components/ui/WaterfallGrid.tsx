@@ -1,8 +1,8 @@
 'use client';
 import { cn } from '@/lib/utils';
 import { throttle } from 'es-toolkit';
-import { AnimatePresence, m } from 'motion/react';
-import React, { useCallback, useEffect, useRef, useState, useMemo, memo } from 'react';
+import { m } from 'motion/react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 interface WaterfallItem {
   id: string | number;
@@ -53,7 +53,7 @@ function WaterfallGrid<T extends WaterfallItem>({
   const loadingRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(false);
   const hasAnimatedRef = useRef(false);
-  
+
   // 获取响应式列数（fallback逻辑）
   const getColumnCount = useCallback(() => {
     if (!containerRef.current) return 2;
@@ -93,7 +93,7 @@ function WaterfallGrid<T extends WaterfallItem>({
 
     // 计算每个item的标准化高度
     const itemsWithHeight = items.map((item) => {
-      const aspectRatio = (item.width && item.height) ? item.width / item.height : 1;
+      const aspectRatio = item.width && item.height ? item.width / item.height : 1;
       const normalizedHeight = 300 / aspectRatio; // 基准高度300px
       return { item, height: normalizedHeight };
     });
@@ -101,17 +101,15 @@ function WaterfallGrid<T extends WaterfallItem>({
     // 分配items到各列
     itemsWithHeight.forEach(({ item, height }) => {
       // 找到高度最小的列
-      const shortestColumn = columns.reduce((prev, current) => 
-        current.height < prev.height ? current : prev
-      );
-      
+      const shortestColumn = columns.reduce((prev, current) => (current.height < prev.height ? current : prev));
+
       shortestColumn.items.push(item);
       shortestColumn.height += height + gap;
     });
 
-    const maxHeight = Math.max(...columns.map(col => col.height));
+    const maxHeight = Math.max(...columns.map((col) => col.height));
 
-    return { columns: columns.map(col => col.items), maxHeight };
+    return { columns: columns.map((col) => col.items), maxHeight };
   }, [items, actualColumnCount, gap]);
 
   // 无限滚动观察器
@@ -143,7 +141,10 @@ function WaterfallGrid<T extends WaterfallItem>({
     return () => observer.disconnect();
   }, [handleObserver]);
 
-  const actualColumnWidth = typeof columnWidth === 'number' ? `${columnWidth}px` : columnWidth || `calc((100% - ${(actualColumnCount - 1) * gap}px) / ${actualColumnCount})`;
+  const actualColumnWidth =
+    typeof columnWidth === 'number'
+      ? `${columnWidth}px`
+      : columnWidth || `calc((100% - ${(actualColumnCount - 1) * gap}px) / ${actualColumnCount})`;
 
   const handleAnimationComplete = useCallback(() => {
     hasAnimatedRef.current = true;
@@ -151,24 +152,20 @@ function WaterfallGrid<T extends WaterfallItem>({
 
   return (
     <div className={cn('w-full', className)}>
-      <div 
-        ref={containerRef}
-        className="flex w-full"
-        style={{ gap: `${gap}px` }}
-      >
+      <div ref={containerRef} className="flex w-full" style={{ gap: `${gap}px` }}>
         {layout.columns.map((column, columnIndex) => (
           <div
             key={columnIndex}
             className="flex flex-col"
-            style={{ 
+            style={{
               width: actualColumnWidth,
-              gap: `${gap}px`
+              gap: `${gap}px`,
             }}
           >
             {column.map((item, itemIndex) => {
               const globalIndex = items.indexOf(item);
               return (
-                <WaterfallItem
+                <WaterfallItem<T>
                   key={`${item.id}`}
                   item={item}
                   index={globalIndex}
@@ -184,8 +181,8 @@ function WaterfallGrid<T extends WaterfallItem>({
       </div>
 
       {/* 加载状态 */}
-      <div ref={loadingRef} className="mt-8 flex h-20 items-center justify-center">
-        {(loading || isLoading) && (
+      {(loading || isLoading) && (
+        <div ref={loadingRef} className="mt-8 flex h-20 items-center justify-center">
           <div className="group relative overflow-hidden rounded-2xl border border-white/20 bg-white/10 px-8 py-6 backdrop-blur-xl dark:border-gray-800/50 dark:bg-gray-900/10">
             <div className="absolute inset-0 opacity-30">
               <div className="absolute top-2 right-2 h-8 w-8 rounded-full bg-blue-400/20 blur-lg" />
@@ -207,50 +204,29 @@ function WaterfallGrid<T extends WaterfallItem>({
               </div>
             </div>
           </div>
-        )}
-        
-        {!hasMore && items.length > 0 && (
-          <div className="relative overflow-hidden rounded-2xl border border-gray-200/30 bg-gradient-to-br from-gray-50/80 via-white/60 to-gray-50/80 px-8 py-6 shadow-lg shadow-gray-100/20 backdrop-blur-xl dark:border-gray-700/30 dark:from-gray-800/20 dark:via-gray-700/15 dark:to-gray-800/20 dark:shadow-gray-900/20">
-            <div className="absolute inset-0 opacity-20">
-              <div className="absolute top-2 right-2 h-8 w-8 rounded-full bg-gray-400/15 blur-lg" />
-              <div className="absolute bottom-2 left-2 h-10 w-10 rounded-full bg-blue-400/15 blur-lg" />
-            </div>
-
-            <div className="relative z-10 flex items-center space-x-4">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-gray-400/20 to-blue-400/20 ring-2 ring-gray-200/40 dark:ring-gray-700/40">
-                <svg className="h-4 w-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <div className="space-y-1">
-                <div className="text-sm font-medium text-gray-600 dark:text-gray-400">已加载完成</div>
-                <div className="text-xs text-gray-500/80 dark:text-gray-400/80">所有内容都在这里了 ✨</div>
-              </div>
-            </div>
-
-            <div className="absolute bottom-0 left-1/2 h-px w-16 -translate-x-1/2 bg-gradient-to-r from-transparent via-gray-300/50 to-transparent dark:via-gray-600/50" />
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
 
-const WaterfallItem = memo(<T extends WaterfallItem>({
-  item,
-  index,
-  renderItem,
-  hasAnimated,
-  onAnimationComplete,
-  enableAnimation = true,
-}: {
+interface WaterfallItemProps<T extends WaterfallItem> {
   item: T;
   index: number;
   renderItem: (item: T, index?: number) => React.ReactNode;
   hasAnimated: boolean;
   onAnimationComplete: () => void;
   enableAnimation: boolean;
-}) => {
+}
+
+function WaterfallItemComponent<T extends WaterfallItem>({
+  item,
+  index,
+  renderItem,
+  hasAnimated,
+  onAnimationComplete,
+  enableAnimation = true,
+}: WaterfallItemProps<T>) {
   // 只对第一屏的 items 做动画，且只在首次加载时
   const shouldAnimate = enableAnimation && !hasAnimated && index < FIRST_SCREEN_ITEMS_COUNT;
 
@@ -258,11 +234,7 @@ const WaterfallItem = memo(<T extends WaterfallItem>({
   const delay = shouldAnimate ? Math.min(index * 0.05, 0.3) : 0;
 
   if (!enableAnimation || !shouldAnimate) {
-    return (
-      <div className="w-full">
-        {renderItem(item, index)}
-      </div>
-    );
+    return <div className="w-full">{renderItem(item, index)}</div>;
   }
 
   return (
@@ -289,8 +261,8 @@ const WaterfallItem = memo(<T extends WaterfallItem>({
       {renderItem(item, index)}
     </m.div>
   );
-});
+}
 
-WaterfallItem.displayName = 'WaterfallItem';
+const WaterfallItem = memo(WaterfallItemComponent) as typeof WaterfallItemComponent;
 
 export default WaterfallGrid;
