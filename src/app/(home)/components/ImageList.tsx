@@ -2,15 +2,16 @@
 import Loader from '@/components/ui/loading/Loader';
 import { useImages } from '@/lib/hooks/useImages';
 import { pageAtom, totalPageAtom, viewModeAtom } from '@/store/app';
-import { Image } from '@prisma/client';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { Masonry } from 'masonic';
+import WaterfallGrid from '@/components/ui/WaterfallGrid';
 import { AnimatePresence } from 'motion/react';
 import { useCallback, useEffect } from 'react';
 import { PhotoProvider } from 'react-photo-view';
 import { ImageItem } from './ImageItem';
 import { ImageToolbar } from './ImageToolbar';
 import InfiniteImageList from './InfiniteImageList';
+import { ImageControls } from './ImageControls';
+import { CompactPagination } from './CompactPagination';
 import { useColumnConfig } from '@/lib/hooks/useColumnConfig';
 import { DEFAULT_PAGE_SIZE } from '@/constants';
 import { ImageWithTag } from '@/lib/type';
@@ -26,11 +27,18 @@ export function ImageList({ initialData }: ImageListProps) {
   const page = useAtomValue(pageAtom);
   const setTotalPage = useSetAtom(totalPageAtom);
   const viewMode = useAtomValue(viewModeAtom);
-  const { images, total, isLoading, isError } = useImages(page, DEFAULT_PAGE_SIZE, initialData);
+
+  // 只在分页模式下启用 useImages hook
+  const { images, total, isLoading, isError } = useImages(
+    page,
+    DEFAULT_PAGE_SIZE,
+    initialData,
+    viewMode === 'pagination', // 只在分页模式下启用
+  );
   const columnConfig = useColumnConfig();
 
-  const renderItem = useCallback(({ data, index }: { data: ImageWithTag; index: number }) => {
-    return <ImageItem key={index} data={data} />;
+  const renderItem = useCallback((data: ImageWithTag, index?: number) => {
+    return <ImageItem key={index || data.id} data={data} />;
   }, []);
 
   useEffect(() => {
@@ -64,11 +72,29 @@ export function ImageList({ initialData }: ImageListProps) {
       );
     }
 
-    return <Masonry items={images} columnGutter={columnConfig.gutter} columnWidth={columnConfig.width} render={renderItem} />;
-  }, [isLoading, isError, images, columnConfig, renderItem]);
+    return (
+      <div className="flex flex-col gap-4">
+        <WaterfallGrid
+          key={page} // 添加key强制重新渲染，重置动画状态
+          items={images || []}
+          loadMore={async () => {}} // 分页模式不需要无限加载
+          hasMore={false}
+          isLoading={false}
+          renderItem={renderItem}
+          gap={4}
+          enableAnimation={false} // 分页模式禁用动画
+        />
+        {/* 分页模式底部分页控件 */}
+        <div className="flex justify-center py-4">
+          <CompactPagination />
+        </div>
+      </div>
+    );
+  }, [isLoading, isError, images, columnConfig, renderItem, page]);
 
   return (
     <div className="flex flex-col gap-4">
+      <ImageControls showColumnSlider={viewMode === 'infinite'} />
       {viewMode === 'infinite' ? (
         <InfiniteImageList initialData={initialData} />
       ) : (

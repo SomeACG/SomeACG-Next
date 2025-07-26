@@ -1,19 +1,14 @@
 'use client';
 
-import ImagePagination from '@/app/(home)/components/ImagePagination';
-import { routers, Routes } from '@/constants/router';
 import { useIsMounted } from '@/hooks/useIsMounted';
 import { useScrollHide } from '@/hooks/useScrollHide';
-import { viewModeAtom } from '@/store/app';
 import { cn } from '@/lib/utils';
-import { usePathname } from 'next/navigation';
-import { useAtomValue } from 'jotai';
 
 export function Footer() {
   const isMounted = useIsMounted();
-  const pathname = usePathname();
   const isVisible = useScrollHide();
-  const viewMode = useAtomValue(viewModeAtom);
+
+  if (!isMounted) return null;
 
   return (
     <footer
@@ -22,7 +17,15 @@ export function Footer() {
         isVisible ? 'translate-y-0' : 'translate-y-full',
       )}
     >
-      {isMounted && pathname === Routes.Home && viewMode === 'pagination' && <ImagePagination />}
+      <div className="@container flex items-center justify-center px-2 py-3">
+        <div className="text-muted-foreground hidden items-center justify-center gap-1 text-xs @lg:flex">
+          关注
+          <a className="text-blue-400 hover:underline" href="https://t.me/CosineGallery">
+            Cosine 🎨 Gallery
+          </a>
+          每天看甜妹！
+        </div>
+      </div>
     </footer>
   );
 }

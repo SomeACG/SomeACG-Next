@@ -82,7 +82,7 @@ export default function ArtworkClient({ id }: ArtworkClientProps) {
   }, [originShowUrl]);
 
   if (isError) {
-    return <div className="container mx-auto px-4 py-8 text-center">加载失败，请稍后再试，可能该作品信息还未同步</div>;
+    return <div className="px-4 py-8 text-center">加载失败，请稍后再试，可能该作品信息还未同步</div>;
   }
 
   if (isLoading || !artwork) {
@@ -102,7 +102,7 @@ export default function ArtworkClient({ id }: ArtworkClientProps) {
           );
         }}
       >
-        <div className="container mx-auto px-2 py-8">
+        <div className="px-2 py-8">
           <div className={cn('grid grid-cols-1 gap-8', { 'lg:grid-cols-2': !isLandscape })}>
             <PhotoView src={realShowUrl}>
               <div className="bg-primary/20 relative w-full max-w-[1200px]" style={{ aspectRatio }}>

@@ -14,10 +14,10 @@ export default function ImagePagination() {
   };
 
   return (
-    <div className="flex items-center justify-between px-2 py-1 @container">
+    <div className="@container flex items-center justify-between px-2 py-1">
       <PageInput currentPage={page} totalPage={totalPage} onPageChange={handlePageChange} />
 
-      <div className="hidden items-center justify-center gap-1 text-xs text-muted-foreground @lg:flex">
+      <div className="text-muted-foreground hidden items-center justify-center gap-1 text-xs @lg:flex">
         关注
         <a className="text-blue-400 hover:underline" href="https://t.me/CosineGallery">
           Cosine 🎨 Gallery

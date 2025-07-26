@@ -49,7 +49,7 @@ export default function TagClient({ tag }: TagClientProps) {
   }, []);
 
   if (error) {
-    return <div className="container mx-auto px-4 py-8 text-center text-red-500">加载失败，请刷新重试</div>;
+    return <div className="px-4 py-8 text-center text-red-500">加载失败，请刷新重试</div>;
   }
 
   if (isLoading) {

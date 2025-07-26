@@ -96,7 +96,7 @@ export default function ArtistClient({ platform, uid, initialData }: ArtistClien
 
   if (isInfoError) {
     return (
-      <div className="mx-auto max-w-screen-xl px-4 py-8 text-center">
+      <div className="px-4 py-8 text-center">
         <div className={errorCard}>
           {/* Background decoration */}
           <div className="absolute inset-0 opacity-30">
@@ -156,7 +156,7 @@ export default function ArtistClient({ platform, uid, initialData }: ArtistClien
 
   return (
     <ClientOnly>
-      <div className="relative mx-auto min-h-screen max-w-screen-xl">
+      <div className="relative min-h-screen">
         {/* Background decoration */}
         <div className="fixed inset-0 -z-10">
           <div className="absolute top-20 left-10 h-72 w-72 rounded-full bg-purple-500/10 blur-3xl" />

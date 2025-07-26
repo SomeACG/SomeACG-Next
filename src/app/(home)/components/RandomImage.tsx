@@ -1,12 +1,10 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import Card from '@/components/ui/card';
 import { ArrowLeftIcon } from '@/components/ui/icons/ArrowLeftIcon';
 import { ArrowRightIcon } from '@/components/ui/icons/ArrowRightIcon';
 import Loader from '@/components/ui/loading/Loader';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { useIsMobile } from '@/hooks/useIsMobile';
 import { cn } from '@/lib/utils';
 import { Image } from '@prisma/client';
 import { RefreshCw } from 'lucide-react';
@@ -26,7 +24,8 @@ export function RandomImage() {
   const [images, setImages] = useState<RandomImage[]>([]);
   const [loading, setLoading] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const isMobile = useIsMobile();
+  const hasInitialized = useRef(false);
+
   const fetchRandomImages = useCallback(async () => {
     try {
       setLoading(true);
@@ -42,7 +41,10 @@ export function RandomImage() {
   }, []);
 
   useEffect(() => {
-    fetchRandomImages();
+    if (!hasInitialized.current) {
+      hasInitialized.current = true;
+      fetchRandomImages();
+    }
   }, [fetchRandomImages]);
 
   // 检查是否有精选图片
@@ -71,64 +73,78 @@ export function RandomImage() {
   };
 
   return (
-    <div className="w-full select-none">
+    <section className="flex flex-col gap-3 select-none">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold tracking-tight">✨随便看看 </h2>
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" className="size-6 p-0" onClick={scrollToStart}>
-            <ArrowLeftIcon />
+        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">✨ 随便看看</h2>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="size-7 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
+            onClick={scrollToStart}
+          >
+            <ArrowLeftIcon className="h-3.5 w-3.5" />
           </Button>
-          <Button variant="ghost" size="sm" className="size-6 p-0" onClick={scrollToEnd}>
-            <ArrowRightIcon />
+          <Button
+            variant="ghost"
+            size="sm"
+            className="size-7 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
+            onClick={scrollToEnd}
+          >
+            <ArrowRightIcon className="h-3.5 w-3.5" />
           </Button>
-          <Button variant="ghost" size="sm" className="group" onClick={fetchRandomImages} disabled={loading}>
-            <RefreshCw className={cn('size-4 group-hover:animate-spin', { 'animate-spin': loading })} />
-            <span>来点新的</span>
+          <div className="mx-1 h-4 w-px bg-gray-200 dark:bg-gray-700" />
+          <Button
+            variant="ghost"
+            size="sm"
+            className="group h-7 gap-1.5 px-2 text-xs font-medium hover:bg-gray-100 dark:hover:bg-gray-800"
+            onClick={fetchRandomImages}
+            disabled={loading}
+          >
+            <RefreshCw className={cn('h-3 w-3 transition-transform', { 'animate-spin': loading })} />
+            <span>换一批</span>
           </Button>
         </div>
       </div>
-      <Card
-        className={cn(
-          'dark:hover:shadow-primary/5 mt-2 overflow-hidden p-4 pb-1 transition-shadow duration-300 hover:shadow-lg',
-          {
-            'flex-center': loading,
-          },
-        )}
-        // isPremium={hasPremiumImages}
-      >
+      <div className="relative h-[280px] overflow-hidden rounded-xl border border-gray-200/60 bg-white/50 shadow-sm backdrop-blur-sm transition-all duration-300 hover:border-gray-300/60 hover:shadow-md dark:border-gray-700/60 dark:bg-gray-900/50 dark:hover:border-gray-600/60">
         {loading ? (
-          <Loader />
+          <div className="flex h-full items-center justify-center">
+            <Loader />
+          </div>
         ) : (
           <PhotoProvider
             className="photo-provider"
             toolbarRender={({ onRotate, onScale, rotate, scale }) => <ImageToolbar {...{ onRotate, onScale, rotate, scale }} />}
           >
-            <ScrollArea className={cn('pb-4 md:h-[23.625rem]')} ref={scrollContainerRef}>
+            <ScrollArea className="h-full p-3" ref={scrollContainerRef}>
               <div className="flex items-start gap-2">
                 {images.map((image) => {
                   const aspectRatio = (image.width ?? 800) / (image.height ?? 600);
-                  const height = 300;
+                  const height = 250;
                   const width = height * aspectRatio;
 
                   return (
                     <div
                       key={image.id}
-                      className="flex-none"
+                      className="flex-none overflow-hidden rounded-lg"
                       style={{
                         height: `${height}px`,
                         width: `${width}px`,
                       }}
                     >
-                      <ImageItem data={image} className={cn('size-full object-cover', { 'h-[362px]': isMobile })} />
+                      <ImageItem
+                        data={image}
+                        className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+                      />
                     </div>
                   );
                 })}
               </div>
-              <ScrollBar orientation="horizontal" />
+              <ScrollBar orientation="horizontal" className="h-1.5" />
             </ScrollArea>
           </PhotoProvider>
         )}
-      </Card>
-    </div>
+      </div>
+    </section>
   );
 }

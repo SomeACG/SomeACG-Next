@@ -5,7 +5,7 @@ import Loader from '@/components/ui/loading/Loader';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { ImageWithTag, Platform } from '@/lib/type';
 import { cn, genArtistUrl, genArtworkUrl, getImageThumbUrl } from '@/lib/utils';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence } from 'motion/react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useState } from 'react';
 import { FaLink, FaSquareXTwitter } from 'react-icons/fa6';
@@ -21,7 +21,7 @@ interface ImageItemProps {
 }
 
 export function ImageItem({ data, className, premiumMode }: ImageItemProps) {
-  const { id, title, author, thumburl, rawurl, platform, authorid, pid, width, height, filename, tags } = data ?? {};
+  const { id, title, author, thumburl, platform, authorid, pid, width, height, filename, tags } = data ?? {};
   const [isHover, setIsHover] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
@@ -59,13 +59,11 @@ export function ImageItem({ data, className, premiumMode }: ImageItemProps) {
   }, [width, height]);
 
   return (
-    <motion.div
-      key={id}
-      layout
-      onHoverStart={() => setIsHover(true)}
-      onHoverEnd={() => setIsHover(false)}
+    <div
+      onMouseEnter={() => setIsHover(true)}
+      onMouseLeave={() => setIsHover(false)}
       className={cn(
-        'group relative z-1 overflow-hidden rounded-lg',
+        'group relative z-1 overflow-hidden rounded-lg hover:z-10',
         {
           'bg-gradient-to-br from-[#AF40FF] via-[#5B42F3] to-[#00DDEB] p-1 shadow-[0_10px_20px_-5px_rgba(151,65,252,0.3)]':
             isPremium,
@@ -85,9 +83,9 @@ export function ImageItem({ data, className, premiumMode }: ImageItemProps) {
               loading="lazy"
               fill
               decoding="async"
-              className={`h-full w-full cursor-pointer rounded-lg object-contain shadow-md transition-all duration-300 ${
+              className={`h-full w-full cursor-pointer rounded-lg object-cover shadow-md transition-transform duration-300 ${
                 isLoading ? 'opacity-0' : 'opacity-100'
-              } group-hover:scale-105`}
+              } group-hover:scale-110`}
               onLoad={() => setIsLoading(false)}
             />
           </div>
@@ -145,6 +143,6 @@ export function ImageItem({ data, className, premiumMode }: ImageItemProps) {
           )}
         </AnimatePresence>
       )}
-    </motion.div>
+    </div>
   );
 }

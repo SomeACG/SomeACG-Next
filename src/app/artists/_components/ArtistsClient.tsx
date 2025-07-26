@@ -124,7 +124,7 @@ export default function ArtistsClient() {
           </div>
         }
       >
-        <div className="relative mx-auto min-h-screen max-w-screen-xl">
+        <div className="relative min-h-screen">
           <div className="fixed inset-0 -z-10">
             <div className="absolute top-20 left-10 h-72 w-72 rounded-full bg-purple-500/10 blur-3xl" />
             <div className="absolute top-40 right-20 h-96 w-96 rounded-full bg-blue-500/10 blur-3xl" />
