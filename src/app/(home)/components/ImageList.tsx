@@ -82,7 +82,6 @@ export function ImageList({ initialData }: ImageListProps) {
           isLoading={false}
           renderItem={renderItem}
           gap={4}
-          enableAnimation={false} // 分页模式禁用动画
         />
         {/* 分页模式底部分页控件 */}
         <div className="flex justify-center py-4">

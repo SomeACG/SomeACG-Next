@@ -1,8 +1,7 @@
 'use client';
 import { cn } from '@/lib/utils';
 import { throttle } from 'es-toolkit';
-import { m } from 'motion/react';
-import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 interface WaterfallItem {
   id: string | number;
@@ -20,20 +19,8 @@ interface WaterfallGridProps<T extends WaterfallItem> {
   gap?: number;
   columnWidth?: number;
   columnCount?: number;
-  enableAnimation?: boolean;
 }
 
-const FIRST_SCREEN_ITEMS_COUNT = 30;
-
-const Spring = {
-  presets: {
-    smooth: {
-      type: 'spring' as const,
-      stiffness: 300,
-      damping: 30,
-    },
-  },
-};
 
 function WaterfallGrid<T extends WaterfallItem>({
   items,
@@ -45,12 +32,10 @@ function WaterfallGrid<T extends WaterfallItem>({
   gap = 16,
   columnWidth,
   columnCount,
-  enableAnimation = true,
 }: WaterfallGridProps<T>) {
   const containerRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(false);
-  const hasAnimatedRef = useRef(false);
 
   // 获取响应式列数（fallback逻辑）
   const getColumnCount = useCallback(() => {
@@ -145,9 +130,6 @@ function WaterfallGrid<T extends WaterfallItem>({
       ? `${columnWidth}px`
       : columnWidth || `calc((100% - ${(actualColumnCount - 1) * gap}px) / ${actualColumnCount})`;
 
-  const handleAnimationComplete = useCallback(() => {
-    hasAnimatedRef.current = true;
-  }, []);
 
   return (
     <div className={cn('w-full', className)}>
@@ -164,15 +146,9 @@ function WaterfallGrid<T extends WaterfallItem>({
             {column.map((item) => {
               const globalIndex = items.indexOf(item);
               return (
-                <WaterfallItem<T>
-                  key={`${item.id}`}
-                  item={item}
-                  index={globalIndex}
-                  renderItem={renderItem}
-                  hasAnimated={hasAnimatedRef.current}
-                  onAnimationComplete={handleAnimationComplete}
-                  enableAnimation={enableAnimation}
-                />
+                <div key={`${item.id}`} className="w-full">
+                  {renderItem(item, globalIndex)}
+                </div>
               );
             })}
           </div>
@@ -211,59 +187,5 @@ function WaterfallGrid<T extends WaterfallItem>({
   );
 }
 
-interface WaterfallItemProps<T extends WaterfallItem> {
-  item: T;
-  index: number;
-  renderItem: (item: T, index?: number) => React.ReactNode;
-  hasAnimated: boolean;
-  onAnimationComplete: () => void;
-  enableAnimation: boolean;
-}
-
-function WaterfallItemComponent<T extends WaterfallItem>({
-  item,
-  index,
-  renderItem,
-  hasAnimated,
-  onAnimationComplete,
-  enableAnimation = true,
-}: WaterfallItemProps<T>) {
-  // 只对第一屏的 items 做动画，且只在首次加载时
-  const shouldAnimate = enableAnimation && !hasAnimated && index < FIRST_SCREEN_ITEMS_COUNT;
-
-  // 计算动画延迟
-  const delay = shouldAnimate ? Math.min(index * 0.05, 0.3) : 0;
-
-  if (!enableAnimation || !shouldAnimate) {
-    return <div className="w-full">{renderItem(item, index)}</div>;
-  }
-
-  return (
-    <m.div
-      initial={{
-        opacity: 0,
-        y: 30,
-        scale: 0.95,
-        filter: 'blur(4px)',
-      }}
-      animate={{
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        filter: 'blur(0px)',
-      }}
-      transition={{
-        ...Spring.presets.smooth,
-        delay,
-      }}
-      onAnimationComplete={onAnimationComplete}
-      className="w-full"
-    >
-      {renderItem(item, index)}
-    </m.div>
-  );
-}
-
-const WaterfallItem = memo(WaterfallItemComponent) as typeof WaterfallItemComponent;
 
 export default WaterfallGrid;

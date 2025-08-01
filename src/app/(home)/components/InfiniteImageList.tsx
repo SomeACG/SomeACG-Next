@@ -92,7 +92,6 @@ function InfiniteImageListComponent({ initialData }: InfiniteImageListProps) {
                 gap={4}
                 columnWidth={columnWidth}
                 columnCount={columnCount}
-                enableAnimation={false}
               />
             ) : (
               <div className="flex-center min-h-[200px]">
