@@ -256,11 +256,19 @@ export async function getPopularArtists(page: number, pageSize: number, sortBy: 
             not: null,
           },
         },
-        orderBy: {
-          _count: {
-            id: 'desc',
+        orderBy: [
+          {
+            _count: {
+              id: 'desc',
+            },
           },
-        },
+          {
+            platform: 'asc',
+          },
+          {
+            authorid: 'asc',
+          },
+        ],
         skip,
         take,
         having: {
@@ -270,7 +278,7 @@ export async function getPopularArtists(page: number, pageSize: number, sortBy: 
         },
       });
 
-      // 获取总数
+      // 获取总数 (使用相同的排序确保一致性)
       const totalArtistsResult = await prisma.image.groupBy({
         by: ['platform', 'authorid'],
         where: {
@@ -284,6 +292,19 @@ export async function getPopularArtists(page: number, pageSize: number, sortBy: 
             not: null,
           },
         },
+        orderBy: [
+          {
+            _count: {
+              id: 'desc',
+            },
+          },
+          {
+            platform: 'asc',
+          },
+          {
+            authorid: 'asc',
+          },
+        ],
         having: {
           authorid: {
             not: null,

@@ -2,9 +2,9 @@
 
 import ImageFb from '@/components/common/ImageFb';
 import { PopularArtist } from '@/lib/type';
-import { genArtistUrl, getImageThumbUrl, transformPixivUrl } from '@/lib/utils';
+import { genArtistUrl, getImageThumbUrl } from '@/lib/utils';
 import Link from 'next/link';
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { ExternalLink, Calendar, Hash, Images, User } from 'lucide-react';
 import { FaSquareXTwitter } from 'react-icons/fa6';
 import { SiPixiv } from 'react-icons/si';
@@ -59,12 +59,19 @@ function ArtistCard({ artist, index }: ArtistCardProps) {
     () => getImageThumbUrl({ thumbUrl: latestImageThumb ?? '', platform, filename: latestImageFilename }),
     [latestImageThumb, platform, latestImageFilename],
   );
-  const onImgFallback = useCallback(() => {}, []);
+  
+  const [realShowUrl, setRealShowUrl] = useState('');
+  
+  const onImgFallback = useCallback((fallbackSrc: string) => {
+    setRealShowUrl(fallbackSrc);
+  }, []);
 
-  const thumbUrl = useMemo(() => {
-    if (!latestImageThumb) return '';
-    return transformPixivUrl(latestImageThumb);
-  }, [latestImageThumb]);
+  // 初始化 realShowUrl
+  useEffect(() => {
+    if (thumbShowUrl?.s3ThumbUrl) {
+      setRealShowUrl(thumbShowUrl.s3ThumbUrl);
+    }
+  }, [thumbShowUrl]);
 
   const formatDate = (date: Date | null) => {
     if (!date) return '未知';
@@ -113,8 +120,8 @@ function ArtistCard({ artist, index }: ArtistCardProps) {
         className="relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900"
         style={{ width: '100%', paddingBottom }}
       >
-        {thumbUrl && !imageError ? (
-          <PhotoView src={thumbUrl}>
+        {thumbShowUrl.s3ThumbUrl && !imageError ? (
+          <PhotoView src={realShowUrl}>
             <div className="absolute inset-0 cursor-pointer overflow-hidden">
               <ImageFb
                 src={thumbShowUrl.s3ThumbUrl}
