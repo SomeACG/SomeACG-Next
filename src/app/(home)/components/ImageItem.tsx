@@ -4,11 +4,11 @@ import { Button } from '@/components/ui/button';
 import Loader from '@/components/ui/loading/Loader';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { ImageWithTag, Platform } from '@/lib/type';
-import { cn, genArtistUrl, genArtworkUrl, getImageThumbUrl } from '@/lib/utils';
+import { cn, genArtistUrl, genArtworkUrl, getImageThumbUrl, getImageOriginUrl } from '@/lib/utils';
 import { AnimatePresence } from 'motion/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FaLink, FaSquareXTwitter } from 'react-icons/fa6';
 import { SiPixiv } from 'react-icons/si';
 import { PhotoView } from 'react-photo-view';
@@ -21,7 +21,7 @@ interface ImageItemProps {
 }
 
 export function ImageItem({ data, className, premiumMode }: ImageItemProps) {
-  const { id, title, author, thumburl, platform, authorid, pid, width, height, filename, tags } = data ?? {};
+  const { id, title, author, thumburl, platform, authorid, pid, width, height, filename, tags, rawurl } = data ?? {};
   const [isHover, setIsHover] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
@@ -34,21 +34,65 @@ export function ImageItem({ data, className, premiumMode }: ImageItemProps) {
     () => getImageThumbUrl({ thumbUrl: thumburl ?? '', platform, filename }),
     [filename, platform, thumburl],
   );
-  const [currentImageSrc, setCurrentImageSrc] = useState(thumbShowUrl.transformThumbUrl || thumbShowUrl.s3ThumbUrl);
+  const [hasFallbacked, setHasFallbacked] = useState(false);
 
-  useEffect(() => {
-    setCurrentImageSrc(thumbShowUrl.transformThumbUrl || thumbShowUrl.s3ThumbUrl);
-  }, [thumbShowUrl]);
+  // 获取原图URL用于PhotoView
+  const originShowUrl = useMemo(
+    () => getImageOriginUrl({ rawUrl: rawurl ?? '', platform, filename }),
+    [rawurl, platform, filename],
+  );
+
+  const internalArtistUrl = useMemo(() => `/artist/${platform}/${authorid}`, [platform, authorid]);
+  const artworkUrl = useMemo(
+    () => genArtworkUrl({ platform: platform ?? '', pid: pid ?? '', username: author ?? '' }),
+    [platform, author, pid],
+  );
+
+  // 原图URL基于是否已经fallback来决定
+  const currentOriginSrc = useMemo(() => {
+    if (hasFallbacked) {
+      return originShowUrl.s3OriginUrl;
+    }
+    return originShowUrl.transformOriginUrl || originShowUrl.s3OriginUrl;
+  }, [originShowUrl, hasFallbacked]);
 
   // console.log('image item', data);
   const authorUrl = useMemo(
     () => genArtistUrl(platform, { uid: authorid?.toString() ?? '', username: author ?? '' }),
     [platform, authorid, author],
   );
-  const internalArtistUrl = useMemo(() => `/artist/${platform}/${authorid}`, [platform, authorid]);
-  const artworkUrl = useMemo(
-    () => genArtworkUrl({ platform: platform ?? '', pid: pid ?? '', username: author ?? '' }),
-    [platform, author, pid],
+
+  useEffect(() => {
+    setHasFallbacked(false); // 重置fallback状态
+  }, [thumbShowUrl]);
+
+  // 定义稳定的回调函数
+  const handleImageLoad = useCallback(() => {
+    setIsLoading(false);
+  }, []);
+
+  const handleCurrentSrcChange = useCallback(
+    (currentSrc: string) => {
+      // 如果fallback到s3源，标记状态
+      setHasFallbacked(currentSrc === thumbShowUrl.s3ThumbUrl);
+    },
+    [thumbShowUrl.s3ThumbUrl],
+  );
+
+  const handleArtworkClick = useCallback(() => {
+    router.push(`/artwork/${id}`);
+  }, [router, id]);
+
+  const handleAuthorLinkClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+  }, []);
+
+  const handleExternalLinkClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      window.open(artworkUrl, '_blank');
+    },
+    [artworkUrl],
   );
 
   // 计算容器高度
@@ -73,7 +117,7 @@ export function ImageItem({ data, className, premiumMode }: ImageItemProps) {
         className,
       )}
     >
-      <PhotoView src={currentImageSrc}>
+      <PhotoView src={currentOriginSrc}>
         <div className="bg-primary/20 relative" style={{ width: '100%', paddingBottom }}>
           {isLoading && <Loader className="absolute inset-0" />}
           <div className="absolute inset-0">
@@ -86,8 +130,8 @@ export function ImageItem({ data, className, premiumMode }: ImageItemProps) {
               className={`h-full w-full cursor-pointer rounded-lg object-cover shadow-md transition-transform duration-300 ${
                 isLoading ? 'opacity-0' : 'opacity-100'
               } group-hover:scale-110`}
-              onLoad={() => setIsLoading(false)}
-              onCurrentSrcChange={setCurrentImageSrc}
+              onLoad={handleImageLoad}
+              onCurrentSrcChange={handleCurrentSrcChange}
             />
           </div>
         </div>
@@ -95,7 +139,7 @@ export function ImageItem({ data, className, premiumMode }: ImageItemProps) {
       {isMobile ? (
         <div
           className="text-primary hidden bg-[#d3d2da] px-2 py-2 backdrop-blur-lg md:block dark:bg-[#3b3c40] dark:text-white"
-          onClick={() => router.push(`/artwork/${id}`)}
+          onClick={handleArtworkClick}
         >
           {/* 移动端显示在底部 */}
           <h2 className="truncate text-sm/4 font-semibold">{title}</h2>
@@ -104,7 +148,7 @@ export function ImageItem({ data, className, premiumMode }: ImageItemProps) {
             <Link
               href={internalArtistUrl}
               className="flex-center group/author border-primary bg-primary/50 hover:bg-primary/80 h-6 cursor-pointer gap-1.5 rounded-full border px-1.5"
-              onClick={(e) => e.stopPropagation()}
+              onClick={handleAuthorLinkClick}
             >
               {platform === Platform.Pixiv && <SiPixiv className="size-4 opacity-70 group-hover/author:opacity-100" />}
               {platform === Platform.Twitter && (
@@ -116,10 +160,7 @@ export function ImageItem({ data, className, premiumMode }: ImageItemProps) {
               variant="ghost"
               size="xs"
               className="flex-center border-primary bg-primary/50 hover:bg-primary/80 cursor-pointer gap-0.5 rounded-full border p-0 px-1.5 text-xs"
-              onClick={(e) => {
-                e.stopPropagation();
-                window.open(artworkUrl, '_blank');
-              }}
+              onClick={handleExternalLinkClick}
             >
               <FaLink className="size-3.5" />
               <span className="truncate">原图</span>
