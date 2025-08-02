@@ -1,7 +1,7 @@
 'use client';
 
 import { ClientOnly } from '@/components/common/ClientOnly';
-import ImageFb from '@/components/common/ImageFb';
+import ImageWithAutoFallback from '@/components/common/ImageWithAutoFallback';
 import Card from '@/components/ui/card';
 import { LinkCard } from '@/components/ui/card/LinkCard';
 import Loader from '@/components/ui/loading/Loader';
@@ -29,6 +29,22 @@ export default function ArtworkClient({ id }: ArtworkClientProps) {
   }, [platform, title]);
   const isLandscape = useMemo(() => width && height && width > height, [width, height]);
   const [isImgLoading, setIsImgLoading] = useState(true);
+
+  const originShowUrl = useMemo(
+    () =>
+      getImageOriginUrl({
+        rawUrl: rawurl ?? '',
+        platform,
+        filename,
+      }),
+    [rawurl, platform, filename],
+  );
+
+  const [currentImageSrc, setCurrentImageSrc] = useState(originShowUrl.transformOriginUrl || originShowUrl.s3OriginUrl);
+
+  useEffect(() => {
+    setCurrentImageSrc(originShowUrl.transformOriginUrl || originShowUrl.s3OriginUrl);
+  }, [originShowUrl]);
   const finalTags = useMemo(() => {
     // TODO: 多图的时候 tag 有 bug ，待修复
     return uniq(tags ?? []);
@@ -40,21 +56,6 @@ export default function ArtworkClient({ id }: ArtworkClientProps) {
     }
     return 1; // 默认 4:3 比例
   }, [width, height]);
-
-  const originShowUrl = useMemo(
-    () =>
-      getImageOriginUrl({
-        rawUrl: rawurl ?? '',
-        platform,
-        filename,
-      }),
-    [rawurl, platform, filename],
-  );
-  const [realShowUrl, setRealShowUrl] = useState(originShowUrl?.s3OriginUrl ?? '');
-
-  const onImgFallback = useCallback((fallbackSrc: string) => {
-    setRealShowUrl(fallbackSrc);
-  }, []);
 
   const authorUrl = genArtistUrl(platform, {
     uid: authorid?.toString() ?? '',
@@ -74,12 +75,6 @@ export default function ArtworkClient({ id }: ArtworkClientProps) {
     }
     return <Card desc={title} />;
   }, [platform, title]);
-
-  useEffect(() => {
-    if (originShowUrl?.s3OriginUrl) {
-      setRealShowUrl(originShowUrl.s3OriginUrl);
-    }
-  }, [originShowUrl]);
 
   if (isError) {
     return <div className="px-4 py-8 text-center">加载失败，请稍后再试，可能该作品信息还未同步</div>;
@@ -102,24 +97,23 @@ export default function ArtworkClient({ id }: ArtworkClientProps) {
           );
         }}
       >
-        <div className="px-2 py-8">
+        <div className="px-4 py-8">
           <div className={cn('grid grid-cols-1 gap-8', { 'lg:grid-cols-2': !isLandscape })}>
-            <PhotoView src={realShowUrl}>
+            <PhotoView src={currentImageSrc}>
               <div className="bg-primary/20 relative w-full max-w-[1200px]" style={{ aspectRatio }}>
                 {isImgLoading && <Loader className="absolute inset-0" />}
                 <div className="absolute inset-0">
-                  <ImageFb
-                    src={originShowUrl.s3OriginUrl}
-                    fallbackSrc={originShowUrl.transformOriginUrl}
-                    onImgFallback={onImgFallback}
+                  <ImageWithAutoFallback
+                    primarySrc={originShowUrl.transformOriginUrl}
+                    fallbackSrc={originShowUrl.s3OriginUrl}
                     alt={title ?? ''}
-                    loading="lazy"
                     fill
                     decoding="async"
                     className={`h-full w-full cursor-pointer rounded-lg object-contain shadow-md transition-all duration-300 ${
                       isImgLoading ? 'opacity-0' : 'opacity-100'
                     } group-hover:scale-105`}
                     onLoad={() => setIsImgLoading(false)}
+                    onCurrentSrcChange={setCurrentImageSrc}
                   />
                 </div>
               </div>

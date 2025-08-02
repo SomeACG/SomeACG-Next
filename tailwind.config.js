@@ -44,6 +44,23 @@ module.exports = {
         red: {
           DEFAULT: '#ec4f41',
         },
+        // Artist card colors
+        artist: {
+          neutral: {
+            100: 'hsl(220 14% 96%)', // 浅色边框/背景
+            200: 'hsl(220 12% 87%)', // hover边框
+            600: 'hsl(215 12% 53%)', // 次要文字
+            700: 'hsl(215 16% 37%)', // 按钮背景
+            800: 'hsl(215 20% 17%)', // 主要文字
+          },
+          'neutral-dark': {
+            200: 'hsl(215 15% 74%)', // 浅色文字
+            300: 'hsl(215 14% 34%)', // hover边框
+            700: 'hsl(215 16% 28%)', // 边框
+            800: 'hsl(215 20% 20%)', // 背景
+            900: 'hsl(210 20% 95%)', // 主要文字
+          },
+        },
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {

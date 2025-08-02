@@ -1,18 +1,18 @@
 'use client';
-import ImageFb from '@/components/common/ImageFb';
+import ImageWithAutoFallback from '@/components/common/ImageWithAutoFallback';
 import { Button } from '@/components/ui/button';
 import Loader from '@/components/ui/loading/Loader';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { ImageWithTag, Platform } from '@/lib/type';
 import { cn, genArtistUrl, genArtworkUrl, getImageThumbUrl } from '@/lib/utils';
 import { AnimatePresence } from 'motion/react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useCallback, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FaLink, FaSquareXTwitter } from 'react-icons/fa6';
 import { SiPixiv } from 'react-icons/si';
 import { PhotoView } from 'react-photo-view';
 import { ImageHoverCard } from './ImageHoverCard';
-import Link from 'next/link';
 
 interface ImageItemProps {
   data: ImageWithTag;
@@ -34,11 +34,13 @@ export function ImageItem({ data, className, premiumMode }: ImageItemProps) {
     () => getImageThumbUrl({ thumbUrl: thumburl ?? '', platform, filename }),
     [filename, platform, thumburl],
   );
-  const [realShowUrl, setRealShowUrl] = useState(thumbShowUrl?.s3ThumbUrl ?? '');
+  const [currentImageSrc, setCurrentImageSrc] = useState(thumbShowUrl.transformThumbUrl || thumbShowUrl.s3ThumbUrl);
+
+  useEffect(() => {
+    setCurrentImageSrc(thumbShowUrl.transformThumbUrl || thumbShowUrl.s3ThumbUrl);
+  }, [thumbShowUrl]);
+
   // console.log('image item', data);
-  const onImgFallback = useCallback((fallbackSrc: string) => {
-    setRealShowUrl(fallbackSrc);
-  }, []);
   const authorUrl = useMemo(
     () => genArtistUrl(platform, { uid: authorid?.toString() ?? '', username: author ?? '' }),
     [platform, authorid, author],
@@ -71,22 +73,21 @@ export function ImageItem({ data, className, premiumMode }: ImageItemProps) {
         className,
       )}
     >
-      <PhotoView src={realShowUrl}>
+      <PhotoView src={currentImageSrc}>
         <div className="bg-primary/20 relative" style={{ width: '100%', paddingBottom }}>
           {isLoading && <Loader className="absolute inset-0" />}
           <div className="absolute inset-0">
-            <ImageFb
-              src={thumbShowUrl.s3ThumbUrl}
-              fallbackSrc={thumbShowUrl.transformThumbUrl}
-              onImgFallback={onImgFallback}
+            <ImageWithAutoFallback
+              primarySrc={thumbShowUrl.transformThumbUrl}
+              fallbackSrc={thumbShowUrl.s3ThumbUrl}
               alt={title ?? ''}
-              loading="lazy"
               fill
               decoding="async"
               className={`h-full w-full cursor-pointer rounded-lg object-cover shadow-md transition-transform duration-300 ${
                 isLoading ? 'opacity-0' : 'opacity-100'
               } group-hover:scale-110`}
               onLoad={() => setIsLoading(false)}
+              onCurrentSrcChange={setCurrentImageSrc}
             />
           </div>
         </div>

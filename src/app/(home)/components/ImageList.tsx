@@ -89,7 +89,7 @@ export function ImageList({ initialData }: ImageListProps) {
         </div>
       </div>
     );
-  }, [isLoading, isError, images, columnConfig, renderItem, page]);
+  }, [isLoading, isError, images, renderItem, page]);
 
   return (
     <div className="flex flex-col gap-4">

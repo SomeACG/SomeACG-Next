@@ -1,11 +1,11 @@
 'use client';
 
-import ImageFb from '@/components/common/ImageFb';
+import ImageWithAutoFallback from '@/components/common/ImageWithAutoFallback';
 import { PopularArtist } from '@/lib/type';
 import { genArtistUrl, getImageThumbUrl } from '@/lib/utils';
+import { Calendar, ExternalLink, Hash, Images, User } from 'lucide-react';
 import Link from 'next/link';
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { ExternalLink, Calendar, Hash, Images, User } from 'lucide-react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { FaSquareXTwitter } from 'react-icons/fa6';
 import { SiPixiv } from 'react-icons/si';
 import { PhotoView } from 'react-photo-view';
@@ -16,8 +16,6 @@ type ArtistCardProps = {
 };
 
 function ArtistCard({ artist, index }: ArtistCardProps) {
-  const [imageError, setImageError] = useState(false);
-
   const { platform, authorid, author, artworkCount, latestImageThumb, lastUpdateTime, latestImageFilename } = artist;
 
   const getPlatformIcon = () => {
@@ -34,22 +32,22 @@ function ArtistCard({ artist, index }: ArtistCardProps) {
   const getPlatformColor = () => {
     switch (platform) {
       case 'pixiv':
-        return 'text-blue-600';
+        return 'text-blue';
       case 'twitter':
-        return 'text-gray-900 dark:text-gray-100';
+        return 'text-artist-neutral-700 dark:text-artist-neutral-dark-200';
       default:
-        return 'text-purple-600';
+        return 'text-purple-500';
     }
   };
 
   const getRankBadge = () => {
     if (index < 3) {
-      return 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white';
+      return 'bg-gradient-to-r from-yellow to-red text-white shadow-lg';
     }
     if (index < 10) {
-      return 'bg-gradient-to-r from-gray-400 to-gray-600 text-white';
+      return 'bg-gradient-to-r from-artist-neutral-700 to-artist-neutral-800 text-white shadow-md';
     }
-    return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
+    return 'bg-white/90 text-artist-neutral-600 shadow-sm backdrop-blur-sm dark:bg-artist-neutral-dark-700/90 dark:text-artist-neutral-dark-200';
   };
 
   const externalUrl = genArtistUrl(platform, { uid: authorid ?? '', username: author ?? '' });
@@ -59,18 +57,11 @@ function ArtistCard({ artist, index }: ArtistCardProps) {
     () => getImageThumbUrl({ thumbUrl: latestImageThumb ?? '', platform, filename: latestImageFilename }),
     [latestImageThumb, platform, latestImageFilename],
   );
-  
-  const [realShowUrl, setRealShowUrl] = useState('');
-  
-  const onImgFallback = useCallback((fallbackSrc: string) => {
-    setRealShowUrl(fallbackSrc);
-  }, []);
 
-  // 初始化 realShowUrl
+  const [currentImageSrc, setCurrentImageSrc] = useState(thumbShowUrl.transformThumbUrl || thumbShowUrl.s3ThumbUrl);
+
   useEffect(() => {
-    if (thumbShowUrl?.s3ThumbUrl) {
-      setRealShowUrl(thumbShowUrl.s3ThumbUrl);
-    }
+    setCurrentImageSrc(thumbShowUrl.transformThumbUrl || thumbShowUrl.s3ThumbUrl);
   }, [thumbShowUrl]);
 
   const formatDate = (date: Date | null) => {
@@ -96,83 +87,68 @@ function ArtistCard({ artist, index }: ArtistCardProps) {
     }
   }, [artworkCount]);
 
-  const handleImageError = () => {
-    setImageError(true);
-  };
-
   return (
-    <div className="group relative overflow-hidden rounded-xl border border-gray-200/60 bg-white/80 shadow-sm backdrop-blur-sm transition-all duration-300 hover:border-gray-300/60 hover:shadow-lg hover:-translate-y-0.5 dark:border-gray-700/60 dark:bg-gray-900/80 dark:hover:border-gray-600/60">
+    <div className="group border-artist-neutral-100/60 hover:border-artist-neutral-200/80 dark:border-artist-neutral-dark-700/60 dark:bg-artist-neutral-dark-800/75 dark:hover:border-artist-neutral-dark-300/80 dark:hover:bg-artist-neutral-dark-800/85 relative overflow-hidden rounded-2xl border bg-white/75 shadow-sm backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/85 hover:shadow-xl">
       {/* Rank and Platform indicators */}
-      <div className="absolute top-3 left-3 z-10">
-        <div className={`flex h-5 w-5 items-center justify-center rounded-md text-xs font-bold ${getRankBadge()}`}>
+      <div className="absolute top-2.5 left-2.5 z-10">
+        <div
+          className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold transition-transform duration-200 group-hover:scale-105 ${getRankBadge()}`}
+        >
           {index + 1}
         </div>
       </div>
-      
-      <div className="absolute top-3 right-3 z-10">
-        <div className={`flex h-5 w-5 items-center justify-center rounded-md bg-white/90 backdrop-blur-sm dark:bg-gray-900/90 ${getPlatformColor()}`}>
+
+      <div className="absolute top-2.5 right-2.5 z-10">
+        <div
+          className={`dark:bg-artist-neutral-dark-700/95 flex h-6 w-6 items-center justify-center rounded-full bg-white/95 shadow-sm backdrop-blur-sm transition-all duration-200 group-hover:scale-105 ${getPlatformColor()}`}
+        >
           {getPlatformIcon()}
         </div>
       </div>
 
       {/* Image section */}
       <div
-        className="relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900"
+        className="dark:from-artist-neutral-dark-700/80 dark:to-artist-neutral-dark-800/80 relative overflow-hidden bg-gradient-to-br from-gray-50/80 to-gray-100/80"
         style={{ width: '100%', paddingBottom }}
       >
-        {thumbShowUrl.s3ThumbUrl && !imageError ? (
-          <PhotoView src={realShowUrl}>
-            <div className="absolute inset-0 cursor-pointer overflow-hidden">
-              <ImageFb
-                src={thumbShowUrl.s3ThumbUrl}
-                fallbackSrc={thumbShowUrl.transformThumbUrl}
-                onImgFallback={onImgFallback}
-                alt={author || '画师作品'}
-                loading="lazy"
-                fill
-                decoding="async"
-                className="h-full w-full cursor-pointer object-cover transition-all duration-500 group-hover:scale-110"
-                onError={handleImageError}
-              />
-              {/* Overlay gradient for better text readability */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-            </div>
-          </PhotoView>
-        ) : (
-          <div className="absolute inset-0 flex h-full w-full items-center justify-center">
-            <div className="text-center text-gray-400 dark:text-gray-500">
-              <div className="mb-2 flex justify-center">
-                <div className="rounded-lg bg-gray-200/50 p-2 dark:bg-gray-700/50">
-                  {getPlatformIcon()}
-                </div>
-              </div>
-              <p className="text-xs">暂无预览</p>
-            </div>
+        <PhotoView src={currentImageSrc}>
+          <div className="absolute inset-0 cursor-pointer overflow-hidden">
+            <ImageWithAutoFallback
+              primarySrc={thumbShowUrl.transformThumbUrl}
+              fallbackSrc={thumbShowUrl.s3ThumbUrl}
+              alt={author || '画师作品'}
+              fill
+              decoding="async"
+              className="h-full w-full cursor-pointer object-cover transition-all duration-500 group-hover:scale-110"
+              onCurrentSrcChange={setCurrentImageSrc}
+            />
+            {/* Overlay gradient for better visual effect */}
+            <div className="from-artist-neutral-800/30 absolute inset-0 bg-gradient-to-t via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
           </div>
-        )}
+        </PhotoView>
       </div>
 
       {/* Compact content section */}
       <div className="p-2.5">
         {/* Artist name and ID - single line */}
         <div className="mb-1.5 flex items-center justify-between">
-          <h3 className="truncate text-sm font-semibold text-gray-900 dark:text-gray-100">
+          <h3 className="text-artist-neutral-800 dark:text-artist-neutral-dark-900 truncate text-sm font-semibold">
             {author || '未知画师'}
           </h3>
-          <div className="ml-2 flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+          <div className="text-artist-neutral-600 dark:text-artist-neutral-dark-200 ml-2 flex items-center gap-1 text-xs">
             <Hash className="h-2.5 w-2.5" />
-            <span className="truncate max-w-[60px]">{authorid}</span>
+            <span className="max-w-[60px] truncate">{authorid}</span>
           </div>
         </div>
-        
+
         {/* Stats row - more compact */}
-        <div className="mb-2 flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
+        <div className="text-artist-neutral-600 dark:text-artist-neutral-dark-200 mb-2 flex items-center justify-between text-xs">
           <div className="flex items-center gap-1">
-            <Images className="h-3 w-3 text-blue-500" />
+            <Images className="text-blue h-3 w-3" />
             <span className="font-medium">{artworkCount}</span>
           </div>
           <div className="flex items-center gap-1">
-            <Calendar className="h-3 w-3 text-green-500" />
+            <Calendar className="text-yellow h-3 w-3" />
             <span>{formatDate(lastUpdateTime)}</span>
           </div>
         </div>
@@ -181,7 +157,7 @@ function ArtistCard({ artist, index }: ArtistCardProps) {
         <div className="flex items-center gap-1.5">
           <Link
             href={internalUrl}
-            className="flex-1 rounded-lg bg-gray-900 px-2.5 py-1.5 text-center text-xs font-medium text-white transition-all hover:bg-gray-800 hover:scale-[1.02] dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+            className="from-artist-neutral-700 to-artist-neutral-800 hover:to-artist-neutral-700 dark:from-artist-neutral-dark-200 dark:text-artist-neutral-800 dark:hover:to-artist-neutral-dark-200 flex-1 rounded-xl bg-gradient-to-r px-2.5 py-1.5 text-center text-xs font-medium text-white shadow-sm transition-all hover:scale-[1.02] hover:from-gray-600 hover:shadow-md dark:to-gray-300 dark:hover:from-gray-200"
           >
             查看作品
           </Link>
@@ -190,7 +166,7 @@ function ArtistCard({ artist, index }: ArtistCardProps) {
               href={externalUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex h-6 w-6 items-center justify-center rounded-lg border border-gray-200/80 text-gray-600 transition-all hover:bg-gray-50 hover:scale-105 dark:border-gray-700/80 dark:text-gray-400 dark:hover:bg-gray-800"
+              className="border-artist-neutral-100/70 text-artist-neutral-600 dark:border-artist-neutral-dark-700/70 dark:bg-artist-neutral-dark-700/70 dark:text-artist-neutral-dark-200 dark:hover:bg-artist-neutral-dark-700/85 flex h-6 w-6 items-center justify-center rounded-xl border bg-white/70 shadow-sm backdrop-blur-sm transition-all hover:scale-105 hover:bg-white/85 hover:shadow-md"
               title="访问原平台"
             >
               <ExternalLink className="h-2.5 w-2.5" />
