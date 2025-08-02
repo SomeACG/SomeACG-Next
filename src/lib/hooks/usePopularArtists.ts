@@ -10,7 +10,7 @@ const fetcher = async (url: string): Promise<PopularArtistsResponse> => {
   return res.json();
 };
 
-export function usePopularArtists(pageSize = 20, sortBy: 'artworks' | 'random' = 'artworks') {
+export function usePopularArtists(pageSize = 20, sortBy: 'artworks' | 'random' | 'lastUpdate' = 'artworks') {
   const { data, error, mutate } = useSWR(`/api/artists?page=1&pageSize=${pageSize}&sortBy=${sortBy}`, fetcher, {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
@@ -25,7 +25,7 @@ export function usePopularArtists(pageSize = 20, sortBy: 'artworks' | 'random' =
   };
 }
 
-export function useInfinitePopularArtists(pageSize = 20, sortBy: 'artworks' | 'random' = 'artworks') {
+export function useInfinitePopularArtists(pageSize = 20, sortBy: 'artworks' | 'random' | 'lastUpdate' = 'artworks') {
   const getKey = (pageIndex: number, previousPageData: PopularArtistsResponse | null) => {
     if (previousPageData && !previousPageData.hasNextPage) return null;
     return `/api/artists?page=${pageIndex + 1}&pageSize=${pageSize}&sortBy=${sortBy}`;

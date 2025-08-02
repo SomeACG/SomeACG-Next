@@ -16,7 +16,7 @@ type ArtistCardProps = {
 };
 
 function ArtistCard({ artist, index }: ArtistCardProps) {
-  const { platform, authorid, author, artworkCount, latestImageThumb, lastUpdateTime, latestImageFilename } = artist;
+  const { platform, authorid, author, artworkCount, latestImageThumb, lastUpdateTime, latestImageFilename, latestImageWidth, latestImageHeight } = artist;
 
   const getPlatformIcon = () => {
     switch (platform) {
@@ -72,20 +72,16 @@ function ArtistCard({ artist, index }: ArtistCardProps) {
     }).format(new Date(date));
   };
 
-  // 计算容器高度 - 确保稳定性，避免布局跳动
+  // 计算容器高度 - 基于真实图片比例
   const paddingBottom = useMemo(() => {
-    // 优先使用稳定的默认比例，避免因图片加载而改变布局
-    const isPortrait = artworkCount % 3 === 0; // Every 3rd artist gets portrait treatment
-    const isSquare = artworkCount % 4 === 0; // Every 4th artist gets square treatment
-
-    if (isPortrait) {
-      return '133.33%'; // 3:4 portrait ratio
-    } else if (isSquare) {
-      return '100%'; // 1:1 square ratio
-    } else {
-      return '75%'; // 4:3 landscape ratio (default)
+    if (latestImageWidth && latestImageHeight && latestImageWidth > 0 && latestImageHeight > 0) {
+      const aspectRatio = latestImageHeight / latestImageWidth;
+      // Convert to percentage and clamp to reasonable bounds
+      const percentage = Math.max(50, Math.min(200, aspectRatio * 100));
+      return `${percentage}%`;
     }
-  }, [artworkCount]);
+    return '75%'; // 4:3 landscape ratio fallback
+  }, [latestImageWidth, latestImageHeight]);
 
   return (
     <div className="group border-artist-neutral-100/60 hover:border-artist-neutral-200/80 dark:border-artist-neutral-dark-700/60 dark:bg-artist-neutral-dark-800/75 dark:hover:border-artist-neutral-dark-300/80 dark:hover:bg-artist-neutral-dark-800/85 relative overflow-hidden rounded-2xl border bg-white/75 shadow-sm backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/85 hover:shadow-xl">

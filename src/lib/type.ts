@@ -26,6 +26,8 @@ export type PopularArtist = {
   latestImageThumb: string | null;
   latestImageFilename: string | null;
   lastUpdateTime: Date | null;
+  latestImageWidth: number | null;
+  latestImageHeight: number | null;
 };
 
 export type PopularArtistsResponse = {

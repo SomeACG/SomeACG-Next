@@ -16,7 +16,7 @@ import { PhotoProvider } from 'react-photo-view';
 import { ImageToolbar } from '../../(home)/components/ImageToolbar';
 import ArtistCard from './ArtistCard';
 
-type SortType = 'artworks' | 'random';
+type SortType = 'artworks' | 'random' | 'lastUpdate';
 
 const pageSize = 20;
 
@@ -41,25 +41,22 @@ export default function ArtistsClient() {
 
   // Calculate dimensions for WaterfallGrid based on artist data
   const getArtistDimensions = useCallback((artist: PopularArtist) => {
-    // 使用与 ArtistCard 一致的宽高比计算逻辑
-    const isPortrait = artist.artworkCount % 3 === 0; // Every 3rd artist gets portrait treatment
-    const isSquare = artist.artworkCount % 4 === 0; // Every 4th artist gets square treatment
-
-    let aspectRatio: number;
-    if (isPortrait) {
-      aspectRatio = 3 / 4; // 3:4 portrait ratio
-    } else if (isSquare) {
-      aspectRatio = 1; // 1:1 square ratio
-    } else {
-      aspectRatio = 4 / 3; // 4:3 landscape ratio (default)
-    }
-
-    // Use standard width and calculate height based on aspect ratio
     const width = 300;
-    const imageHeight = width / aspectRatio;
-    const contentHeight = 200; // Base content height for text and buttons
+    const contentHeight = 120; // Height for artist info section (name, stats, buttons)
+    
+    // Calculate image height based on actual image aspect ratio
+    let imageHeight = width * 0.75; // Default 4:3 ratio fallback
+    
+    if (artist.latestImageWidth && artist.latestImageHeight && 
+        artist.latestImageWidth > 0 && artist.latestImageHeight > 0) {
+      const aspectRatio = artist.latestImageHeight / artist.latestImageWidth;
+      imageHeight = width * aspectRatio;
+      
+      // Clamp height to reasonable bounds for layout stability
+      imageHeight = Math.max(width * 0.5, Math.min(width * 2, imageHeight));
+    }
+    
     const totalHeight = imageHeight + contentHeight;
-
     return { width, height: totalHeight };
   }, []);
 
@@ -82,6 +79,12 @@ export default function ArtistsClient() {
     if (newSortBy === sortBy) return;
     setSortBy(newSortBy);
     // Clear current data and refetch
+    await mutate();
+  };
+
+  const handleRefreshRandom = async () => {
+    if (sortBy !== 'random') return;
+    // Force refresh random list
     await mutate();
   };
 
@@ -164,6 +167,14 @@ export default function ArtistsClient() {
                   作品数量
                 </Button>
                 <Button
+                  variant={sortBy === 'lastUpdate' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => handleSortChange('lastUpdate')}
+                  className="h-7 px-3 text-xs"
+                >
+                  最近更新
+                </Button>
+                <Button
                   variant={sortBy === 'random' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => handleSortChange('random')}
@@ -173,6 +184,22 @@ export default function ArtistsClient() {
                   随机
                 </Button>
               </div>
+              {/* Refresh button for random mode */}
+              {sortBy === 'random' && (
+                <>
+                  <div className="h-4 w-px bg-gray-200 dark:bg-gray-700" />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleRefreshRandom}
+                    disabled={isValidating}
+                    className="h-7 gap-1.5 px-2 text-xs font-medium hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
+                    <RefreshCw className={`h-3 w-3 ${isValidating ? 'animate-spin' : ''}`} />
+                    <span>重新随机</span>
+                  </Button>
+                </>
+              )}
             </div>
           </section>
 
