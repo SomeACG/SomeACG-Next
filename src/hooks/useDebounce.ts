@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState, useEffect } from 'react';
 
 /**
  * 防抖hook - 在指定延迟后执行函数，如果在延迟期间再次调用则重新计时
@@ -6,10 +6,7 @@ import { useCallback, useRef } from 'react';
  * @param delay 延迟时间（毫秒）
  * @returns 防抖后的函数
  */
-export function useDebounce<T extends (...args: any[]) => any>(
-  callback: T,
-  delay: number
-): T {
+export function useDebounce<T extends (...args: any[]) => any>(callback: T, delay: number): T {
   const timeoutRef = useRef<NodeJS.Timeout>();
 
   const debouncedCallback = useCallback(
@@ -24,7 +21,7 @@ export function useDebounce<T extends (...args: any[]) => any>(
         callback(...args);
       }, delay);
     },
-    [callback, delay]
+    [callback, delay],
   ) as T;
 
   return debouncedCallback;
@@ -36,17 +33,14 @@ export function useDebounce<T extends (...args: any[]) => any>(
  * @param delay 延迟时间（毫秒）
  * @returns 防抖后的函数
  */
-export function useDebounceImmediate<T extends (...args: any[]) => any>(
-  callback: T,
-  delay: number
-): T {
+export function useDebounceImmediate<T extends (...args: any[]) => any>(callback: T, delay: number): T {
   const timeoutRef = useRef<NodeJS.Timeout>();
   const lastCallTime = useRef<number>(0);
 
   const debouncedCallback = useCallback(
     (...args: Parameters<T>) => {
       const now = Date.now();
-      
+
       // 如果距离上次调用时间超过延迟，立即执行
       if (now - lastCallTime.current >= delay) {
         callback(...args);
@@ -59,13 +53,38 @@ export function useDebounceImmediate<T extends (...args: any[]) => any>(
         clearTimeout(timeoutRef.current);
       }
 
-      timeoutRef.current = setTimeout(() => {
-        callback(...args);
-        lastCallTime.current = Date.now();
-      }, delay - (now - lastCallTime.current));
+      timeoutRef.current = setTimeout(
+        () => {
+          callback(...args);
+          lastCallTime.current = Date.now();
+        },
+        delay - (now - lastCallTime.current),
+      );
     },
-    [callback, delay]
+    [callback, delay],
   ) as T;
 
   return debouncedCallback;
+}
+
+/**
+ * 值防抖hook - 延迟更新值，在指定延迟内多次更新只会取最后一次的值
+ * @param value 要防抖的值
+ * @param delay 延迟时间（毫秒）
+ * @returns 防抖后的值
+ */
+export function useDebounceValue<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
 }

@@ -71,6 +71,9 @@ importers:
       masonic:
         specifier: ^4.0.1
         version: 4.0.1(react@18.3.1)
+      meilisearch:
+        specifier: ^0.51.0
+        version: 0.51.0
       motion:
         specifier: ^12.4.1
         version: 12.4.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2119,6 +2122,9 @@ packages:
 
   mdn-data@2.0.30:
     resolution: {integrity: sha512-GaqWWShW4kv/G9IEucWScBx9G1/vsFZZJUO+tD26M8J8z3Kw5RDQjaoZe03YAClgeS/SWPOcb4nkFBTEi5DUEA==}
+
+  meilisearch@0.51.0:
+    resolution: {integrity: sha512-IuNsYyT8r/QLhU33XDZdXWUT6cA/nACCHHZc+NHkNuaU55LELRxff1uBJhpJcwjYaAPEEmeWrzBhYl2XlhJdAg==}
 
   merge2@1.4.1:
     resolution: {integrity: sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==}
@@ -5422,6 +5428,8 @@ snapshots:
   mdn-data@2.0.28: {}
 
   mdn-data@2.0.30: {}
+
+  meilisearch@0.51.0: {}
 
   merge2@1.4.1: {}
 

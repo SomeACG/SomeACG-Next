@@ -1,38 +1,137 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Cosine 🎨 Gallery 网站
 
-## Getting Started
+图库网站，用于频道 [@CosineGallery](https://t.me/CosineGallery)
 
-First, run the development server:
+## 开发步骤
+
+启动
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+pnpm i
+pnpm db:init # 如果是全新启动，第一次启动前使用，初始化数据库， 见 [prisma](https://www.prisma.io/docs/orm/prisma-migrate/workflows/development-and-production#create-and-apply-migrations)
+
+pnpm pm2 # pm2 启动守护进程，配置文件见 ecosystem.config.js
+#or
+pnpm start # 直接终端起方便调试，可以 Ctrl+C 中断
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+其他命令（问就是个人习惯）：
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm pm2:stop # = pm2 stop ecosystem.config.js
+pnpm pm2:restart # = pm2 restart ecosystem.config.js
+pnpm pm2:log # = pm2 log ecosystem.config.js
+```
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+.env.example 复制一份变成 .env，填入自己的环境变量
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+```bash
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE
+NEXT_PUBLIC_PIXIV_PROXY_URL=https://pixiv.proxy.url
+NEXT_PUBLIC_SITE_URL=https://site.url # 用于站点 SEO 和 RSS
+NEXT_PUBLIC_IMG_ORIGIN=https://your-s3-origin-url.com/origin # 原图链接（自己的S3图源）选填，没有的话会使用上面填入的 PIXIV 代理
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+REVALIDATE_SECRET=your_revalidate_secret # 用于 revalidate 的密钥 选填
 
-## Learn More
+# Meilisearch 搜索配置 选填
+MEILISEARCH_HOST="http://localhost:7700"
+MEILISEARCH_API_KEY= # adminKey
+```
 
-To learn more about Next.js, take a look at the following resources:
+## MeiliSearch 搜索配置
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+需要先初始化 Meilisearch 索引。按以下正确的顺序执行：
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+1. 检查 Meilisearch 连接状态
 
-## Deploy on Vercel
+首先确认你的 .env.local 配置正确，然后检查索引状态：
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+curl http://localhost:6645/api/search/admin
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+2. 初始化 Meilisearch 索引配置
+
+```json
+curl -X POST http://localhost:6645/api/search/admin \
+ -H "Content-Type: application/json" \
+ -d '{"action": "initialize"}'
+```
+
+这个步骤会：
+
+- 创建 images 索引
+- 配置搜索字段 (title, author, tags, platform)
+- 配置过滤字段 (platform, author, tags, r18, ai)
+- 配置排序字段 (create_time, width, height)
+
+3. 索引现有图片数据
+
+```bash
+curl -X POST http://localhost:6645/api/search/admin \
+ -H "Content-Type: application/json" \
+ -d '{"action": "index_all", "batchSize": 100}'
+```
+
+这个命令会：
+
+- 分批处理所有张图片（每批 100 张）
+- 提取图片的标题、作者、标签等信息
+- 将数据索引到 Meilisearch
+
+索引过程可能需要几分钟时间。你会看到类似这样的进度：
+
+```bash
+Processed 100/3270 images (3%)
+Processed 200/3270 images (6%)
+```
+
+4. 监控进度
+
+在索引过程中，你可以用这个命令监控进度：
+
+```bash
+curl http://localhost:6645/api/search/admin
+```
+
+状态会从：
+
+- "indexHealth": "empty" → "partial" → "healthy"
+- "indexedImages" 会逐渐增加
+
+5. 验证索引状态
+
+```bash
+curl http://localhost:6645/api/search/admin
+```
+
+应该会返回类似：
+
+```json
+{
+  "success": true,
+  "data": {
+    "totalImages": 1000,
+    "indexedImages": 1000,
+    "indexHealth": "healthy"
+  }
+}
+```
+
+### 🚨 如果遇到连接问题
+
+如果上面的命令都失败，可能是环境变量配置问题。请确认：
+
+1. 检查你的 .env.local 文件：
+
+   - MEILISEARCH_HOST 是否正确
+   - MEILISEARCH_API_KEY 是否使用了 Admin API Key
+
+2. 测试 Meilisearch 连接：
+
+```bash
+curl -H "Authorization: Bearer 你的Admin_API_Key" \
+ http://你的Meilisearch地址/health
+```
+
+3. 重启开发服务器

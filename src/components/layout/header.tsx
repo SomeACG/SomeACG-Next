@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import DynamicLottie from '../ui/DynamicLottie';
 import { Navigator } from '../ui/navigator';
+import { SearchBox } from '../search/SearchBox';
 
 // 定义动画常量
 const HEADER_VARIANTS: Variants = {
@@ -98,7 +99,22 @@ export function Header() {
             <DynamicLottie ref={lottieRef} src="https://r2.cosine.ren/og/cos-gallery-lottie.json" className="-mt-1.5 h-20" />
           </div>
         </motion.div>
-        <Navigator className="grow" />
+        
+        {/* 搜索框 */}
+        <motion.div 
+          className="flex-1 max-w-md mx-2 md:mx-4"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2, duration: 0.3 }}
+        >
+          <SearchBox 
+            placeholder="搜索图片、标签、画师..."
+            showSuggestions={true}
+            className="w-full"
+          />
+        </motion.div>
+        
+        <Navigator className="grow md:grow-0" />
       </motion.header>
     </AnimatePresence>
   );
