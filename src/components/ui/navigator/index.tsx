@@ -16,6 +16,7 @@ import { useMediaQuery } from 'react-responsive';
 import Sider from '../../layout/sider';
 import MenuIcon from '../icons/MenuIcon';
 import NavItem from './NavItem';
+import { SearchBox } from '@/components/search/SearchBox';
 
 type NavigatorProps = {
   className?: ClassValue;
@@ -76,6 +77,13 @@ export const Navigator = ({ className }: NavigatorProps) => {
           );
         })}
         <div className="ml-auto flex items-center gap-1">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2, duration: 0.3 }}
+          >
+            <SearchBox placeholder="搜索图片、标签、画师..." showSuggestions={true} compact={true} className="max-w-md" />
+          </motion.div>
           {buttons.map(({ key, icon, onClick }, idx) => (
             <NavItem
               selected={selectIdx === routers.length + idx + 1}

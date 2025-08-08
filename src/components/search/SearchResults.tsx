@@ -1,11 +1,22 @@
 'use client';
 
-import React from 'react';
-import { Loader2, Search, ImageIcon } from 'lucide-react';
+import React, { useCallback, useMemo, useState } from 'react';
+import { Loader2, Search, ImageIcon, Settings } from 'lucide-react';
 import { SearchResult, SearchHit } from '@/lib/hooks/useSearch';
 import { ImageItem } from '../../app/(home)/components/ImageItem';
+import { ImageToolbar } from '../../app/(home)/components/ImageToolbar';
 import { ImageWithTag } from '@/lib/type';
 import { PhotoProvider } from 'react-photo-view';
+import { ClientOnly } from '@/components/common/ClientOnly';
+import WaterfallGrid from '@/components/ui/WaterfallGrid';
+import { useDynamicColumnWidth } from '@/lib/hooks/useDynamicColumnWidth';
+import { AnimatePresence } from 'motion/react';
+import { Button } from '@/components/ui/button';
+import { ColumnSlider } from '@/components/ui/ColumnSlider';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+
+// Constants
+const COOLDOWN_TIME = 1000; // 1秒冷却时间
 
 interface SearchResultsProps {
   results?: SearchResult;
@@ -17,6 +28,19 @@ interface SearchResultsProps {
 }
 
 export function SearchResults({ results, isLoading, isEmpty, hasMore, onLoadMore, searchQuery }: SearchResultsProps) {
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [lastLoadTime, setLastLoadTime] = useState(0);
+
+  // 使用动态列宽 hook
+  const { columnWidth, columnCount, setContainer } = useDynamicColumnWidth();
+
+  // 直接使用 setContainer 作为 ref callback
+  const setContainerRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      setContainer(node);
+    },
+    [setContainer],
+  );
   // 转换搜索结果为 ImageWithTag 格式
   const transformSearchHit = (hit: SearchHit): ImageWithTag => ({
     id: parseInt(hit.id),
@@ -34,13 +58,68 @@ export function SearchResults({ results, isLoading, isEmpty, hasMore, onLoadMore
     extension: null,
     rawurl: hit.rawurl || null,
     thumburl: hit.thumburl || null,
-    width: hit.width || null,
-    height: hit.height || null,
+    width: hit.width || 800, // 设置默认宽度
+    height: hit.height || 600, // 设置默认高度
     guest: null,
     r18: hit.r18 || false,
     ai: hit.ai || false,
     tags: hit.tags || [],
   });
+
+  // 包装onLoadMore函数使其返回Promise<void>，并添加冷却时间控制
+  const handleLoadMore = useCallback(async () => {
+    const now = Date.now();
+    if (isLoadingMore || now - lastLoadTime < COOLDOWN_TIME) {
+      return;
+    }
+
+    try {
+      setIsLoadingMore(true);
+      onLoadMore();
+      setLastLoadTime(now);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [onLoadMore, isLoadingMore, lastLoadTime]);
+
+  // 转换图片数据格式以匹配WaterfallGrid需要的接口
+  const gridItems: ImageWithTag[] = useMemo(() => (results ? results.hits.map(transformSearchHit) : []), [results]);
+
+  // Render function for image items with search highlights - memoized
+  const renderImageItem = useCallback(
+    (item: ImageWithTag) => {
+      const hit = results?.hits.find((h) => parseInt(h.id) === item.id);
+      return (
+        <div className="group relative">
+          <ImageItem data={item} />
+
+          {/* 搜索高亮信息 */}
+          {hit?._formatted && (
+            <div className="absolute top-2 left-2 opacity-0 transition-opacity group-hover:opacity-100">
+              <div className="max-w-xs rounded-lg bg-black/70 px-2 py-1 text-xs text-white">
+                {hit._formatted.title && hit._formatted.title !== hit.title && (
+                  <div dangerouslySetInnerHTML={{ __html: hit._formatted.title }} />
+                )}
+                {hit._formatted.author && hit._formatted.author !== hit.author && (
+                  <div dangerouslySetInnerHTML={{ __html: hit._formatted.author }} />
+                )}
+                {hit._formatted.tags && hit._formatted.tags.length > 0 && (
+                  <div className="mt-1">
+                    {hit._formatted.tags.slice(0, 3).map((tag, i) => (
+                      <span key={i} className="mr-1 mb-1 inline-block rounded-md bg-blue-500/80 px-1 py-0.5 text-xs">
+                        <span dangerouslySetInnerHTML={{ __html: tag }} />
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    },
+    [results],
+  );
 
   // 空搜索状态
   if (!searchQuery && !isLoading) {
@@ -90,81 +169,62 @@ export function SearchResults({ results, isLoading, isEmpty, hasMore, onLoadMore
   // 有结果时显示
   return (
     <div className="space-y-6">
-      {/* 结果网格 */}
-      {results && (
-        <PhotoProvider
-          toolbarRender={({ onRotate, onScale, rotate, scale }) => (
-            <div className="flex items-center space-x-2">
-              <button onClick={() => onRotate(rotate + 90)} className="rounded p-2 text-white hover:bg-white/10">
-                旋转
-              </button>
-              <button onClick={() => onScale(scale * 1.5)} className="rounded p-2 text-white hover:bg-white/10">
-                放大
-              </button>
-              <button onClick={() => onScale(scale / 1.5)} className="rounded p-2 text-white hover:bg-white/10">
-                缩小
-              </button>
-            </div>
-          )}
-        >
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-            {results.hits.map((hit) => {
-              const imageData = transformSearchHit(hit);
-              return (
-                <div key={hit.id} className="group relative">
-                  <ImageItem data={imageData} />
+      {/* 搜索结果控制栏 */}
+      {gridItems.length > 0 && (
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-gray-600 dark:text-gray-400">找到 {results?.total || 0} 个结果</div>
 
-                  {/* 搜索高亮信息 */}
-                  {hit._formatted && (
-                    <div className="absolute top-2 left-2 opacity-0 transition-opacity group-hover:opacity-100">
-                      <div className="max-w-xs rounded bg-black/70 px-2 py-1 text-xs text-white">
-                        {hit._formatted.title && hit._formatted.title !== hit.title && (
-                          <div dangerouslySetInnerHTML={{ __html: hit._formatted.title }} />
-                        )}
-                        {hit._formatted.author && hit._formatted.author !== hit.author && (
-                          <div dangerouslySetInnerHTML={{ __html: hit._formatted.author }} />
-                        )}
-                        {hit._formatted.tags && hit._formatted.tags.length > 0 && (
-                          <div className="mt-1">
-                            {hit._formatted.tags.slice(0, 3).map((tag, i) => (
-                              <span key={i} className="mr-1 mb-1 inline-block rounded bg-blue-500/80 px-1 py-0.5 text-xs">
-                                <span dangerouslySetInnerHTML={{ __html: tag }} />
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 gap-2 text-xs font-medium hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                <Settings className="h-3.5 w-3.5" />
+                列数设置
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80" align="end">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <h4 className="leading-none font-medium">列数设置</h4>
+                  <p className="text-muted-foreground text-sm">调整图片网格的列数</p>
                 </div>
-              );
-            })}
-          </div>
+                <ColumnSlider min={1} max={10} />
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
+      )}
+
+      {/* 搜索结果网格 */}
+      <AnimatePresence mode="wait">
+        <PhotoProvider
+          toolbarRender={({ onRotate, onScale, rotate, scale }) => <ImageToolbar {...{ onRotate, onScale, rotate, scale }} />}
+        >
+          <ClientOnly>
+            <div ref={setContainerRef} className="w-full">
+              {gridItems.length > 0 ? (
+                <WaterfallGrid
+                  items={gridItems}
+                  loadMore={handleLoadMore}
+                  hasMore={hasMore}
+                  isLoading={isLoadingMore}
+                  renderItem={renderImageItem}
+                  gap={4}
+                  columnWidth={columnWidth}
+                  columnCount={columnCount}
+                />
+              ) : (
+                <div className="flex-center min-h-[200px]">
+                  <div className="text-lg">暂无数据</div>
+                </div>
+              )}
+            </div>
+          </ClientOnly>
         </PhotoProvider>
-      )}
-
-      {/* 加载更多 */}
-      {hasMore && (
-        <div className="flex justify-center py-8">
-          <button
-            onClick={onLoadMore}
-            disabled={isLoading}
-            className="flex items-center space-x-2 rounded-lg bg-blue-500 px-6 py-3 text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-            <span>{isLoading ? '加载中...' : '加载更多'}</span>
-          </button>
-        </div>
-      )}
-
-      {/* 加载中的骨架屏（加载更多时） */}
-      {isLoading && results && (
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-          {Array.from({ length: 12 }).map((_, i) => (
-            <div key={`skeleton-${i}`} className="aspect-[3/4] animate-pulse rounded-lg bg-gray-200 dark:bg-gray-700" />
-          ))}
-        </div>
-      )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -85,74 +85,70 @@ export default function SearchClient({ initialParams }: SearchClientProps) {
   };
 
   return (
-    <div className="space-y-6">
-      {/* 搜索框 */}
-      <div className="mx-auto w-full max-w-2xl">
-        <SearchBox
-          initialQuery={searchQuery}
-          onSearch={handleSearch}
-          placeholder="搜索图片、标签、画师..."
-          showSuggestions={true}
-          className="w-full"
-        />
+    <div className="space-y-8">
+      <div className="container mx-auto max-w-4xl px-6">
+        <div className="mx-auto max-w-2xl space-y-6">
+          <SearchBox
+            initialQuery={searchQuery}
+            onSearch={handleSearch}
+            placeholder="搜索图片、标签、画师..."
+            showSuggestions={true}
+          />
+          
+          <SearchFilters
+            currentFilters={{
+              platform: searchParams.platform,
+              tags: searchParams.tags || [],
+              r18: searchParams.r18,
+              sort: searchParams.sort || 'create_time:desc',
+            }}
+            onFilterChange={handleFilterChange}
+            onClear={handleClearSearch}
+          />
+        </div>
+
+        {results && (
+          <div className="mt-8 flex items-center justify-between border-t pt-6 text-sm text-gray-600 dark:text-gray-400">
+            <div className="flex items-center space-x-4">
+              <span>找到 <strong>{results.total}</strong> 个结果</span>
+              {results.query && (
+                <span className="text-xs">搜索：&quot;{results.query}&quot;</span>
+              )}
+              <span className="text-xs opacity-60">({results.processingTimeMs}ms)</span>
+            </div>
+            
+            {searchParams.q && (
+              <button
+                onClick={handleClearSearch}
+                className="text-blue-500 hover:text-blue-600 transition-colors"
+              >
+                清空搜索
+              </button>
+            )}
+          </div>
+        )}
+
+        {error && (
+          <div className="flex justify-center py-16">
+            <div className="text-center space-y-4">
+              <AlertCircle className="mx-auto h-12 w-12 text-red-400" />
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">搜索出错了</h3>
+                <p className="mt-2 text-gray-600 dark:text-gray-400">
+                  {error instanceof Error ? error.message : '搜索服务暂时不可用'}
+                </p>
+              </div>
+              <button
+                onClick={() => window.location.reload()}
+                className="rounded-xl bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 transition-colors"
+              >
+                重新加载
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* 搜索过滤器 */}
-      <SearchFilters
-        currentFilters={{
-          platform: searchParams.platform,
-          tags: searchParams.tags || [],
-          r18: searchParams.r18,
-          sort: searchParams.sort || 'create_time:desc',
-        }}
-        onFilterChange={handleFilterChange}
-        onClear={handleClearSearch}
-      />
-
-      {/* 搜索结果信息 */}
-      {results && (
-        <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
-          <div>
-            找到 <span className="font-medium">{results.total}</span> 个结果
-            {results.query && (
-              <>
-                ，搜索：<span className="font-medium">&quot;{results.query}&quot;</span>
-              </>
-            )}
-            <span className="ml-2">({results.processingTimeMs}ms)</span>
-          </div>
-
-          {searchParams.q && (
-            <button
-              onClick={handleClearSearch}
-              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-            >
-              清空搜索
-            </button>
-          )}
-        </div>
-      )}
-
-      {/* 错误状态 */}
-      {error && (
-        <div className="flex items-center justify-center py-12">
-          <div className="text-center">
-            <AlertCircle className="mx-auto mb-4 h-12 w-12 text-red-500" />
-            <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-gray-100">搜索出错了</h3>
-            <p className="mb-4 text-gray-600 dark:text-gray-400">
-              {error instanceof Error ? error.message : '搜索服务暂时不可用'}
-            </p>
-            <button
-              onClick={() => window.location.reload()}
-              className="rounded-lg bg-blue-500 px-4 py-2 text-white transition-colors hover:bg-blue-600"
-            >
-              重新加载
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* 搜索结果 */}
       {!error && (
         <SearchResults
           results={results}

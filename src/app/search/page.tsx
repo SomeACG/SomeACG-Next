@@ -20,7 +20,7 @@ interface SearchPageProps {
 
 export default function SearchPage({ searchParams }: SearchPageProps) {
   return (
-    <div className="container mx-auto px-4 py-6">
+    <div className="space-y-8 px-8 py-4 md:px-4">
       <Suspense fallback={<SearchPageSkeleton />}>
         <SearchClient initialParams={searchParams} />
       </Suspense>
