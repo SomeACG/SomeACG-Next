@@ -166,7 +166,11 @@ export async function getArtistInfo(platform: string, authorid: string) {
  * @param sortBy 排序方式: 'artworks' | 'random' | 'lastUpdate'
  * @returns 热门画师数据
  */
-export async function getPopularArtists(page: number, pageSize: number, sortBy: 'artworks' | 'random' | 'lastUpdate' = 'artworks') {
+export async function getPopularArtists(
+  page: number,
+  pageSize: number,
+  sortBy: 'artworks' | 'random' | 'lastUpdate' = 'artworks',
+) {
   const skip = (page - 1) * pageSize;
   const take = pageSize;
 

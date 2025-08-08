@@ -32,7 +32,7 @@ export interface SearchDocument {
   create_time?: string;
   r18?: boolean;
   ai?: boolean;
-  
+
   // 用于搜索的组合字段
   searchable_content: string;
 }
@@ -62,10 +62,10 @@ export interface SearchOptions {
 export async function initializeMeilisearch(): Promise<void> {
   try {
     console.log('Initializing Meilisearch...');
-    
+
     // 创建或获取图片索引
     const imagesIndex = meiliClient.index(INDEXES.IMAGES);
-    
+
     // 等待索引创建完成
     try {
       const stats = await imagesIndex.getStats();
@@ -74,48 +74,28 @@ export async function initializeMeilisearch(): Promise<void> {
       // 索引可能不存在，创建它
       await meiliClient.createIndex(INDEXES.IMAGES, { primaryKey: 'id' });
     }
-    
+
     // 配置搜索属性
-    await imagesIndex.updateSearchableAttributes([
-      'title',
-      'author', 
-      'tags',
-      'searchable_content',
-      'platform'
-    ]);
-    
+    await imagesIndex.updateSearchableAttributes(['title', 'author', 'tags', 'searchable_content', 'platform']);
+
     // 配置可过滤属性
-    await imagesIndex.updateFilterableAttributes([
-      'platform',
-      'author',
-      'tags',
-      'r18',
-      'ai',
-      'width',
-      'height',
-      'create_time'
-    ]);
-    
+    await imagesIndex.updateFilterableAttributes(['platform', 'author', 'tags', 'r18', 'ai', 'width', 'height', 'create_time']);
+
     // 配置可排序属性
-    await imagesIndex.updateSortableAttributes([
-      'create_time',
-      'width',
-      'height'
-    ]);
-    
+    await imagesIndex.updateSortableAttributes(['create_time', 'width', 'height']);
+
     // 配置同义词（可选）
     await imagesIndex.updateSynonyms({
-      'pixiv': ['p站', 'pix'],
-      'twitter': ['推特', 'x'],
-      'anime': ['动漫', '动画'],
-      'manga': ['漫画']
+      pixiv: ['p站', 'pix'],
+      twitter: ['推特', 'x'],
+      anime: ['动漫', '动画'],
+      manga: ['漫画'],
     });
-    
+
     // 配置停用词（可选，减少噪音）
     await imagesIndex.updateStopWords(['the', 'a', 'an', 'and', 'or', 'but']);
-    
+
     console.log('Meilisearch initialized successfully');
-    
   } catch (error) {
     console.error('Failed to initialize Meilisearch:', error);
     throw error;
@@ -125,19 +105,14 @@ export async function initializeMeilisearch(): Promise<void> {
 // 将数据库图片转换为搜索文档
 export function transformToSearchDocument(image: any, tags: string[] = []): SearchDocument {
   // 创建搜索内容的组合字段
-  const searchableContent = [
-    image.title || '',
-    image.author || '',
-    ...tags,
-    image.platform || ''
-  ].filter(Boolean).join(' ');
+  const searchableContent = [image.title || '', image.author || '', ...tags, image.platform || ''].filter(Boolean).join(' ');
 
   return {
     id: image.id.toString(),
     title: image.title || undefined,
     author: image.author || undefined,
     platform: image.platform || undefined,
-    tags: tags.filter(tag => tag && tag.trim() !== ''),
+    tags: tags.filter((tag) => tag && tag.trim() !== ''),
     pid: image.pid || undefined,
     authorid: image.authorid?.toString() || undefined,
     width: image.width || undefined,
@@ -148,7 +123,7 @@ export function transformToSearchDocument(image: any, tags: string[] = []): Sear
     create_time: image.create_time?.toISOString() || undefined,
     r18: image.r18 || false,
     ai: image.ai || false,
-    searchable_content: searchableContent
+    searchable_content: searchableContent,
   };
 }
 
@@ -195,10 +170,7 @@ export class MeilisearchService {
   }
 
   // 搜索图片
-  async searchImages(
-    query: string, 
-    options: SearchOptions = {}
-  ): Promise<SearchResult<SearchDocument>> {
+  async searchImages(query: string, options: SearchOptions = {}): Promise<SearchResult<SearchDocument>> {
     try {
       const searchOptions = {
         limit: options.limit || 20,
@@ -208,18 +180,18 @@ export class MeilisearchService {
         attributesToHighlight: options.attributesToHighlight || ['title', 'author', 'tags'],
         attributesToCrop: options.attributesToCrop || ['title'],
         sort: options.sort || ['create_time:desc'],
-        ...options
+        ...options,
       };
 
       const result = await this.imagesIndex.search(query, searchOptions);
-      
+
       return {
         hits: result.hits as SearchDocument[],
         query: result.query,
         processingTimeMs: result.processingTimeMs,
         limit: result.limit,
         offset: result.offset,
-        estimatedTotalHits: result.estimatedTotalHits || 0
+        estimatedTotalHits: result.estimatedTotalHits || 0,
       };
     } catch (error) {
       console.error('Search failed:', error);
@@ -233,7 +205,7 @@ export class MeilisearchService {
     if (options.filter) {
       filter.push(...options.filter);
     }
-    
+
     return this.searchImages('', { ...options, filter });
   }
 
@@ -248,7 +220,7 @@ export class MeilisearchService {
     if (options.filter) {
       filter.push(...options.filter);
     }
-    
+
     return this.searchImages('', { ...options, filter });
   }
 
@@ -258,11 +230,11 @@ export class MeilisearchService {
       // Meilisearch 没有专门的建议 API，我们使用搜索来模拟
       const result = await this.imagesIndex.search(query, {
         limit: limit,
-        attributesToRetrieve: ['title', 'author', 'tags']
+        attributesToRetrieve: ['title', 'author', 'tags'],
       });
 
       const suggestions = new Set<string>();
-      
+
       result.hits.forEach((hit: any) => {
         // 从标题、作者、标签中提取建议
         if (hit.title && hit.title.toLowerCase().includes(query.toLowerCase())) {

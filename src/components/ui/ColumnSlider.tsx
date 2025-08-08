@@ -23,54 +23,53 @@ const COLUMN_OPTIONS = ['auto', 1, 2, 3, 4, 5, 6, 8, 10] as const;
 // 分离计算逻辑为纯函数
 const getPositionFromValue = (val: ColumnValue): number => {
   if (val === 'auto') return 5; // 自动档位置稍微偏右一点
-  
-  const numericOptions = COLUMN_OPTIONS.filter(opt => opt !== 'auto') as number[];
+
+  const numericOptions = COLUMN_OPTIONS.filter((opt) => opt !== 'auto') as number[];
   const index = numericOptions.indexOf(val as number);
   if (index === -1) return 15; // 如果不在预设中，默认位置
-  
+
   // 数值档从 15% 开始到 100%
   return 15 + (index / (numericOptions.length - 1)) * 85;
 };
 
 const getValueFromPosition = (position: number): ColumnValue => {
   if (position <= 12) return 'auto'; // 左侧 12% 区域为自动档
-  
-  const numericOptions = COLUMN_OPTIONS.filter(opt => opt !== 'auto') as number[];
+
+  const numericOptions = COLUMN_OPTIONS.filter((opt) => opt !== 'auto') as number[];
   const normalizedPosition = (position - 15) / 85; // 从 15% 开始的 85% 区域为数值
   const index = Math.round(normalizedPosition * (numericOptions.length - 1));
   const clampedIndex = Math.max(0, Math.min(numericOptions.length - 1, index));
-  
+
   return numericOptions[clampedIndex];
 };
 
-export const ColumnSlider = ({
-  autoLabel = '自动',
-  className,
-  disabled = false,
-}: ColumnSliderProps) => {
+export const ColumnSlider = ({ autoLabel = '自动', className, disabled = false }: ColumnSliderProps) => {
   const [gallerySetting, setGallerySetting] = useAtom(gallerySettingAtom);
   const [isDragging, setIsDragging] = useState(false);
   const [previewValue, setPreviewValue] = useState<ColumnValue>(gallerySetting.columns);
   const [justFinishedDragging, setJustFinishedDragging] = useState(false);
-  
+
   const sliderRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
 
   // 计算当前显示值
   const displayValue = useMemo((): ColumnValue => {
-    return (isDragging || justFinishedDragging) ? previewValue : gallerySetting.columns;
+    return isDragging || justFinishedDragging ? previewValue : gallerySetting.columns;
   }, [isDragging, justFinishedDragging, previewValue, gallerySetting.columns]);
 
   // 计算滑块位置
   const position = useMemo(() => getPositionFromValue(displayValue), [displayValue]);
 
   // 状态更新函数
-  const updateGallerySettings = useCallback((newValue: ColumnValue) => {
-    setGallerySetting(prev => ({
-      ...prev,
-      columns: newValue,
-    }));
-  }, [setGallerySetting]);
+  const updateGallerySettings = useCallback(
+    (newValue: ColumnValue) => {
+      setGallerySetting((prev) => ({
+        ...prev,
+        columns: newValue,
+      }));
+    },
+    [setGallerySetting],
+  );
 
   // 防抖的更新函数
   const debouncedUpdate = useDebounce(updateGallerySettings, 150);
@@ -83,28 +82,34 @@ export const ColumnSlider = ({
   }, [gallerySetting.columns, previewValue, justFinishedDragging]);
 
   // 计算新值并更新预览
-  const updatePreviewValue = useCallback((clientX: number) => {
-    if (!trackRef.current) return;
+  const updatePreviewValue = useCallback(
+    (clientX: number) => {
+      if (!trackRef.current) return;
 
-    const rect = trackRef.current.getBoundingClientRect();
-    const positionPercent = ((clientX - rect.left) / rect.width) * 100;
-    const clampedPosition = Math.max(0, Math.min(100, positionPercent));
-    const newValue = getValueFromPosition(clampedPosition);
+      const rect = trackRef.current.getBoundingClientRect();
+      const positionPercent = ((clientX - rect.left) / rect.width) * 100;
+      const clampedPosition = Math.max(0, Math.min(100, positionPercent));
+      const newValue = getValueFromPosition(clampedPosition);
 
-    if (newValue !== previewValue) {
-      setPreviewValue(newValue);
-      debouncedUpdate(newValue);
-    }
-  }, [previewValue, debouncedUpdate]);
+      if (newValue !== previewValue) {
+        setPreviewValue(newValue);
+        debouncedUpdate(newValue);
+      }
+    },
+    [previewValue, debouncedUpdate],
+  );
 
   // 拖动开始处理
-  const handleDragStart = useCallback((clientX: number) => {
-    if (disabled) return;
+  const handleDragStart = useCallback(
+    (clientX: number) => {
+      if (disabled) return;
 
-    setPreviewValue(gallerySetting.columns);
-    setIsDragging(true);
-    updatePreviewValue(clientX);
-  }, [disabled, gallerySetting.columns, updatePreviewValue]);
+      setPreviewValue(gallerySetting.columns);
+      setIsDragging(true);
+      updatePreviewValue(clientX);
+    },
+    [disabled, gallerySetting.columns, updatePreviewValue],
+  );
 
   // 拖动结束处理
   const handleDragEnd = useCallback(() => {
@@ -189,24 +194,11 @@ export const ColumnSlider = ({
   const renderScale = () => (
     <div className="absolute top-full mt-1 flex w-full text-xs text-gray-400 dark:text-gray-500">
       <div className="w-[15%] text-left">
-        <span
-          className={cn(
-            'transition-colors',
-            displayValue === 'auto' && 'font-medium text-blue-500',
-          )}
-        >
-          {autoLabel}
-        </span>
+        <span className={cn('transition-colors', displayValue === 'auto' && 'font-medium text-blue-500')}>{autoLabel}</span>
       </div>
       <div className="flex w-[85%] justify-between">
-        {COLUMN_OPTIONS.filter(opt => opt !== 'auto').map((num) => (
-          <span
-            key={num}
-            className={cn(
-              'transition-colors',
-              displayValue === num && 'font-medium text-primary',
-            )}
-          >
+        {COLUMN_OPTIONS.filter((opt) => opt !== 'auto').map((num) => (
+          <span key={num} className={cn('transition-colors', displayValue === num && 'text-primary font-medium')}>
             {num}
           </span>
         ))}
@@ -216,17 +208,14 @@ export const ColumnSlider = ({
 
   // 渲染滑块轨道
   const renderTrack = () => (
-    <div
-      ref={trackRef}
-      className="absolute top-1/2 h-1.5 w-full -translate-y-1/2 rounded-full bg-gray-200 dark:bg-gray-700"
-    >
+    <div ref={trackRef} className="absolute top-1/2 h-1.5 w-full -translate-y-1/2 rounded-full bg-gray-200 dark:bg-gray-700">
       {/* 自动档区域指示 */}
       <div className="absolute top-0 left-0 h-full w-[12%] rounded-l-full bg-blue-100 dark:bg-blue-900/50" />
 
       {/* 激活区域 */}
       <div
         className={cn(
-          'absolute top-0 h-full rounded-full transition-all duration-150 max-w-full',
+          'absolute top-0 h-full max-w-full rounded-full transition-all duration-150',
           displayValue === 'auto' ? 'bg-blue-500' : 'bg-primary',
         )}
         style={{
@@ -266,10 +255,7 @@ export const ColumnSlider = ({
       {/* 滑块容器 */}
       <div
         ref={sliderRef}
-        className={cn(
-          'relative h-6 cursor-pointer touch-none',
-          disabled && 'cursor-not-allowed opacity-50',
-        )}
+        className={cn('relative h-6 cursor-pointer touch-none', disabled && 'cursor-not-allowed opacity-50')}
         onPointerDown={handlePointerDown}
         onTouchStart={handleTouchStart}
       >

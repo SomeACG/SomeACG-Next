@@ -8,15 +8,18 @@ import { ReactElement, useState } from 'react';
 import { SWRConfig } from 'swr';
 
 export default function Providers({ children }: { children: ReactElement }) {
-  const [queryClient] = useState(() => new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: 1000 * 60 * 5, // 5 minutes
-        refetchOnWindowFocus: false,
-        refetchIntervalInBackground: false,
-      },
-    },
-  }));
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 1000 * 60 * 5, // 5 minutes
+            refetchOnWindowFocus: false,
+            refetchIntervalInBackground: false,
+          },
+        },
+      }),
+  );
 
   const contexts: JSX.Element[] = [
     <ThemeProvider attribute="class" key="ThemeProvider" />,

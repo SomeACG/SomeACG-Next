@@ -16,7 +16,17 @@ type ArtistCardProps = {
 };
 
 function ArtistCard({ artist, index }: ArtistCardProps) {
-  const { platform, authorid, author, artworkCount, latestImageThumb, lastUpdateTime, latestImageFilename, latestImageWidth, latestImageHeight } = artist;
+  const {
+    platform,
+    authorid,
+    author,
+    artworkCount,
+    latestImageThumb,
+    lastUpdateTime,
+    latestImageFilename,
+    latestImageWidth,
+    latestImageHeight,
+  } = artist;
 
   const getPlatformIcon = () => {
     switch (platform) {

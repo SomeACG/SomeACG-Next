@@ -43,19 +43,18 @@ export default function ArtistsClient() {
   const getArtistDimensions = useCallback((artist: PopularArtist) => {
     const width = 300;
     const contentHeight = 120; // Height for artist info section (name, stats, buttons)
-    
+
     // Calculate image height based on actual image aspect ratio
     let imageHeight = width * 0.75; // Default 4:3 ratio fallback
-    
-    if (artist.latestImageWidth && artist.latestImageHeight && 
-        artist.latestImageWidth > 0 && artist.latestImageHeight > 0) {
+
+    if (artist.latestImageWidth && artist.latestImageHeight && artist.latestImageWidth > 0 && artist.latestImageHeight > 0) {
       const aspectRatio = artist.latestImageHeight / artist.latestImageWidth;
       imageHeight = width * aspectRatio;
-      
+
       // Clamp height to reasonable bounds for layout stability
       imageHeight = Math.max(width * 0.5, Math.min(width * 2, imageHeight));
     }
-    
+
     const totalHeight = imageHeight + contentHeight;
     return { width, height: totalHeight };
   }, []);

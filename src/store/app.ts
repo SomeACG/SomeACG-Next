@@ -15,5 +15,5 @@ export interface GallerySetting {
 }
 
 export const gallerySettingAtom = atom<GallerySetting>({
-  columns: 'auto'
+  columns: 'auto',
 });
