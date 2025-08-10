@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { searchService } from '@/lib/search/meilisearch-client';
 
+// 告诉 Next.js 这是一个动态路由，不要尝试静态生成
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
