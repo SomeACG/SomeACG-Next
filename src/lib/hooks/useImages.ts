@@ -36,11 +36,11 @@ const artworkFetcher = async (url: string): Promise<ArtworkData> => {
 
 export function useImages(page: number, pageSize: number, initialData?: ImagesResponse, enabled: boolean = true) {
   const { data, error, isLoading, mutate } = useSWR<ImagesResponse>(
-    enabled ? `/api/list?page=${page}&pageSize=${pageSize}&mode=pagination` : null, 
-    fetcher, 
+    enabled ? `/api/list?page=${page}&pageSize=${pageSize}&mode=pagination` : null,
+    fetcher,
     {
       fallbackData: initialData,
-    }
+    },
   );
 
   return {

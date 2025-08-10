@@ -21,7 +21,6 @@ interface WaterfallGridProps<T extends WaterfallItem> {
   columnCount?: number;
 }
 
-
 function WaterfallGrid<T extends WaterfallItem>({
   items,
   loadMore,
@@ -130,7 +129,6 @@ function WaterfallGrid<T extends WaterfallItem>({
       ? `${columnWidth}px`
       : columnWidth || `calc((100% - ${(actualColumnCount - 1) * gap}px) / ${actualColumnCount})`;
 
-
   return (
     <div className={cn('w-full', className)}>
       <div ref={containerRef} className="flex w-full" style={{ gap: `${gap}px` }}>
@@ -186,6 +184,5 @@ function WaterfallGrid<T extends WaterfallItem>({
     </div>
   );
 }
-
 
 export default WaterfallGrid;

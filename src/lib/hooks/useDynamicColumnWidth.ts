@@ -11,21 +11,19 @@ const COLUMN_WIDTH_CONFIG = {
   },
 };
 
-
-
 // Simplified container size hook using ResizeObserver
 function useContainerWidth() {
   const [width, setWidth] = useState(0);
-  
+
   const ref = useCallback((element: HTMLElement | null) => {
     if (!element) {
       setWidth(0);
       return;
     }
-    
+
     // Set initial width
     setWidth(element.clientWidth);
-    
+
     // Create ResizeObserver
     const observer = new ResizeObserver((entries) => {
       const entry = entries[0];
@@ -33,13 +31,13 @@ function useContainerWidth() {
         setWidth(entry.contentRect.width);
       }
     });
-    
+
     observer.observe(element);
-    
+
     // Cleanup
     return () => observer.disconnect();
   }, []);
-  
+
   return [width, ref] as const;
 }
 
@@ -47,7 +45,6 @@ export function useDynamicColumnWidth() {
   const { columns } = useAtomValue(gallerySettingAtom);
   const [containerWidth, setContainer] = useContainerWidth();
   const isMobile = useMediaQuery({ maxWidth: 767 });
-
 
   // 动态计算列宽和列数（确保填满容器）
   const { columnWidth, columnCount } = useMemo(() => {

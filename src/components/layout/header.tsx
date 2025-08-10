@@ -98,7 +98,8 @@ export function Header() {
             <DynamicLottie ref={lottieRef} src="https://r2.cosine.ren/og/cos-gallery-lottie.json" className="-mt-1.5 h-20" />
           </div>
         </motion.div>
-        <Navigator className="grow" />
+
+        <Navigator className="grow md:grow-0" />
       </motion.header>
     </AnimatePresence>
   );

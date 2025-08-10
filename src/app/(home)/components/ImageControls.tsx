@@ -55,10 +55,8 @@ export function ImageControls({ showColumnSlider = false }: ImageControlsProps) 
           <PopoverContent className="w-80" align="end">
             <div className="space-y-4">
               <div className="space-y-2">
-                <h4 className="font-medium leading-none">列数设置</h4>
-                <p className="text-sm text-muted-foreground">
-                  调整图片网格的列数
-                </p>
+                <h4 className="leading-none font-medium">列数设置</h4>
+                <p className="text-muted-foreground text-sm">调整图片网格的列数</p>
               </div>
               <ColumnSlider min={1} max={10} />
             </div>

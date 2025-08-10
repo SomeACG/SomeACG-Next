@@ -38,14 +38,14 @@ export function PageInput({ currentPage, totalPage, onPageChange }: PageInputPro
   };
 
   return (
-    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+    <div className="text-muted-foreground flex items-center gap-1.5 text-sm">
       <input
         type="text"
         value={inputPage}
         onChange={handlePageInputChange}
         onBlur={handlePageInputBlur}
         onKeyDown={handleKeyDown}
-        className="h-7 w-12 rounded border border-primary bg-primary/20 px-1 text-center text-sm text-foreground transition-colors focus:outline-primary"
+        className="border-primary bg-primary/20 text-foreground focus:outline-primary h-7 w-12 rounded border px-1 text-center text-sm transition-colors"
       />
       <span className="opacity-50">/ {totalPage}</span>
     </div>

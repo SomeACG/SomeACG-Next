@@ -12,7 +12,7 @@ export function LinkCard({ name, avatar, description, link }: LinkCardProps) {
       href={link}
       target="_blank"
       rel="noopener noreferrer"
-      className="group not-prose relative flex flex-col items-center rounded-xl border border-gray-200/70 bg-white/70 p-6 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:border-gray-300/70 hover:bg-gray-50/70 dark:border-gray-800/50 dark:bg-gray-900/50 dark:hover:border-gray-700/50 dark:hover:bg-gray-800/50"
+      className="group not-prose relative flex w-full flex-col items-center rounded-xl border border-gray-200/70 bg-white/70 p-6 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:border-gray-300/70 hover:bg-gray-50/70 dark:border-gray-800/50 dark:bg-gray-900/50 dark:hover:border-gray-700/50 dark:hover:bg-gray-800/50"
     >
       {/* 背景光效 */}
       <div className="absolute inset-0 -z-10 h-full w-full rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:from-purple-500/5 dark:to-blue-500/5" />

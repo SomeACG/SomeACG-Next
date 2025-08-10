@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation';
 import Drawer from '../ui/drawer';
 import NavItem, { NavItemProps } from '../ui/navigator/NavItem';
 import { routers } from '@/constants/router';
+import { motion } from 'motion/react';
+import { SearchBox } from '../search/SearchBox';
 
 type SiderProps = {
   bottomItems: (NavItemProps & { key?: string })[];
@@ -43,6 +45,13 @@ const Sider = ({ bottomItems, menuTriggerRef }: SiderProps) => {
             ))}
           </div>
           <div className="flex flex-col gap-2">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2, duration: 0.3 }}
+            >
+              <SearchBox placeholder="搜索图片、标签、画师..." showSuggestions={true} compact={true} className="max-w-md" />
+            </motion.div>
             {bottomItems.map(({ key, icon, onClick }, idx) => (
               <NavItem
                 key={key}

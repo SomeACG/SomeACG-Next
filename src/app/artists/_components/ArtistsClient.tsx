@@ -43,19 +43,18 @@ export default function ArtistsClient() {
   const getArtistDimensions = useCallback((artist: PopularArtist) => {
     const width = 300;
     const contentHeight = 120; // Height for artist info section (name, stats, buttons)
-    
+
     // Calculate image height based on actual image aspect ratio
     let imageHeight = width * 0.75; // Default 4:3 ratio fallback
-    
-    if (artist.latestImageWidth && artist.latestImageHeight && 
-        artist.latestImageWidth > 0 && artist.latestImageHeight > 0) {
+
+    if (artist.latestImageWidth && artist.latestImageHeight && artist.latestImageWidth > 0 && artist.latestImageHeight > 0) {
       const aspectRatio = artist.latestImageHeight / artist.latestImageWidth;
       imageHeight = width * aspectRatio;
-      
+
       // Clamp height to reasonable bounds for layout stability
       imageHeight = Math.max(width * 0.5, Math.min(width * 2, imageHeight));
     }
-    
+
     const totalHeight = imageHeight + contentHeight;
     return { width, height: totalHeight };
   }, []);
@@ -119,7 +118,7 @@ export default function ArtistsClient() {
       <PhotoProvider
         toolbarRender={({ onRotate, onScale, rotate, scale }) => <ImageToolbar {...{ onRotate, onScale, rotate, scale }} />}
       >
-        <div className="space-y-8 px-8 py-4">
+        <div className="px-8 py-4">
           {/* Header Section */}
           <section className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
@@ -204,7 +203,7 @@ export default function ArtistsClient() {
           </section>
 
           {/* Artists Grid */}
-          <section>
+          <section className="mt-4">
             <AnimatePresence mode="wait">
               {error ? (
                 <div className="flex h-[400px] items-center justify-center rounded-xl border border-gray-200/60 bg-white/50 shadow-sm backdrop-blur-sm dark:border-gray-700/60 dark:bg-gray-900/50">

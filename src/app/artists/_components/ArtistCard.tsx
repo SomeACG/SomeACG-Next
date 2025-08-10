@@ -16,7 +16,17 @@ type ArtistCardProps = {
 };
 
 function ArtistCard({ artist, index }: ArtistCardProps) {
-  const { platform, authorid, author, artworkCount, latestImageThumb, lastUpdateTime, latestImageFilename, latestImageWidth, latestImageHeight } = artist;
+  const {
+    platform,
+    authorid,
+    author,
+    artworkCount,
+    latestImageThumb,
+    lastUpdateTime,
+    latestImageFilename,
+    latestImageWidth,
+    latestImageHeight,
+  } = artist;
 
   const getPlatformIcon = () => {
     switch (platform) {
@@ -84,7 +94,7 @@ function ArtistCard({ artist, index }: ArtistCardProps) {
   }, [latestImageWidth, latestImageHeight]);
 
   return (
-    <div className="group border-artist-neutral-100/60 hover:border-artist-neutral-200/80 dark:border-artist-neutral-dark-700/60 dark:bg-artist-neutral-dark-800/75 dark:hover:border-artist-neutral-dark-300/80 dark:hover:bg-artist-neutral-dark-800/85 relative overflow-hidden rounded-2xl border bg-white/75 shadow-sm backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/85 hover:shadow-xl">
+    <div className="group border-artist-neutral-100/60 hover:border-artist-neutral-200/80 dark:border-artist-neutral-dark-700/60 dark:bg-artist-neutral-dark-800/75 dark:hover:border-artist-neutral-dark-300/80 dark:hover:bg-artist-neutral-dark-800/85 relative overflow-hidden border bg-white/75 shadow-sm backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/85 hover:shadow-xl">
       {/* Rank and Platform indicators */}
       <div className="absolute top-2.5 left-2.5 z-10">
         <div

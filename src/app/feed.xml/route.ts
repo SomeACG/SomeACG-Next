@@ -3,8 +3,7 @@ import { getPaginatedImages, getTagByPids } from '@/lib/imageService';
 import { genArtworkUrl, transformPixivUrl } from '@/lib/utils';
 import { Feed } from 'feed';
 import dayjs from 'dayjs';
-
-const SITE_URL = 'https://pic.cosine.ren';
+import { SITE_URL } from '@/constants';
 
 function cleanTitle(title: string | null): string {
   if (!title) return '无题';
