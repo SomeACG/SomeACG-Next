@@ -26,10 +26,10 @@ export default function SearchClient({ initialParams }: SearchClientProps) {
   const [searchQuery, setSearchQuery] = useState(initialParams.q || '');
 
   const initialSearchParams: SearchParams = {
-    q: initialParams.q,
+    q: initialParams.q || '',
     platform: initialParams.platform,
     tags: initialParams.tags?.split(',').filter(Boolean),
-    r18: initialParams.r18 === 'true',
+    r18: initialParams.r18 === 'true' ? true : initialParams.r18 === 'false' ? false : undefined,
     sort: (initialParams.sort as any) || 'create_time:desc',
     limit: 20,
     offset: 0,
@@ -47,6 +47,19 @@ export default function SearchClient({ initialParams }: SearchClientProps) {
     clearSearch,
     loadMore,
   } = useSearch(initialSearchParams);
+
+  // 如果有初始参数（来自URL），自动触发搜索
+  useEffect(() => {
+    if (initialParams.q !== undefined || initialParams.platform || initialParams.tags || initialParams.r18) {
+      search(initialParams.q || '', {
+        platform: initialParams.platform,
+        tags: initialParams.tags?.split(',').filter(Boolean),
+        r18: initialParams.r18 === 'true' ? true : initialParams.r18 === 'false' ? false : undefined,
+        sort: (initialParams.sort as any) || 'create_time:desc',
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 只在组件挂载时执行一次
 
   // 同步 URL 参数
   useEffect(() => {
@@ -86,7 +99,7 @@ export default function SearchClient({ initialParams }: SearchClientProps) {
 
   return (
     <div className="space-y-8">
-      <div className="container mx-auto max-w-4xl px-6">
+      <div className="container mx-auto max-w-2xl px-6">
         <div className="mx-auto max-w-2xl space-y-6">
           <SearchBox
             initialQuery={searchQuery}
@@ -94,7 +107,7 @@ export default function SearchClient({ initialParams }: SearchClientProps) {
             placeholder="搜索图片、标签、画师..."
             showSuggestions={true}
           />
-          
+
           <SearchFilters
             currentFilters={{
               platform: searchParams.platform,
@@ -108,19 +121,19 @@ export default function SearchClient({ initialParams }: SearchClientProps) {
         </div>
 
         {results && (
-          <div className="mt-8 flex items-center justify-between border-t pt-6 text-sm text-gray-600 dark:text-gray-400">
+          <div className="mt-8 flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
             <div className="flex items-center space-x-4">
-              <span>找到 <strong>{results.total}</strong> 个结果</span>
-              {results.query && (
-                <span className="text-xs">搜索：&quot;{results.query}&quot;</span>
-              )}
+              <span>
+                找到 <strong>{results.total}</strong> 个结果
+              </span>
+              {results.query && <span className="text-xs">搜索：&quot;{results.query}&quot;</span>}
               <span className="text-xs opacity-60">({results.processingTimeMs}ms)</span>
             </div>
-            
+
             {searchParams.q && (
               <button
                 onClick={handleClearSearch}
-                className="text-blue-500 hover:text-blue-600 transition-colors"
+                className="cursor-pointer text-blue-500 transition-colors hover:text-blue-600"
               >
                 清空搜索
               </button>
@@ -129,8 +142,8 @@ export default function SearchClient({ initialParams }: SearchClientProps) {
         )}
 
         {error && (
-          <div className="flex justify-center py-16">
-            <div className="text-center space-y-4">
+          <div className="flex max-w-2xl justify-center py-16">
+            <div className="space-y-4 text-center">
               <AlertCircle className="mx-auto h-12 w-12 text-red-400" />
               <div>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">搜索出错了</h3>
@@ -140,7 +153,7 @@ export default function SearchClient({ initialParams }: SearchClientProps) {
               </div>
               <button
                 onClick={() => window.location.reload()}
-                className="rounded-xl bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 transition-colors"
+                className="rounded-xl bg-blue-500 px-4 py-2 text-white transition-colors hover:bg-blue-600"
               >
                 重新加载
               </button>
@@ -151,7 +164,7 @@ export default function SearchClient({ initialParams }: SearchClientProps) {
 
       {!error && (
         <SearchResults
-          results={results}
+          results={results || undefined}
           isLoading={isLoading}
           isEmpty={isEmpty}
           hasMore={hasMore}

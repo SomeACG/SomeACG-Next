@@ -121,8 +121,8 @@ export function SearchResults({ results, isLoading, isEmpty, hasMore, onLoadMore
     [results],
   );
 
-  // 空搜索状态
-  if (!searchQuery && !isLoading) {
+  // 空搜索状态 - 只有当没有任何搜索结果且不在加载时才显示
+  if (!results && !isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <Search className="mb-4 h-16 w-16 text-gray-400" />
@@ -145,13 +145,16 @@ export function SearchResults({ results, isLoading, isEmpty, hasMore, onLoadMore
   }
 
   // 空结果状态
-  if (isEmpty && searchQuery) {
+  if (isEmpty) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <ImageIcon className="mb-4 h-16 w-16 text-gray-400" />
         <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-gray-100">没有找到结果</h3>
         <p className="mb-4 max-w-md text-gray-600 dark:text-gray-400">
-          没有找到匹配 &quot;{searchQuery}&quot; 的图片，试试其他关键词吧
+          {searchQuery 
+            ? `没有找到匹配 "${searchQuery}" 的图片，试试其他关键词吧` 
+            : '当前筛选条件下没有找到图片，试试调整筛选条件吧'
+          }
         </p>
         <div className="text-sm text-gray-500 dark:text-gray-400">
           <p>搜索建议：</p>

@@ -22,9 +22,9 @@ export async function GET(request: NextRequest) {
     }
 
     if (tags.length > 0) {
-      // 支持多标签查询：tags IN ["tag1", "tag2"]
+      // 支持多标签查询：要求所有标签都匹配（AND逻辑）
       const tagFilters = tags.map((tag) => `tags = "${tag.trim()}"`);
-      filters.push(`(${tagFilters.join(' OR ')})`);
+      filters.push(...tagFilters);
     }
 
     if (r18 !== null) {

@@ -60,13 +60,11 @@ export function SearchBox({
 
   // 处理搜索提交
   const handleSubmit = (searchQuery?: string) => {
-    const finalQuery = searchQuery || query;
-    if (finalQuery.trim()) {
-      onSearch?.(finalQuery);
-      router.push(`/search?q=${encodeURIComponent(finalQuery)}`);
-      setIsFocused(false);
-      inputRef.current?.blur();
-    }
+    const finalQuery = searchQuery !== undefined ? searchQuery : query;
+    onSearch?.(finalQuery);
+    router.push(`/search?q=${encodeURIComponent(finalQuery)}`);
+    setIsFocused(false);
+    inputRef.current?.blur();
   };
 
   // 处理建议点击

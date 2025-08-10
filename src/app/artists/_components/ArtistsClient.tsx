@@ -118,7 +118,7 @@ export default function ArtistsClient() {
       <PhotoProvider
         toolbarRender={({ onRotate, onScale, rotate, scale }) => <ImageToolbar {...{ onRotate, onScale, rotate, scale }} />}
       >
-        <div className="space-y-8 px-8 py-4">
+        <div className="px-8 py-4">
           {/* Header Section */}
           <section className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
@@ -203,7 +203,7 @@ export default function ArtistsClient() {
           </section>
 
           {/* Artists Grid */}
-          <section>
+          <section className="mt-4">
             <AnimatePresence mode="wait">
               {error ? (
                 <div className="flex h-[400px] items-center justify-center rounded-xl border border-gray-200/60 bg-white/50 shadow-sm backdrop-blur-sm dark:border-gray-700/60 dark:bg-gray-900/50">

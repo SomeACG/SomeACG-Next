@@ -90,11 +90,14 @@ const searchFetcher = async (url: string): Promise<SearchResult> => {
 // 主搜索 Hook
 export function useSearch(initialParams: SearchParams = {}) {
   const [params, setParams] = useState<SearchParams>(initialParams);
+  const [accumulatedResults, setAccumulatedResults] = useState<SearchHit[]>([]);
+  const [lastSearchQuery, setLastSearchQuery] = useState<string | undefined>(undefined);
+  const [hasSearched, setHasSearched] = useState(false);
   const debouncedParams = useDebounceValue(params, 300);
 
   // 构建 API URL
   const queryString = buildQueryString(debouncedParams);
-  const shouldFetch = debouncedParams.q && debouncedParams.q.length > 0;
+  const shouldFetch = hasSearched && debouncedParams.q !== undefined;
   const apiUrl = shouldFetch ? `/api/search?${queryString}` : null;
 
   // 使用 SWR 进行数据获取
@@ -103,16 +106,65 @@ export function useSearch(initialParams: SearchParams = {}) {
     dedupingInterval: 1000,
   });
 
+  // 检查是否是新的搜索查询
+  const isNewSearch = useCallback(
+    (currentQuery: string | undefined, currentOffset: number | undefined) => {
+      const queryChanged = currentQuery !== lastSearchQuery;
+      const isFirstPage = (currentOffset || 0) === 0;
+      return queryChanged || isFirstPage;
+    },
+    [lastSearchQuery],
+  );
+
+  // 当数据更新时，处理累加逻辑
+  useEffect(() => {
+    if (data) {
+      if (isNewSearch(debouncedParams.q, debouncedParams.offset)) {
+        // 新搜索或首页：替换结果
+        setAccumulatedResults(data.hits);
+        setLastSearchQuery(debouncedParams.q);
+      } else {
+        // 加载更多：累加结果
+        setAccumulatedResults((prev) => [...prev, ...data.hits]);
+      }
+    }
+  }, [
+    data,
+    debouncedParams.q,
+    debouncedParams.offset,
+    debouncedParams.platform,
+    debouncedParams.tags,
+    debouncedParams.r18,
+    debouncedParams.sort,
+    isNewSearch,
+  ]);
+
+  // 清空累积结果当搜索参数变化时（除了 offset）
+  useEffect(() => {
+    if (debouncedParams.offset === 0) {
+      setAccumulatedResults([]);
+    }
+  }, [
+    debouncedParams.q,
+    debouncedParams.platform,
+    debouncedParams.tags,
+    debouncedParams.r18,
+    debouncedParams.sort,
+    debouncedParams.offset,
+  ]);
+
   // 更新搜索参数
   const updateParams = useCallback((newParams: Partial<SearchParams>) => {
+    setHasSearched(true);
     setParams((prev) => ({ ...prev, ...newParams }));
   }, []);
 
   // 执行新搜索
   const search = useCallback((query: string, options: Partial<SearchParams> = {}) => {
+    setHasSearched(true);
     setParams((prev) => ({
       ...prev,
-      q: query,
+      q: query || '', // 允许空字符串查询
       offset: 0, // 重置偏移量
       ...options,
     }));
@@ -121,28 +173,39 @@ export function useSearch(initialParams: SearchParams = {}) {
   // 清空搜索
   const clearSearch = useCallback(() => {
     setParams({ limit: params.limit });
+    setAccumulatedResults([]);
+    setLastSearchQuery(undefined);
+    setHasSearched(false);
   }, [params.limit]);
 
   // 加载更多结果
   const loadMore = useCallback(() => {
-    if (data && data.hits.length < data.total) {
+    if (data && accumulatedResults.length < data.total) {
       setParams((prev) => ({
         ...prev,
         offset: (prev.offset || 0) + (prev.limit || 20),
       }));
     }
-  }, [data]);
+  }, [data, accumulatedResults.length]);
+
+  // 构建返回的 results 对象，包含累积的结果
+  const combinedResults = data
+    ? {
+        ...data,
+        hits: accumulatedResults,
+      }
+    : null;
 
   return {
     // 数据
-    results: data,
+    results: combinedResults,
     isLoading,
     error,
 
     // 状态
     params: debouncedParams,
-    hasMore: data ? data.hits.length < data.total : false,
-    isEmpty: data ? data.hits.length === 0 : false,
+    hasMore: data ? accumulatedResults.length < data.total : false,
+    isEmpty: accumulatedResults.length === 0,
 
     // 方法
     search,
